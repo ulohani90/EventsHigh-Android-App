@@ -49,7 +49,6 @@ import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.InviteFriendsDialog;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -154,14 +153,14 @@ public class NewEventDetailActivity extends BaseContextActivity {
             @Override
             public void onClick(View v) {
                 if (event != null) {
-
                     if (favAction.isSelected()) {
                         removeFavourite(v);
                         favAction.setSelected(false);
                         showMessage("Removed from favourites");
                     } else {
                         addFavourite(v);
-
+                        favAction.setSelected(true);
+                        showMessage("Added to favourites");
 
                     }
                 }
@@ -241,21 +240,16 @@ public class NewEventDetailActivity extends BaseContextActivity {
             reportEventAction(event, "addFavourite");
 
             Account account = new Account(this);
-
-            if( account.getUserInfo().phoneNo== null){
-                PhoneVerificationDialog.show(this,R.string.ui_phone_verify_plan,R.string.ui_phone_verify);
-            }else{
-                EventsMarkerManager.Editor eventsMarkerEditor =
-                        EventsMarkerManager.getInstance(this).getEditor();
-                eventsMarkerEditor.recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE, false);
-                //mark view as favourite
-                eventsMarkerEditor.close();
-                favAction.setSelected(true);
-                showMessage("Added to favourites");
+            if (!account.getUserInfo().isSignedIn) {
+                FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 1);
             }
         }
 
-
+        EventsMarkerManager.Editor eventsMarkerEditor =
+                EventsMarkerManager.getInstance(this).getEditor();
+        eventsMarkerEditor.recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE, false);
+        //mark view as favourite
+        eventsMarkerEditor.close();
     }
 
 
