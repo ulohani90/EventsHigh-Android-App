@@ -62,7 +62,7 @@ public class ExploreFragment extends BaseEventsFragment {
         return fragment;
     }
 
-    String endDate = "2017-01-01 00:00:00.0";
+    String endDate = "2017-10-01 00:00:00.0";
 
     private EventsAdapter eventsAdapter;
     private View topProgressBar;

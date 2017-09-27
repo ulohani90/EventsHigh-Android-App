@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.crashlytics.android.Crashlytics;
@@ -68,7 +69,7 @@ public class EHGcmListenerService extends GcmListenerService {
             Log.w(LOG_TAG, "Invalid notification: message: " + message + ", title: " + title);
             return null;
         }
-
+       // Toast.makeText(this,"Notification Received",Toast.LENGTH_SHORT).show();
         String eventId = Utils.checkIfUnknown(msg.getString("id"));
         String query = Utils.checkIfUnknown(msg.getString("q"));
         String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));

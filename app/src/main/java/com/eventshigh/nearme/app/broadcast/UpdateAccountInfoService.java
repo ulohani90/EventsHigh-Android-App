@@ -8,6 +8,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.toolbox.RequestFuture;
@@ -175,13 +176,14 @@ public class UpdateAccountInfoService extends IntentService {
 
         // Upload GCM registration id.
         reportGcmRegistrationId(registrationId, uploadStatus);
-
+      //  Toast.makeText(this, "GCM Registration Id received", Toast.LENGTH_SHORT).show();
         // Report the GCM registration id with zendesk.
         ZendeskUtils.initZendesk(this);
         try {
             ZendeskConfig.INSTANCE.enablePushWithIdentifier(registrationId, new ZendeskCallback<PushRegistrationResponse>() {
                 @Override
                 public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
+                  //  Toast.makeText(UpdateAccountInfoService.this, "Zendesk GCM Registration Id added", Toast.LENGTH_SHORT).show();
                     uploadStatus.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
                     synchronized (UpdateAccountInfoService.this) {
                         UpdateAccountInfoService.this.notifyAll();
@@ -191,6 +193,7 @@ public class UpdateAccountInfoService extends IntentService {
                 @Override
                 public void onError(ErrorResponse errorResponse) {
                     // do nothing. upload will be retried.
+                    Log.i("Zendesk RegId sub:: ", "false");
                     synchronized (UpdateAccountInfoService.this) {
                         UpdateAccountInfoService.this.notifyAll();
                     }

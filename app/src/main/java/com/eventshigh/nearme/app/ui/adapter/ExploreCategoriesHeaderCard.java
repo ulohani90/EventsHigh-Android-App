@@ -1,9 +1,11 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Intent;
+import android.graphics.Matrix;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.eventshigh.nearme.app.R;
@@ -21,7 +23,8 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
 
 
-    ImageView whatsHot, nearBy, newYearImage;
+    ImageView whatsHot, nearBy;
+    FrameLayout specialEventLayout;
 
     public static ExploreCategoriesHeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.explore_categories_header_card, parent, false);
@@ -32,10 +35,10 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         super(itemView);
         whatsHot = (ImageView) itemView.findViewById(R.id.whats_hot);
         nearBy = (ImageView) itemView.findViewById(R.id.nearby);
-        newYearImage = (ImageView) itemView.findViewById(R.id.new_year_img);
+        specialEventLayout = (FrameLayout) itemView.findViewById(R.id.special_event_layout);
     }
 
-    public void bindData(final BaseContextActivity activity, boolean showNewYearCard) {
+    public void bindData(final BaseContextActivity activity, boolean showSpecialEventCard) {
         whatsHot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,14 +46,14 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
             }
         });
 
-        if (!showNewYearCard) {
-            newYearImage.setVisibility(View.GONE);
+        if (!showSpecialEventCard) {
+            specialEventLayout.setVisibility(View.GONE);
         } else {
-            newYearImage.setVisibility(View.VISIBLE);
-            newYearImage.setOnClickListener(new View.OnClickListener() {
+            specialEventLayout.setVisibility(View.VISIBLE);
+            specialEventLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView("New Year Parties");
+                    activity.showSearchView("Dandiya");
                 }
             });
         }
