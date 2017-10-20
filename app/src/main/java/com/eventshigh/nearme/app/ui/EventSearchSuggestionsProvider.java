@@ -102,7 +102,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
                 newRow[iconColumnIndex] = R.drawable.ic_event_white_24dp;
                 newRow[intentActionColumnIndex] = Intent.ACTION_VIEW;
                 newRow[intentDataColumnIndex] = EventsHighEndpoints.getEventDetailsURI(
-                        City.getCity(allEvents[i].city), allEvents[i].id);
+                        City.getCity(allEvents[i].city).name(), allEvents[i].id);
                 suggestionsCursor.addRow(newRow);
             }
         }

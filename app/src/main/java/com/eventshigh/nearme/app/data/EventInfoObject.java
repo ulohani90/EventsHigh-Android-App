@@ -26,7 +26,7 @@ import java.util.List;
 public class EventInfoObject implements Parcelable {
 
     public final String id;
-    public final City city;
+    public final String city;
     public final String title;
     public final EventCategory category;
 
@@ -122,6 +122,8 @@ public class EventInfoObject implements Parcelable {
 
     public final String destination;
 
+    public final String timezone;
+
     public EventInfoObject(Event event) {
 
         this.id = event.id;
@@ -147,7 +149,7 @@ public class EventInfoObject implements Parcelable {
 
         this.eventTimings = event.eventTimings;
 
-        this.location = event.location != null && event.city.cityBounds.contains(event.location) ? event.location : null;
+        this.location = event.location != null ? event.location : null;
         this.venue = Utils.checkIfUnknown(event.venue);
         this.locality = Utils.checkIfUnknown(event.locality);
         this.address = Utils.checkIfUnknown(event.address);
@@ -188,12 +190,13 @@ public class EventInfoObject implements Parcelable {
         this.skipRequestToCall = event.skipRequestToCall;
         this.skipCallbackupPhone = event.skipCallbackupPhone;
         this.destination = event.destination;
+        this.timezone = event.timezone;
     }
 
     protected EventInfoObject(Parcel in) {
         id = in.readString();
         String cityName = in.readString();
-        this.city = Utils.checkIfStringEmpty(cityName) ? null : City.parseCity(cityName);
+        this.city = Utils.checkIfStringEmpty(cityName) ? null : cityName;
         title = in.readString();
         this.category = EventCategory.parseCategory(in.readString());
         description = in.readString();
@@ -244,6 +247,7 @@ public class EventInfoObject implements Parcelable {
         skipRequestToCall = in.readByte() != 0;
         skipCallbackupPhone = in.readString();
         destination = in.readString();
+        timezone = in.readString();
     }
 
     @Override
@@ -297,6 +301,7 @@ public class EventInfoObject implements Parcelable {
         dest.writeByte((byte) (skipRequestToCall ? 1 : 0));
         dest.writeString(skipCallbackupPhone);
         dest.writeString(destination);
+        dest.writeString(timezone);
     }
 
     @Override
@@ -330,7 +335,7 @@ public class EventInfoObject implements Parcelable {
 
     public String getShortAddress() {
         String shortAddress = (venue == null ? "" : venue + " ") + (locality == null ? "" : "(" + locality + ")").trim();
-        return shortAddress.isEmpty() ? Utils.capitalize(city.name()) : shortAddress;
+        return shortAddress.isEmpty() ? Utils.capitalize(city) : shortAddress;
     }
 
     public double getMinPrice() {

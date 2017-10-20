@@ -287,7 +287,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         reportEventAction(event, "showEventDetails", label);
         Crashlytics.setString("Event_id", event.id);
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
-        detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, event.id));
+        detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(), event.id));
         //detailIntent.putExtra(NewEventDetailActivity.EVENT_ID, event.id);
         startActivity(detailIntent, bundle);
     }
@@ -296,7 +296,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         Crashlytics.setString("Event_id", event.id);
         reportEventAction(event, "showEventDetails", label);
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
-        detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, event.id));
+        detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(), event.id));
         detailIntent.putExtras(resources);
         startActivity(detailIntent, bundle);
     }

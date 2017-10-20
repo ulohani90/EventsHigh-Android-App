@@ -322,7 +322,11 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                                     ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
                             }
                             if (isLoadingFinished) {
-                                NewWeekEventsFragment.this.eventsCollection.events.addAll(eventsCollection.events);
+                                if(NewWeekEventsFragment.this.eventsCollection == null){
+                                    NewWeekEventsFragment.this.eventsCollection = eventsCollection;
+                                }else {
+                                    NewWeekEventsFragment.this.eventsCollection.events.addAll(eventsCollection.events);
+                                }
                             } else {
                                 NewWeekEventsFragment.this.eventsCollection = eventsCollection;
                             }

@@ -87,7 +87,7 @@ public class AlertsRequest extends JsonRequest<Boolean> {
                     targetUrl = Utils.checkIfUnknown(obj.getString("target_url"));
                 }
                 if (eid != null) {
-                    EventNotificationStreamItem.record(context, title, message, imgUrl, null, eid, city);
+                    EventNotificationStreamItem.record(context, title, message, imgUrl, null, eid, city.name());
                 } else if (query != null) {
                     QueryNotificationStreamItem.record(context, title, message, imgUrl, null, query);
                 } else if (ticket != null) {

@@ -52,7 +52,7 @@ public final class TrendingTopic {
                 String[] actionParts = action.split(":", 2);
                 if (actionParts.length == 2) {
                     activity.showEventDetails(
-                        EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, actionParts[1]), null);
+                        EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(), actionParts[1]), null);
                     return;
                 }
             }

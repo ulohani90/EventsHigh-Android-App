@@ -176,10 +176,10 @@ public class EHNotification {
 
 
     public static PendingIntent createPendingIntent(Context context, String eventId,
-                                                    @Nullable City city) {
+                                                     String city) {
         if (city == null) {
             // placeholder for city.
-            city = City.BANGALORE;
+            city = City.BANGALORE.name();
         }
         Intent intent = new Intent(context, NewEventDetailActivity.class);
         intent.setAction(BaseActivity.NOTIFICATION_ACTION);

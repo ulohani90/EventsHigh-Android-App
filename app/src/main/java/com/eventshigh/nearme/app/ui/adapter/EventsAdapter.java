@@ -67,7 +67,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         setHasStableIds(true);
     }
 
-    public void setSessionsData(List<EventSession> sessions, City city) {
+    public void setSessionsData(List<EventSession> sessions, String city) {
         dataToShow.clear();
         for (EventSession session : sessions) {
             dataToShow.add(new EventSessionData(session, activity, city));

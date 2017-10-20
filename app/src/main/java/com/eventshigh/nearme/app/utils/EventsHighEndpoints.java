@@ -123,7 +123,7 @@ public class EventsHighEndpoints {
         return API_TAGS_SUGGEST_URL;
     }
 
-    public static Uri getEventDetailsURI(City city, String eventId) {
+    public static Uri getEventDetailsURI(String city, String eventId) {
         return Uri.parse(WEB_URI_BASE).buildUpon()
                 .appendPath("detail")
                 .appendPath(Utils.capitalize(city.toString()))

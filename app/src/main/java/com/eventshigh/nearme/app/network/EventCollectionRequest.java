@@ -207,7 +207,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                 }
 
                 EventTime eventTime = DateTimeUtils.dateToEventTime(new Date(eventTiming),
-                        TimeZone.getTimeZone(event.city.timeZone));
+                        TimeZone.getTimeZone(event.timezone));
                 if (eventTime.time != null && eventTiming < threeHoursBack) {
                     continue;
                 }

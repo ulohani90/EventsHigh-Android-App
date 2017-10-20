@@ -109,7 +109,7 @@ public class DateTimeUtils {
 
     public static
     @Nullable
-    Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
+    Date mergeDateTime(String date, String time, TimeZone timeZone) throws ParseException {
 
         SimpleDateFormat FULL_DATE_TIME_FORMAT =
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
@@ -127,32 +127,51 @@ public class DateTimeUtils {
             time = time + ":00";
         }
 
-        return FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
+        return FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + displayTimeZone(timeZone));
+    }
+
+    private static String displayTimeZone(TimeZone tz) {
+
+        long hours = TimeUnit.MILLISECONDS.toHours(tz.getRawOffset());
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(tz.getRawOffset())
+                - TimeUnit.HOURS.toMinutes(hours);
+        // avoid -4:-30 issue
+        minutes = Math.abs(minutes);
+
+        String result = "";
+        if (hours > 0) {
+            result = String.format("GMT+%02d%02d", hours, minutes);
+        } else {
+            result = String.format("GMT%02d%02d", hours, minutes);
+        }
+
+        return result;
+
     }
 
 
     public static int getDaysLater(Event event) {
         Date eventDate = DateTimeUtils.getEventDate(event, 0);
-        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.city.timeZone).getTime();
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.timezone).getTime();
         return (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
     }
 
     public static int getDaysLater(EventInfoObject event) {
         Date eventDate = DateTimeUtils.getEventDate(event, 0);
-        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.city.timeZone).getTime();
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.timezone).getTime();
         return (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
     }
 
     public static Date getEventDate(Event event, int occurrenceNo) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(event.eventTimings.get(occurrenceNo)));
-        return toMidnight(cal, event.city.timeZone).getTime();
+        return toMidnight(cal, event.timezone).getTime();
     }
 
     public static Date getEventDate(EventInfoObject event, int occurrenceNo) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(event.eventTimings.get(occurrenceNo)));
-        return toMidnight(cal, event.city.timeZone).getTime();
+        return toMidnight(cal, event.timezone).getTime();
     }
 
 
@@ -185,7 +204,7 @@ public class DateTimeUtils {
         }
 
         return dateToEventTime(new Date(event.eventTimings.get(index)),
-                TimeZone.getTimeZone(event.city.timeZone), event.eventTimings.get(index));
+                TimeZone.getTimeZone(event.timezone), event.eventTimings.get(index));
     }
 
     public static
@@ -196,7 +215,7 @@ public class DateTimeUtils {
         }
 
         return dateToEventTime(new Date(event.eventTimings.get(index)),
-                TimeZone.getTimeZone(event.city.timeZone), event.eventTimings.get(index));
+                TimeZone.getTimeZone(event.timezone), event.eventTimings.get(index));
     }
 
 

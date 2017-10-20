@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +44,7 @@ public class Event implements Parcelable {
     private static final String CONSTANT_DISCOUNT_PERCENTAGE_TEXT = "offer message";
 
     public final String id;
-    public final City city;
+    public final String city;
     public final String title;
     public final EventCategory category;
 
@@ -149,7 +151,9 @@ public class Event implements Parcelable {
 
     public final String destination;
 
-    public Event(String id, City city, String title, EventCategory category,
+    public final String timezone;
+
+    public Event(String id, String city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
                  @Nullable String bookingUrl, @Nullable String bookingText,
@@ -163,7 +167,7 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination, String timezone) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -186,7 +190,7 @@ public class Event implements Parcelable {
 
         this.eventTimings = eventTimings;
 
-        this.location = location != null && city.cityBounds.contains(location) ? location : null;
+        this.location = location != null ? location : null;
         this.venue = Utils.checkIfUnknown(venue);
         this.locality = Utils.checkIfUnknown(locality);
         this.address = Utils.checkIfUnknown(address);
@@ -229,12 +233,13 @@ public class Event implements Parcelable {
         this.skipRequestToCall = skipRequestToCall;
         this.skipCallbackupPhone = skipCallbackupPhone;
         this.destination = destination;
+        this.timezone = timezone;
     }
 
     public Event(Parcel in) {
         this.id = in.readString();
         String cityName = in.readString();
-        this.city = Utils.checkIfStringEmpty(cityName) ? null : City.parseCity(cityName);
+        this.city = Utils.checkIfStringEmpty(cityName) ? null : cityName;
         this.title = in.readString();
         this.category = EventCategory.parseCategory(in.readString());
 
@@ -258,7 +263,7 @@ public class Event implements Parcelable {
         this.eventTimings = new ArrayList<>();
         in.readList(eventTimings, Long.class.getClassLoader());
         LatLng sLocation = (LatLng) in.readParcelable(LatLng.class.getClassLoader());
-        this.location = sLocation != null && city.cityBounds.contains(sLocation) ? sLocation : null;
+        this.location = sLocation != null ? sLocation : null;
         this.venue = Utils.checkIfUnknown(in.readString());
         this.locality = Utils.checkIfUnknown(in.readString());
         this.address = Utils.checkIfUnknown(in.readString());
@@ -309,6 +314,7 @@ public class Event implements Parcelable {
         skipRequestToCall = in.readInt() == 1;
         skipCallbackupPhone = in.readString();
         destination = in.readString();
+        timezone = in.readString();
     }
 
     @Override
@@ -368,6 +374,7 @@ public class Event implements Parcelable {
         dest.writeInt(skipRequestToCall ? 1 : 0);
         dest.writeString(skipCallbackupPhone);
         dest.writeString(destination);
+        dest.writeString(timezone);
     }
 
     public Uri getEventDetailsURI() {
@@ -396,7 +403,7 @@ public class Event implements Parcelable {
 
     public String getShortAddress() {
         String shortAddress = (venue == null ? "" : venue + " ") + (locality == null ? "" : "(" + locality + ")").trim();
-        return shortAddress.isEmpty() ? Utils.capitalize(city.name()) : shortAddress;
+        return shortAddress.isEmpty() ? Utils.capitalize(city) : shortAddress;
     }
 
     public double getMinPrice() {
@@ -496,10 +503,10 @@ public class Event implements Parcelable {
                 .replaceAll("Â", "")
                 .replaceAll("\r\n", "<br/>")
                 .replaceAll("\n\n", "<br/><br/>");
-        City city = null;
+        String city = null;
         try {
-            city = City.valueOf(eventJson.getString("city").toUpperCase());
 
+            city = eventJson.getString("city");
 
             JSONObject mashup = eventJson.optJSONObject("mashup");
             String source_url = eventJson.optString("source_url");
@@ -533,7 +540,7 @@ public class Event implements Parcelable {
             }
 
             JSONObject localityJson = eventJson.optJSONObject("locality_info");
-            if (city != null && !city.cityBounds.contains(new LatLng(lat, lon)) && localityJson != null) {
+            if (city != null && localityJson != null) {
                 // Invalid latitude and longitude. Try locality_info.
                 lat = localityJson.optDouble("lat", 0);
                 lon = localityJson.optDouble("lon", 0);
@@ -586,9 +593,10 @@ public class Event implements Parcelable {
             }
 
             // Event timings.
+            String timeZone = eventJson.has("timezone") ? eventJson.getString("timezone") : null;
             List<Long> eventTimings = new ArrayList<>();
             Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
-                    eventJson.optString("start_time"), city.timeZone);
+                    eventJson.optString("start_time"), TimeZone.getTimeZone(timeZone));
             if (eventTiming != null) {
                 eventTimings.add(eventTiming.getTime());
             }
@@ -598,7 +606,7 @@ public class Event implements Parcelable {
                 for (int i = 0; i < upcoming_occurrences.length(); i++) {
                     eventTiming = DateTimeUtils.mergeDateTime(
                             upcoming_occurrences.getJSONObject(i).optString("date"),
-                            upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
+                            upcoming_occurrences.getJSONObject(i).optString("start_time"), TimeZone.getTimeZone(timeZone));
                     if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
                         eventTimings.add(eventTiming.getTime());
                     }
@@ -672,7 +680,7 @@ public class Event implements Parcelable {
                     if (occurrences != null) {
                         for (int k = 0; k < occurrences.length(); k++) {
                             Date date = DateTimeUtils.mergeDateTime(occurrences.getJSONObject(k).optString("date"),
-                                    occurrences.getJSONObject(k).optString("time"), city.timeZone);
+                                    occurrences.getJSONObject(k).optString("time"), TimeZone.getTimeZone(timeZone));
                             ehOccurences.add(date.getTime());
                         }
                     }
@@ -818,8 +826,8 @@ public class Event implements Parcelable {
             if (zone == null || venue == null) {
                 System.out.println("Event Id :: " + id);
             }
-            if (zone.equalsIgnoreCase("unknown") && venue.equalsIgnoreCase("outside " + city.name())) {
-                zone = "Outside " + (city.name());
+            if (zone.equalsIgnoreCase("unknown") && venue.equalsIgnoreCase("outside " + city)) {
+                zone = "Outside " + (city);
             }
 
             String discountPercentage = null;
@@ -927,7 +935,7 @@ public class Event implements Parcelable {
                     discountPercentage,
                     discountPercentageText,
                     skipRequestToCall,
-                    skipCallBackupPhone, destination
+                    skipCallBackupPhone, destination,timeZone
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());

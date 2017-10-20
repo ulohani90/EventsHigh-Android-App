@@ -123,7 +123,7 @@ public class EHGcmListenerService extends GcmListenerService {
         if (eventId != null) {
             City city = new Account(this).getLastCity();
             contentIntent = createPendingIntent(this, eventId, city);
-            EventNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, eventId, city);
+            EventNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, eventId, city.name());
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
@@ -244,7 +244,7 @@ public class EHGcmListenerService extends GcmListenerService {
 
         Intent intent = new Intent(context, NewEventDetailActivity.class);
         intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-        intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
+        intent.setData(EventsHighEndpoints.getEventDetailsURI(city.name(), eventId));
         return PendingIntent.getActivity(context, 0, intent, 0);
     }
 

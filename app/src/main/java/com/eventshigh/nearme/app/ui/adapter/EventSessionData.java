@@ -13,10 +13,10 @@ import com.eventshigh.nearme.app.data.EventSession;
 public class EventSessionData implements AdapterData {
 
     EventSession session;
-    City city;
+    String city;
     BaseContextActivity activity;
 
-    public EventSessionData(EventSession session, BaseContextActivity activity, City city) {
+    public EventSessionData(EventSession session, BaseContextActivity activity, String city) {
         this.session = session;
         this.activity = activity;
         this.city = city;

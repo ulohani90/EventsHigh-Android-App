@@ -134,7 +134,7 @@ public class OfferCard extends RecyclerView.ViewHolder {
                 }else if(offer.callToAction.startsWith("detail")){
                     String eventId = offer.callToAction.substring(7,offer.callToAction.length());
                     activity.showEventDetails(
-                            EventsHighEndpoints.getEventDetailsURI(City.BANGALORE,eventId ), null);
+                            EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(),eventId ), null);
                 }
             }
         });

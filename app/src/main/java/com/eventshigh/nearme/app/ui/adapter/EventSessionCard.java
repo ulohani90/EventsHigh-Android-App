@@ -45,7 +45,7 @@ public class EventSessionCard extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindData(final EventSession session, final BaseContextActivity activity, final City city) {
+    public void bindData(final EventSession session, final BaseContextActivity activity, final String city) {
         sessionTitle.setText(session.getTitle().trim());
         if (session.getDescription() != null) {
             sessionDesc.setVisibility(View.VISIBLE);

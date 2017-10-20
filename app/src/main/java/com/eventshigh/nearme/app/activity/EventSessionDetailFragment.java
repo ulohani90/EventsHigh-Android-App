@@ -32,15 +32,15 @@ public class EventSessionDetailFragment extends Fragment {
 
     ArrayList<EventSession> sessions;
 
-    City city;
+    String city;
 
     BaseContextActivity activity;
 
-    public static EventSessionDetailFragment newInstance(ArrayList<EventSession> sessions, City city) {
+    public static EventSessionDetailFragment newInstance(ArrayList<EventSession> sessions, String city) {
 
         Bundle args = new Bundle();
         args.putParcelableArrayList("sessions", sessions);
-        args.putSerializable("city", city);
+        args.putString("city", city);
         EventSessionDetailFragment fragment = new EventSessionDetailFragment();
         fragment.setArguments(args);
         return fragment;
@@ -50,7 +50,7 @@ public class EventSessionDetailFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.sessions = getArguments().getParcelableArrayList("sessions");
-        this.city = (City) getArguments().getSerializable("city");
+        this.city = getArguments().getString("city");
         activity = (BaseContextActivity) getActivity();
     }
 

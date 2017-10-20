@@ -1411,7 +1411,7 @@ public class LaunchActivity extends BaseContextActivity {
                                 } else {
                                     if (referringParams.has("event_id")) {
                                         showEventDetails(
-                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), "branch");
+                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(), referringParams.getString("event_id")), "branch");
                                     } else if (referringParams.has("event_uri")) {
                                         Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                         showSearchView(uri.getLastPathSegment());
@@ -1444,7 +1444,7 @@ public class LaunchActivity extends BaseContextActivity {
                                 } else {
                                     if (referringParams.has("event_id")) {
                                         writeEventReview(
-                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(), referringParams.getString("event_id")), null);
                                     } else if (referringParams.has("event_uri")) {
                                         Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                         showSearchView(uri.getLastPathSegment());
