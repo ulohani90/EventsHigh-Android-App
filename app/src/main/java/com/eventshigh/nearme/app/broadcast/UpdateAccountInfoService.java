@@ -16,7 +16,6 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DeviceUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Signer;
@@ -24,8 +23,7 @@ import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.zendesk.sdk.model.push.PushRegistrationResponse;
 import com.zendesk.sdk.network.impl.ZendeskConfig;
 import com.zendesk.service.ErrorResponse;
@@ -33,7 +31,6 @@ import com.zendesk.service.ZendeskCallback;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.TimeUnit;
@@ -149,7 +146,8 @@ public class UpdateAccountInfoService extends IntentService {
 
 
         // Upload IID.
-        InstanceID instanceID = InstanceID.getInstance(this);
+
+        FirebaseInstanceId instanceID = FirebaseInstanceId.getInstance();
         if (instanceID == null) {
             return;
         }
@@ -162,13 +160,9 @@ public class UpdateAccountInfoService extends IntentService {
             return;
         }
 
-        String registrationId;
-        try {
-            registrationId = instanceID.getToken(GcmRegistration.SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-        } catch (IOException e) {
-            Crashlytics.getInstance().core.logException(e);
-            return;
-        }
+        String registrationId = FirebaseInstanceId.getInstance().getToken();
+
+
         if (registrationId == null) {
             return;
         }

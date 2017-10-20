@@ -141,20 +141,5 @@ public class UserActionHelper {
         });
     }
 
-    private void recordAction(final String action, final String data, final long timestamp) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Bundle bundle = new Bundle();
-                bundle.putString(JSON_KEY_ANDROID_ID, Utils.getAndroidId(context));
-                bundle.putString(JSON_KEY_TIMESTAMP, Long.toString(timestamp));
-                bundle.putString(JSON_KEY_ACTION, action);
-                bundle.putString(JSON_KEY_DATA, data);
-                GcmRegistration.sendUpstream(context, bundle);
-            }
-        });
-        thread.start();
-    }
-
 
 }

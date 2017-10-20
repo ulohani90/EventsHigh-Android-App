@@ -14,17 +14,10 @@
 
     <!-- Notification services -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <!-- To access contacts -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
-    <permission
-        android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE" />
 
     <application
         android:name=".application.EHApplication"
@@ -389,21 +382,12 @@
             android:name=".broadcast.EHInstanceIdService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
         <!-- Receives the GCM broadcast messages, which is used for notification -->
-        <receiver
-            android:name="com.google.android.gms.gcm.GcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.eventshigh.nearme.app" />
-            </intent-filter>
-        </receiver>
         <receiver android:name=".broadcast.NotificationDeleteBroadcastReciever">
             <intent-filter>
                 <action android:name="notification_deleted_intent" />
@@ -414,7 +398,7 @@
             android:name=".broadcast.EHGcmListenerService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <!-- Receives the alarm broadcast messages, which is used for notification -->

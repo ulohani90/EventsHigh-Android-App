@@ -40,20 +40,28 @@ import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.Map;
 
 /**
  * See https://developers.google.com/cloud-messaging/android/client.
  */
-public class EHGcmListenerService extends GcmListenerService {
+public class EHGcmListenerService extends FirebaseMessagingService {
     private static final String LOG_TAG = EHGcmListenerService.class.getSimpleName();
 
     private GAHelper gaHelper;
 
     @Override
-    public void onMessageReceived(String from, Bundle data) {
+    public void onMessageReceived(RemoteMessage message) {
         gaHelper = GAHelper.getInstance(EHGcmListenerService.this);
-        EHNotification notification = parseBundle(data);
+
+        Bundle bundle = new Bundle();
+        for (Map.Entry<String, String> entry : message.getData().entrySet()) {
+            bundle.putString(entry.getKey(), entry.getValue());
+        }
+        EHNotification notification = parseBundle(bundle);
         if (notification != null) {
             notification.showNotification();
         }
@@ -62,6 +70,7 @@ public class EHGcmListenerService extends GcmListenerService {
     private
     @Nullable
     EHNotification parseBundle(Bundle msg) {
+
         String title = Utils.checkIfUnknown(msg.getString("t"));
         String message = Utils.checkIfUnknown(msg.getString("m"));
         if (message == null || title == null) {
@@ -255,8 +264,10 @@ public class EHGcmListenerService extends GcmListenerService {
     }
 
     @Override
-    public void onSendError(String msgId, String error) {
-        super.onSendError(msgId, error);
-        Log.i("Message Error", msgId);
+    public void onSendError(String s, Exception e) {
+        super.onSendError(s, e);
+        Log.i("Message Error", s);
     }
+
+
 }
