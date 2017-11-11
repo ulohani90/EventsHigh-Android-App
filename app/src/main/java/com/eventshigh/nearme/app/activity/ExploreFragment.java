@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
+import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -24,10 +25,13 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
+import com.eventshigh.nearme.app.data.SponsoredEventObj;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
+import com.eventshigh.nearme.app.network.GetSponsoredEventsRequest;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
+import com.eventshigh.nearme.app.ui.adapter.DataType;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.adapter.LocalitiesAdapter;
 import com.eventshigh.nearme.app.user.Account;
@@ -52,7 +56,7 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.WORKSHOPS.categoryName,
             EventCategory.TECH.categoryName,
             EventCategory.ART.categoryName,
-        //    EventCategory.FOOD.categoryName
+            //    EventCategory.FOOD.categoryName
 
     };
 
@@ -75,6 +79,7 @@ public class ExploreFragment extends BaseEventsFragment {
     private Account account;
 
     TextView verifyMobileBtn;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -107,6 +112,8 @@ public class ExploreFragment extends BaseEventsFragment {
                 showCitySelectionView();
             }
         });
+
+        makeServerRequest();
     }
 
     @Override
@@ -226,7 +233,7 @@ public class ExploreFragment extends BaseEventsFragment {
             selectedLocalities = Locality.getLocalities(eventsContext.city, false);
         }
 
-        makeServerRequest();
+        // makeServerRequest();
     }
 
     public void makeServerRequest() {
@@ -245,12 +252,35 @@ public class ExploreFragment extends BaseEventsFragment {
 
             eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(endDate)));
             topProgressBar.setVisibility(View.GONE);
+            makeSponsoredEventsRequest();
             if (!isIntermediate) {
                /* EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                         false, mEventInvitationsCallback, mErrorListener);*/
             }
         }
     };
+
+    public void makeSponsoredEventsRequest() {
+        topProgressBar.setVisibility(View.VISIBLE);
+        final int width = (3 * (getResources().getDisplayMetrics().widthPixels -
+                3 * ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics())))) / 7;
+
+        GetSponsoredEventsRequest.submit(activity, eventsContext.city.name().toLowerCase(), Priority.HIGH, this, false, new Listener<List<SponsoredEventObj>>() {
+            @Override
+            public void onResponse(List<SponsoredEventObj> sponsoredEventObjs, boolean isIntermediate) {
+                if (!isIntermediate) {
+                    if (sponsoredEventObjs.size() > 0)
+                        eventsAdapter.addSponsoredEvents(sponsoredEventObjs, width);
+                    topProgressBar.setVisibility(View.GONE);
+                }
+            }
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        });
+    }
 
     private Listener<EventInvitationsRequest.InvitaionData> mEventInvitationsCallback = new Listener<EventInvitationsRequest.InvitaionData>() {
         @Override
@@ -275,6 +305,7 @@ public class ExploreFragment extends BaseEventsFragment {
                         Locality.getLocalities(eventsContext.city, false),
                         eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");*/
             }
+            makeSponsoredEventsRequest();
         }
     };
 
@@ -288,9 +319,14 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                    RecyclerView.State state) {
-            if (parent.getChildAdapterPosition(view) == 0 || parent.getChildAdapterPosition(view) == 1) {
+            if (parent.getChildAdapterPosition(view) == 0 || parent.getChildAdapterPosition(view) == 1 || parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.BROWSE_HEADER_CARD.typeId) {
                 outRect.top = 0;
                 outRect.bottom = 0;
+                outRect.left = 0;
+                outRect.right = 0;
+            } else if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.BROWSE_SPONSORED_EVENTS.typeId) {
+                outRect.top = 0;
+                outRect.bottom = space;
                 outRect.left = 0;
                 outRect.right = 0;
             } else if (parent.getChildAdapterPosition(view) >= 2) {

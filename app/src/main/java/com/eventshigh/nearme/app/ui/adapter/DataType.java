@@ -39,7 +39,11 @@ public enum DataType {
     MY_REVIEW_CARD(28),
     EVENT_SESSION_CARD(29),
     EVENT_FILTER_ATTRIBUTE_CARD(30),
-    EVENT_FAQ_CARD(31);
+    EVENT_FAQ_CARD(31),
+    BROWSE_CAROUSEL_CARD(32),
+    EDITOR_PICKS_ITEM_CARD(33),
+    BROWSE_HEADER_CARD(34),
+    BROWSE_SPONSORED_EVENTS(35);
 
     public final int typeId;
 
@@ -54,7 +58,9 @@ public enum DataType {
                 || typeId == POINTS.typeId || typeId == TOTAL_POINT_HEADER.typeId
                 || typeId == POINT_BREAKDWON.typeId || typeId == MOVIE_CATEGORY.typeId
                 || typeId == EXPLORE_CATEGORY_HEADER.typeId || typeId == MY_TICKETS_CARD.typeId
-                || typeId == EVENT_INFO_CARD.typeId || typeId == MY_REVIEW_CARD.typeId || typeId == EVENT_FAQ_CARD.typeId;
+                || typeId == EVENT_INFO_CARD.typeId || typeId == MY_REVIEW_CARD.typeId
+                || typeId == EVENT_FAQ_CARD.typeId || typeId == BROWSE_CAROUSEL_CARD.typeId || typeId == EVENT.typeId
+                || typeId == BROWSE_HEADER_CARD.typeId || typeId == BROWSE_SPONSORED_EVENTS.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -153,7 +159,18 @@ public enum DataType {
         if (typeId == EVENT_FAQ_CARD.typeId) {
             return EventFaqCard.newInstance(activity, parent);
         }
-
+        if (typeId == BROWSE_CAROUSEL_CARD.typeId) {
+            return BrowseCarouselCard.newInstance(activity, parent);
+        }
+        if (typeId == EDITOR_PICKS_ITEM_CARD.typeId) {
+            return EditorPicksItemCard.newInstance(activity, parent);
+        }
+        if (typeId == BROWSE_HEADER_CARD.typeId) {
+            return BrowseHeaderCardLayout.newInstance(activity, parent);
+        }
+        if (typeId == BROWSE_SPONSORED_EVENTS.typeId) {
+            return BrowseSponsoredEventsCard.newInstance(activity, parent);
+        }
         throw new IllegalArgumentException("invalid typeid");
     }
 }

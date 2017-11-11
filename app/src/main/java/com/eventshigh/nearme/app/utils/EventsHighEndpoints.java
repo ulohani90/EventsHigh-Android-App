@@ -54,6 +54,8 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_NEW_DATE_FORMAT =
             API_URI_BASE + "api/date/%s/%s?mobile=1";
 
+    public static final String API_ENDPOINT_GET_SPONSORED_EVENTS = API_URI_BASE + "api/get_sponsored_events/%s";
+
 
     private static final String API_ENDPOINT_MOVIE_UBER_INFO_FORMAT = API_URI_BASE + "api/get_movie_uber_info/%s";
 

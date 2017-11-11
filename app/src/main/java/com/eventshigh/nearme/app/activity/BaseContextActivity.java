@@ -301,6 +301,15 @@ public abstract class BaseContextActivity extends BaseActivity {
         startActivity(detailIntent, bundle);
     }
 
+    public void showEventDetails(String eventId, @Nullable String label, @Nullable Bundle bundle) {
+        reportActionToAnalytics("showSponsoredEventDetails", label);
+        Crashlytics.setString("Event_id", eventId);
+        Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
+        detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(), eventId));
+        //detailIntent.putExtra(NewEventDetailActivity.EVENT_ID, event.id);
+        startActivity(detailIntent, bundle);
+    }
+
 
     public void seeAll() {
         reportActionToAnalytics("seeAll", eventsContext.getLabel());

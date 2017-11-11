@@ -52,6 +52,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.Timer;
 
 import io.branch.indexing.BranchUniversalObject;
 import io.branch.referral.Branch;
@@ -88,6 +89,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected long shareMovieInitiatedTimestamp = 0;
     protected long shareTicketInitiatedTimestamp = 0;
     protected long shareProfileInitiatedTimestamp = 0;
+
+    public Timer timer;
 
 
     // **********************************************

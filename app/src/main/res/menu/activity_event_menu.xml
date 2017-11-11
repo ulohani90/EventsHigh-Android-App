@@ -6,6 +6,12 @@
 
 
     <item
+        android:id="@+id/action_follow"
+        android:orderInCategory="10"
+        myApp:actionLayout="@layout/follow_btn_toolbar_layout"
+        android:title="@string/ui_follow"
+        myApp:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share_white_24dp"
         android:orderInCategory="20"

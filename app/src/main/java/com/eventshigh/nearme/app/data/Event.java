@@ -498,6 +498,9 @@ public class Event implements Parcelable {
         }
 
         String id = eventJson.getString("id");
+        if (id.equalsIgnoreCase("8a3f56f6525331c020bdc651d30a32b7")) {
+            System.out.println("Stop here");
+        }
         String title = eventJson.getString("title");
         String description = eventJson.optString("description")
                 .replaceAll("Â", "")
@@ -542,8 +545,18 @@ public class Event implements Parcelable {
             JSONObject localityJson = eventJson.optJSONObject("locality_info");
             if (city != null && localityJson != null) {
                 // Invalid latitude and longitude. Try locality_info.
-                lat = localityJson.optDouble("lat", 0);
-                lon = localityJson.optDouble("lon", 0);
+                if (localityJson.has("lat"))
+                    lat = localityJson.optDouble("lat", 0);
+                if (localityJson.has("lon"))
+                    lon = localityJson.optDouble("lon", 0);
+            }
+
+            JSONObject venueInfo = eventJson.optJSONObject("venue_info");
+            if (venueInfo != null) {
+                if (venueInfo.has("lat"))
+                    lat = venueInfo.optDouble("lat", 0);
+                if (venueInfo.has("lon"))
+                    lon = venueInfo.optDouble("lon", 0);
             }
 
             String venue = null;
@@ -935,7 +948,7 @@ public class Event implements Parcelable {
                     discountPercentage,
                     discountPercentageText,
                     skipRequestToCall,
-                    skipCallBackupPhone, destination,timeZone
+                    skipCallBackupPhone, destination, timeZone
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());

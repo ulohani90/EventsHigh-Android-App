@@ -38,6 +38,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventDistanceComparator;
 import com.eventshigh.nearme.app.data.EventPriceComparator;
 import com.eventshigh.nearme.app.data.EventScoreComparator;
@@ -54,6 +55,7 @@ import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.BrowsePageItemDecorator;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.eventshigh.nearme.app.ui.adapter.EventCard;
@@ -115,6 +117,9 @@ public class EventsFragment extends BaseEventsFragment {
 
 
     LinearLayout eventListContainer;
+
+    boolean showEditorPicks;
+    boolean showHeaderCard;
 
 
     //Map contents
@@ -189,11 +194,15 @@ public class EventsFragment extends BaseEventsFragment {
         // Setup the events adapter to show data.
         eventsAdapter = new EventsAdapter(activity);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
+
         if (shouldAddPadding)
-            eventGridView.setPadding((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()),
+            eventGridView.addItemDecoration(new BrowsePageItemDecorator((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()),
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()),
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 46, getResources().getDisplayMetrics())));
+           /* eventGridView.setPadding((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()),
                     (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics()),
                     (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()),
-                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));*/
         eventGridView.setAdapter(eventsAdapter);
         eventsAdapter.setOnItemClickedListener(new EventsAdapter.OnItemClickedListener() {
             @Override
@@ -323,10 +332,18 @@ public class EventsFragment extends BaseEventsFragment {
 
     public void showListView() {
         eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+        eventsAdapter.setBrowseHeader(filteredEvents.size());
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                     eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
         }
+        if (!isFilterApplied()) {
+            if (showHeaderCard && filteredEvents.size() > 5)
+                addBrowseCarousel(filteredEvents.subList(0, 5));
+            if (showEditorPicks && filteredEvents.size() > 13)
+                addEditorPicks(filteredEvents.subList(5, 13));
+        }
+
         if (scrollToPos != -1) {
             eventGridView.scrollToPosition(scrollToPos + 1);
             scrollToPos = -1;
@@ -406,6 +423,7 @@ public class EventsFragment extends BaseEventsFragment {
             return;
         }
         isLoading = true;
+
 
         topProgressBar.setVisibility(View.VISIBLE);
         noMyEventsView.setVisibility(View.GONE);
@@ -503,6 +521,13 @@ public class EventsFragment extends BaseEventsFragment {
                                         sortData();
 
                                         eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+                                        eventsAdapter.setBrowseHeader(filteredEvents.size());
+                                        if (showHeaderCard && filteredEvents.size() > 5) {
+                                            addBrowseCarousel(filteredEvents.subList(0, 5));
+                                        }
+                                        if (showEditorPicks && filteredEvents.size() > 13) {
+                                            addEditorPicks(filteredEvents.subList(5, 13));
+                                        }
 
 
                                     }
@@ -513,7 +538,11 @@ public class EventsFragment extends BaseEventsFragment {
                     });
 
         } else {
-
+            showHeaderCard = true;
+            if (eventsContext.query.toLowerCase().equalsIgnoreCase(EventCategory.NIGHTLIFE.categoryName.toLowerCase()) ||
+                    eventsContext.query.toLowerCase().equalsIgnoreCase("new year parties")) {
+                showEditorPicks = true;
+            }
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
@@ -750,9 +779,18 @@ public class EventsFragment extends BaseEventsFragment {
                         ((EventsGridActivity) getActivity()).addSpecialFilterGrid(filteredEvents.get(0).attributes);
 
                     eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+                    eventsAdapter.setBrowseHeader(filteredEvents.size());
                     if (showFollowCard) {
                         eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                                 eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
+                    }
+
+                    if (showHeaderCard && filteredEvents.size() > 5) {
+                        addBrowseCarousel(filteredEvents.subList(0, 5));
+                    }
+
+                    if (showEditorPicks && filteredEvents.size() > 13) {
+                        addEditorPicks(filteredEvents.subList(5, 13));
                     }
                     addSocialInvitationRequests();
                     if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
@@ -957,7 +995,8 @@ public class EventsFragment extends BaseEventsFragment {
                             break secondLoop;
                         } else {
                             for (int k = 0; k < allEvents.get(i).eventTimings.size(); k++) {
-                                if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
+                                if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime() ||
+                                        filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime() + 1) {
                                     filteredEvents.add(allEvents.get(i));
                                     break secondLoop;
 
@@ -1003,7 +1042,6 @@ public class EventsFragment extends BaseEventsFragment {
             if (filterEventPrices == null) {
                 filterEventPrices = new ArrayList<>();
             }
-
 
             if (priceValue != -1) {
                 if (filterEventPrices.contains(priceValue)) {
@@ -1063,6 +1101,7 @@ public class EventsFragment extends BaseEventsFragment {
                 }
             } else {
                 filteredEvents = allEvents;
+
             }
 
             if (totalEvents == null) {
@@ -1210,12 +1249,41 @@ public class EventsFragment extends BaseEventsFragment {
             this.sortState = sortState;
             sortData();
             eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+            eventsAdapter.setBrowseHeader(filteredEvents.size());
             if (showFollowCard) {
                 eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                         eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
             }
+            if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
+                if (!isFilterApplied()) {
+                    if (showHeaderCard && filteredEvents.size() > 5) {
+                        addBrowseCarousel(filteredEvents.subList(0, 5));
+                    }
+                    if (showEditorPicks && filteredEvents.size() > 13) {
+                        addEditorPicks(filteredEvents.subList(5, 13));
+                    }
+                }
+            }
+
         }
     }
+
+
+    public void addBrowseCarousel(List<Event> events) {
+        if (activity.timer != null) {
+            activity.timer.cancel();
+            activity.timer = null;
+        }
+        eventsAdapter.setCarouselEvents(events);
+
+    }
+
+    public void addEditorPicks(List<Event> events) {
+        int width = getResources().getDisplayMetrics().widthPixels -
+                3 * ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()));
+        eventsAdapter.addEditorPicks(events, width / 2);
+    }
+
 
     public void sortData() {
         if (filteredEvents != null) {
@@ -1262,11 +1330,20 @@ public class EventsFragment extends BaseEventsFragment {
         if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
             filterAsyncTask.cancel(true);
         }
+
         filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, zone, specialFilters, showTicketedEvents, times);
         filterAsyncTask.execute();
 
     }
 
+    boolean checkIsPriceFilterApplied, checkIsDateFilterApplied, checkIsCategoryFilterApplied, checkIsZoneFilterApplied, checkIsSpecialFilterApplied;
+
+
+    public boolean isFilterApplied() {
+        if (checkIsPriceFilterApplied || checkIsDateFilterApplied || checkIsCategoryFilterApplied || checkIsZoneFilterApplied || checkIsSpecialFilterApplied)
+            return true;
+        return false;
+    }
 
     public class FilterAsyncTask extends AsyncTask<Void, Void, List<Event>> {
 
@@ -1332,10 +1409,18 @@ public class EventsFragment extends BaseEventsFragment {
                     sortData();
 
                     eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                    eventsAdapter.setBrowseHeader(filteredEvents.size());
                     if (showFollowCard) {
                         eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                                 eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
                     }
+                    if (!isFilterApplied()) {
+                        if (showHeaderCard && filteredEvents.size() > 5)
+                            addBrowseCarousel(filteredEvents.subList(0, 5));
+                        if (showEditorPicks && filteredEvents.size() > 13)
+                            addEditorPicks(filteredEvents.subList(5, 13));
+                    }
+
                 }
                 if (events.isEmpty() && getView() != null) {
                     Snackbar.make(getView(), R.string.no_events, Snackbar.LENGTH_SHORT).show();

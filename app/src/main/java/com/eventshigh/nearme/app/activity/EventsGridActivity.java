@@ -69,13 +69,11 @@ public class EventsGridActivity extends BaseContextActivity {
 
     private boolean showFollowCard;
 
-
     String shareImageUrl;
 
     private boolean isFromNotification;
 
     EventsFragment eventsFragment;
-
 
     HorizontalScrollView categoryFilter, priceFilter, dateFilter, sortFilter, zoneFilter;
 
@@ -616,13 +614,13 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + 1);
                         reportActionToAnalytics("filters", eventsContext.query + "-Today");
 
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY + 1);
                         reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
                         // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
@@ -865,10 +863,52 @@ public class EventsGridActivity extends BaseContextActivity {
         getMenuInflater().inflate(R.menu.activity_event_menu, menu);
 
         menu.findItem(R.id.action_share);
+
+        menu.findItem(R.id.action_follow).setVisible(showFollowCard);
         // Set visibility.
         // menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
 
         return true;
+    }
+
+    TextView followText;
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem followBtn = menu.findItem(R.id.action_follow);
+        LinearLayout followActionLayout = (LinearLayout) followBtn.getActionView();
+        followActionLayout.setOnClickListener(followLayoutClickListener);
+        followText = (TextView) followActionLayout.findViewById(R.id.follow_text);
+        if (account != null)
+            changeToolbarFollowBtnText(account.isFollowing(eventsContext.query));
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
+    View.OnClickListener followLayoutClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (account != null) {
+                if (account.isFollowing(eventsContext.query)) {
+                    reportActionToAnalytics("removeFollowing", eventsContext.query);
+                    account.setIsFollowing(eventsContext.query, false);
+                    changeToolbarFollowBtnText(false);
+                } else {
+                    reportActionToAnalytics("addFollowing", eventsContext.query);
+                    if (!account.getUserInfo().isSignedIn) {
+                        FBSigninDialog.show(EventsGridActivity.this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 1);
+                    }
+                    account.setIsFollowing(eventsContext.query, true);
+                    changeToolbarFollowBtnText(true);
+                }
+            }
+        }
+    };
+
+    public void changeToolbarFollowBtnText(boolean isFollowing) {
+        followText.setBackgroundResource(isFollowing ? R.drawable.follow_btn_round_corner_filled_bg : R.drawable.follow_btn_round_corner_bg);
+        followText.setTextColor(isFollowing ? getResources().getColor(R.color.primary) : getResources().getColor(android.R.color.white));
+        followText.setText(isFollowing ? R.string.ui_following : R.string.ui_follow);
     }
 
     @Override

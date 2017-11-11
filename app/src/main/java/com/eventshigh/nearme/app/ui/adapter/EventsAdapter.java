@@ -20,6 +20,7 @@ import com.eventshigh.nearme.app.data.MovieShowTimeObject;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.data.SocialFriend;
+import com.eventshigh.nearme.app.data.SponsoredEventObj;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.data.stream.PointsObject;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
@@ -106,10 +107,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     public void setEvents(List<Event> events, @Nullable String categoryForSeeAll,
                           boolean showEhInviteForNotification) {
         dataToShow.clear();
+
         for (Event event : events) {
             dataToShow.add(new EventData("", event, false, activity, this));
         }
-
 
         if (categoryForSeeAll != null) {
             dataToShow.add(new SeeAllData(activity, categoryForSeeAll));
@@ -121,8 +122,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void setEventFilterAttributes() {
 
+    public void setBrowseHeader(int size) {
+        dataToShow.add(0, new BrowseHeaderCardData(activity, size + " Upcoming Events"));
+
+    }
+
+    public void setCarouselEvents(List<Event> events) {
+        dataToShow.add(0, new BrowseCarouselCardData(activity, events));
+        notifyDataSetChanged();
     }
 
 
@@ -321,7 +329,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void addFollowCard(String title, int numEvents, int numFollowers, boolean isNearMeQuery) {
-        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this, isNearMeQuery));
+        //  dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this, isNearMeQuery));
     }
 
     @Override
@@ -421,6 +429,20 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         this.pListener = listener;
     }
 
+    public void addEditorPicks(List<Event> events, int width) {
+        dataToShow.add(1, new BrowseHeaderCardData(activity, "Editor's Picks"));
+        for (int i = 0; i < events.size(); i++) {
+            dataToShow.add(i + 2, new EditorPicksItemData(events.get(i), activity, width));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void addSponsoredEvents(List<SponsoredEventObj> events, int width) {
+
+        dataToShow.add(new BrowseHeaderCardData(activity, "Sponsored Events"));
+        dataToShow.add(new BrowseSponsoredEventsData(activity, events, width));
+        notifyDataSetChanged();
+    }
 
     public interface OnEditClickListener {
         void onEditcliked();

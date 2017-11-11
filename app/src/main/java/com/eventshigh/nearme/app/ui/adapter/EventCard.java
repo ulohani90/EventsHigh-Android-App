@@ -397,19 +397,23 @@ public class EventCard extends ViewHolder {
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
         Account account = new Account(activity);
         // Set the travel time.
-        if (account.getLastLocality() != null) {
-            String travelTime = LocationUtils.getTravelTime(activity, account.getLastLocality().getLatLng(), event.location);
-            if (travelTime != null) {
-                travelTimeView.setText(travelTime);
-                travelTimeView.setVisibility(View.VISIBLE);
-            } else {
-                travelTimeView.setVisibility(View.GONE);
-            }
-        } else if (activity.getUserLocation() != null) {
-            String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
-            if (travelTime != null) {
-                travelTimeView.setText(travelTime);
-                travelTimeView.setVisibility(View.VISIBLE);
+        if (event.location.latitude > 0 && event.location.longitude > 0) {
+            if (account.getLastLocality() != null) {
+                String travelTime = LocationUtils.getTravelTime(activity, account.getLastLocality().getLatLng(), event.location);
+                if (travelTime != null) {
+                    travelTimeView.setText(travelTime);
+                    travelTimeView.setVisibility(View.VISIBLE);
+                } else {
+                    travelTimeView.setVisibility(View.GONE);
+                }
+            } else if (activity.getUserLocation() != null) {
+                String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
+                if (travelTime != null) {
+                    travelTimeView.setText(travelTime);
+                    travelTimeView.setVisibility(View.VISIBLE);
+                } else {
+                    travelTimeView.setVisibility(View.GONE);
+                }
             } else {
                 travelTimeView.setVisibility(View.GONE);
             }
