@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -27,6 +28,8 @@ import com.eventshigh.nearme.app.utils.TopCropImageView;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import jp.wasabeef.blurry.Blurry;
 
 /**
  * Created by umesh on 08/11/17.
@@ -124,27 +127,42 @@ public class BrowseCarouselCard extends ViewHolder {
             final Event event = events.get(position);
             View view = activity.getLayoutInflater().inflate(R.layout.browse_carousel_item_layout, container, false);
             final ImageView eventImage = (ImageView) view.findViewById(R.id.event_img);
+
            /* Glide.with(activity).load(event.imgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.eh_default_event)
                     .crossFade().centerCrop()
                     .into(eventImage);*/
-            Glide.with(itemView.getContext()).load(event.imgUrl).asBitmap().centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
+            Glide.with(itemView.getContext()).load(event.imgUrl).asBitmap().dontTransform().diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(new BitmapImageViewTarget(eventImage) {
                         @Override
                         public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
                             super.onResourceReady(bitmap, anim);
-                            Glide.with(itemView.getContext()).load(event.imgUrl).centerCrop().into(eventImage);
+                            Glide.with(itemView.getContext()).load(event.imgUrl).dontTransform().into(eventImage);
                         }
                     });
+            if (event.dominantBgColor != null && event.dominantBgColor.length() > 0) {
+                try {
+                    eventImage.setBackgroundColor(Color.parseColor("#" + getEventColor(event.dominantBgColor)));
+                } catch (IllegalArgumentException e) {
+
+                }
+            }
             TextView eventTitle = (TextView) view.findViewById(R.id.event_title);
             eventTitle.setText(event.title);
             TextView eventDate = (TextView) view.findViewById(R.id.event_date);
-            DateTimeUtils.EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+            if (event.venue != null) {
+                eventDate.setText(event.venue);
+                eventDate.setVisibility(View.VISIBLE);
+            } else {
+                eventDate.setVisibility(View.GONE);
+            }
+           /* DateTimeUtils.EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
             if (eventTime != null) {
                 eventDate.setVisibility(View.VISIBLE);
                 eventDate.setText(eventTime.day + "," + eventTime.date);
             } else {
                 eventDate.setVisibility(View.GONE);
-            }
+            }*/
+
             view.findViewById(R.id.item_card_parent).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -171,6 +189,18 @@ public class BrowseCarouselCard extends ViewHolder {
             return POSITION_NONE;
         }
 
+    }
+
+    public String getEventColor(String color) {
+        StringBuilder finalColor = new StringBuilder();
+        String[] colorArray = color.split(" ");
+        for (String item : colorArray) {
+            finalColor.append(item);
+            if (item.length() < 2) {
+                finalColor.append("0");
+            }
+        }
+        return finalColor.toString();
     }
 
     private class DotsSelector implements ViewPager.OnPageChangeListener {

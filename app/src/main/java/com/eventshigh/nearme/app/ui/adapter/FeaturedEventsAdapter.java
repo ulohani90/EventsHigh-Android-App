@@ -69,6 +69,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
         }
         View view = EventCard.getEventCard(eventPagerData.events.get(eventIndex),
                 eventPagerData.activity, null, container, false);
+        view.findViewById(R.id.event_time_layout).setVisibility(View.GONE);
         container.addView(view);
         return view;
     }

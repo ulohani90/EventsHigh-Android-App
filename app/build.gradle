@@ -32,8 +32,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 370
-        versionName "3.7.0"
+        versionCode 372
+        versionName "3.7.2"
         resConfigs "en"
     }
     signingConfigs {
@@ -88,6 +88,7 @@ dependencies {
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     compile files('libs/GoogleConversionTrackingSdk-2.2.4.jar')
     compile 'com.gu.android:toolargetool:0.1.2@aar'
+    compile 'jp.wasabeef:blurry:2.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

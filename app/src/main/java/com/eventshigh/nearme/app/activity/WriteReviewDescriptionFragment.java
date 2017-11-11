@@ -119,9 +119,14 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
         switch (v.getId()) {
             case R.id.btn_write_review:
                 if (etWriteReviewDescription != null && etWriteReviewDescription.getText() != null && etWriteReviewDescription.getText().toString().length() > 0) {
-                    placeReviewAction();
+                    if (etWriteReviewDescription.getText().toString().length() > 100) {
+                        placeReviewAction();
+                    } else {
+                        Toast.makeText(getActivity(), "Review should be at least of 100 characters.", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    showNoDescDialog();
+                    //showNoDescDialog();
+                    Toast.makeText(getActivity(), "Please add a review.", Toast.LENGTH_SHORT).show();
                 }
 
 

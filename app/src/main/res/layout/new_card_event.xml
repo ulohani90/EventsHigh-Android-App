@@ -9,81 +9,138 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#EFEFEF"
+        android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/event_bg"
+        <LinearLayout
+            android:id="@+id/event_time_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/event_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="SUN"
+                android:textColor="#393939"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/yellow_rectamgle_bg"
+                android:elevation="4dp">
+
+                <TextView
+                    android:id="@+id/event_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="AUG 7"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/event_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7:30 AM"
+                android:textColor="#393939"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/event_card_height"
-            android:layout_alignParentTop="true"
-            android:adjustViewBounds="false"
-            android:scaleType="centerCrop"
-            tools:ignore="ContentDescription" />
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/event_bg"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/event_card_height"
+                android:layout_alignParentTop="true"
+                android:adjustViewBounds="false"
+                android:scaleType="centerCrop"
+                tools:ignore="ContentDescription" />
 
 
-        <View
-            android:id="@+id/arrow"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/shape_triangle" />
+            <View
+                android:id="@+id/arrow"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/shape_triangle" />
 
 
-        <TextView
-            android:id="@+id/event_venue"
-            style="@style/EventCardText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/event_bg"
-            android:background="@drawable/gradient_bg"
-            android:drawableStart="@drawable/ic_location_on_white_12dp"
-            android:paddingBottom="5dp"
-            android:paddingLeft="9dp"
-            android:paddingRight="5dp"
-            android:paddingTop="20dp"
-            android:textColor="#CCFFFFFF"
-            android:textIsSelectable="false"
-            android:textSize="13sp"
+            <TextView
+                android:id="@+id/event_venue"
+                style="@style/EventCardText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/event_bg"
+                android:background="@drawable/gradient_bg"
+                android:drawableStart="@drawable/ic_location_on_white_12dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="9dp"
+                android:paddingRight="5dp"
+                android:paddingTop="20dp"
+                android:textColor="#CCFFFFFF"
+                android:textIsSelectable="false"
+                android:textSize="13sp"
 
-            android:visibility="invisible"
-            tools:text="Jagriti theatre, Whitefield" />
+                android:visibility="invisible"
+                tools:text="Jagriti theatre, Whitefield" />
 
 
-        <ImageView
-            android:id="@+id/event_recommended"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/eh_recommend"
-            tools:ignore="ContentDescription" />
+            <ImageView
+                android:id="@+id/event_recommended"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/eh_recommend"
+                tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:id="@+id/trusted_partner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="-3dp"
-            android:src="@drawable/ic_trusted_list" />
+            <ImageView
+                android:id="@+id/trusted_partner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="-3dp"
+                android:src="@drawable/ic_trusted_list" />
 
-        <TextView
-            android:id="@+id/is_sponsered_event"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/event_bg"
-            android:layout_marginBottom="8dp"
-            android:background="#CCFFFFFF"
-            android:drawableLeft="@drawable/ic_star_sponsored"
-            android:drawablePadding="4dp"
-            android:fontFamily="sans-serif-medium"
-            android:padding="8dp"
-            android:text="SPONSORED"
-            android:textColor="#36889B"
-            android:textSize="10sp" />
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/is_sponsered_event"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/event_bg"
+                android:layout_marginBottom="8dp"
+                android:background="#CCFFFFFF"
+                android:drawableLeft="@drawable/ic_star_sponsored"
+                android:drawablePadding="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:padding="8dp"
+                android:text="SPONSORED"
+                android:textColor="#36889B"
+                android:textSize="10sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
 
     <View
         android:id="@+id/info_arrow"
@@ -199,54 +256,7 @@
                 android:layout_marginTop="8dp"
                 android:background="#e1dfdf"></View>
 
-            <LinearLayout
-                android:id="@+id/event_time_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:gravity="center"
-                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/event_day"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="SUN"
-                    android:textColor="#393939"
-                    android:textSize="14sp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:background="@drawable/yellow_rectamgle_bg"
-                    android:elevation="4dp">
-
-                    <TextView
-                        android:id="@+id/event_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="AUG 7"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/event_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="7:30 AM"
-                    android:textColor="#393939"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
         </LinearLayout>
 
 

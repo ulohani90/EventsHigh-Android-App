@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="false"
-        android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
 
@@ -36,18 +35,17 @@
             android:gravity="center_horizontal"
             android:text="Dummy Title for the event"
             android:textColor="@android:color/white"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/event_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:fontFamily="sans-serif-medium"
             android:gravity="center_horizontal"
             android:text="Sun, 12 Nov"
             android:textColor="@android:color/white"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
     </LinearLayout>
 </FrameLayout>

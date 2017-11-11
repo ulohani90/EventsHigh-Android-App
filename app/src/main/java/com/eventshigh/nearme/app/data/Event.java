@@ -153,6 +153,10 @@ public class Event implements Parcelable {
 
     public final String timezone;
 
+    public final String dominantBgColor;
+
+    public static final String DEFAULT_TIME_ZONE = "Asia/Calcutta";
+
     public Event(String id, String city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -167,7 +171,7 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination, String timezone) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination, String timezone, String dominantBgColor) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -234,6 +238,7 @@ public class Event implements Parcelable {
         this.skipCallbackupPhone = skipCallbackupPhone;
         this.destination = destination;
         this.timezone = timezone;
+        this.dominantBgColor = dominantBgColor;
     }
 
     public Event(Parcel in) {
@@ -315,6 +320,7 @@ public class Event implements Parcelable {
         skipCallbackupPhone = in.readString();
         destination = in.readString();
         timezone = in.readString();
+        dominantBgColor = in.readString();
     }
 
     @Override
@@ -375,6 +381,7 @@ public class Event implements Parcelable {
         dest.writeString(skipCallbackupPhone);
         dest.writeString(destination);
         dest.writeString(timezone);
+        dest.writeString(dominantBgColor);
     }
 
     public Uri getEventDetailsURI() {
@@ -528,6 +535,23 @@ public class Event implements Parcelable {
                     allImages.add(url);
                 }
             }
+            String dominantBgColor = "";
+            if (eventJson.has("image_json")) {
+                JSONObject imageJson = eventJson.optJSONObject("image_json");
+                if (imageJson.has("images_data")) {
+                    JSONArray imagesData = imageJson.optJSONArray("images_data");
+                    for (int i = 0; i < imagesData.length(); i++) {
+                        JSONObject imageData = imagesData.getJSONObject(i);
+                        if (imageData.has("google_serving_url") &&
+                                img_url.equalsIgnoreCase(imageData.getString("google_serving_url"))) {
+                            if (imageData.has("dominant_color")) {
+                                dominantBgColor = imageData.getString("dominant_color");
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
 
             JSONObject stats = eventJson.optJSONObject("stats");
             int num_views = stats == null ? 0 : stats.optInt("view_event");
@@ -608,8 +632,9 @@ public class Event implements Parcelable {
             // Event timings.
             String timeZone = eventJson.has("timezone") ? eventJson.getString("timezone") : null;
             List<Long> eventTimings = new ArrayList<>();
+
             Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
-                    eventJson.optString("start_time"), TimeZone.getTimeZone(timeZone));
+                    eventJson.optString("start_time"), (timeZone != null) ? TimeZone.getTimeZone(timeZone) : TimeZone.getTimeZone(DEFAULT_TIME_ZONE));
             if (eventTiming != null) {
                 eventTimings.add(eventTiming.getTime());
             }
@@ -619,7 +644,7 @@ public class Event implements Parcelable {
                 for (int i = 0; i < upcoming_occurrences.length(); i++) {
                     eventTiming = DateTimeUtils.mergeDateTime(
                             upcoming_occurrences.getJSONObject(i).optString("date"),
-                            upcoming_occurrences.getJSONObject(i).optString("start_time"), TimeZone.getTimeZone(timeZone));
+                            upcoming_occurrences.getJSONObject(i).optString("start_time"), (timeZone != null) ? TimeZone.getTimeZone(timeZone) : TimeZone.getTimeZone(DEFAULT_TIME_ZONE));
                     if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
                         eventTimings.add(eventTiming.getTime());
                     }
@@ -693,7 +718,7 @@ public class Event implements Parcelable {
                     if (occurrences != null) {
                         for (int k = 0; k < occurrences.length(); k++) {
                             Date date = DateTimeUtils.mergeDateTime(occurrences.getJSONObject(k).optString("date"),
-                                    occurrences.getJSONObject(k).optString("time"), TimeZone.getTimeZone(timeZone));
+                                    occurrences.getJSONObject(k).optString("time"), (timeZone != null) ? TimeZone.getTimeZone(timeZone) : TimeZone.getTimeZone(DEFAULT_TIME_ZONE));
                             ehOccurences.add(date.getTime());
                         }
                     }
@@ -736,7 +761,7 @@ public class Event implements Parcelable {
             if (mashup != null && ehPrices.size() == 0) {
                 JSONObject priceInfo = mashup.optJSONObject("price_info");
                 if (priceInfo != null) {
-                    if (priceInfo.optString("type").equalsIgnoreCase("free")) {
+                    if (priceInfo.optBoolean("is_free_event")) {
                         minPrice = 0;
                         maxPrice = 0;
                     } else {
@@ -948,7 +973,7 @@ public class Event implements Parcelable {
                     discountPercentage,
                     discountPercentageText,
                     skipRequestToCall,
-                    skipCallBackupPhone, destination, timeZone
+                    skipCallBackupPhone, destination, timeZone, dominantBgColor
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());

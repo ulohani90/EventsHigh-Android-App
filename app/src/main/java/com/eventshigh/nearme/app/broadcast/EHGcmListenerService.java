@@ -131,6 +131,9 @@ public class EHGcmListenerService extends FirebaseMessagingService {
         PendingIntent contentIntent;
         if (eventId != null) {
             City city = new Account(this).getLastCity();
+            if (city == null) {
+                city = City.BANGALORE;
+            }
             contentIntent = createPendingIntent(this, eventId, city);
             EventNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, eventId, city.name());
         } else if (query != null) {

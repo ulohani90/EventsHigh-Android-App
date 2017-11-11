@@ -626,8 +626,8 @@ public class EventInfoFragment extends Fragment {
                         eventTravelTime = LocationUtils.getTravelTime(getActivity(),
                                 userLocation, event.location);
                     }
-                travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
-                view.findViewById(R.id.direction_separator).setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
+                travelTimeView.setVisibility((event.location.latitude==0 && event.location.longitude == 0) || eventTravelTime == null ? View.GONE : View.VISIBLE);
+                view.findViewById(R.id.direction_separator).setVisibility((event.location.latitude==0 && event.location.longitude == 0) || eventTravelTime == null ? View.GONE : View.VISIBLE);
                 if (eventTravelTime != null) {
                     travelTimeView.setText(eventTravelTime);
                 }
