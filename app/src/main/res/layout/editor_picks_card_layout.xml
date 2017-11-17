@@ -8,56 +8,57 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/event_img"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="center"
-            android:src="@drawable/eh_default_event" />
-
-        <View
-            android:id="@+id/dim_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/gradient_bg"
-            android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:elevation="8dp"
-            android:orientation="vertical"
-            android:paddingBottom="8dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="8dp">
+            android:background="@android:color/white"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/event_title"
+            <ImageView
+                android:id="@+id/event_img"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
-                android:maxLines="2"
-                android:text="Dummy Title for the event"
-                android:textColor="#3e3e3e"
-                android:textSize="14sp" />
+                android:layout_height="200dp"
+                android:scaleType="center"
+                android:src="@drawable/eh_default_event" />
 
-            <TextView
-                android:id="@+id/event_venue"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:ems="2"
-                android:maxLines="1"
-                android:text="Dummy Title for the event"
-                android:textColor="#696969"
-                android:textSize="12sp" />
+                android:layout_height="0dp"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:background="@android:color/white"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:paddingBottom="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/event_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="2"
+                    android:text="Dummy Title for the event"
+                    android:textColor="#3e3e3e"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/event_venue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ems="2"
+                    android:maxLines="1"
+                    android:text="Dummy Title for the event"
+                    android:textColor="#696969"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

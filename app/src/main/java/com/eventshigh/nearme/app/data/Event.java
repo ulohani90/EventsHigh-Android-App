@@ -498,7 +498,7 @@ public class Event implements Parcelable {
     /**********************************
      * Helper static methods, used for JSON parsing
      *********************************/
-    public static Event fromJSON(JSONObject eventJson) throws JSONException, ParseException {
+    public static Event fromJSON(JSONObject eventJson, List<BrowseFilterAttributes> filters) throws JSONException, ParseException {
         if (eventJson.optBoolean("junk")) {
             // Junk event.
             throw new ParseException("junk event", 0);
@@ -597,7 +597,9 @@ public class Event implements Parcelable {
             String destination = eventJson.optString("destination");
 
             String locality = null;
-            if (localityJson != null) {
+            if (eventJson.has("locality")) {
+                locality = eventJson.optString("locality");
+            } else if (localityJson != null) {
                 locality = localityJson.optString("locality");
             }
 
@@ -873,7 +875,7 @@ public class Event implements Parcelable {
             ArrayList<EventFilterAttribute> attributes = new ArrayList<>();
             HashMap<String, Boolean> attributeValues = new HashMap<>();
             if (eventJson.has("attributes")) {
-                if (eventJson.optJSONObject("attributes").has("include_value_attributes")) {
+               /* if (eventJson.optJSONObject("attributes").has("include_value_attributes")) {
                     if (eventJson.optJSONObject("attributes").optJSONObject("include_value_attributes").has("include_values")) {
                         JSONArray jsonArray = eventJson.optJSONObject("attributes").optJSONObject("include_value_attributes").optJSONArray("include_values");
                         for (int i = 0; i < jsonArray.length(); i++) {
@@ -886,7 +888,7 @@ public class Event implements Parcelable {
 
                         //attributes = EventFilterAttribute.getAttributes(jsonArray);
                     }
-                }
+                }*/
                 if (eventJson.optJSONObject("attributes").has("key_value_attributes") && eventJson.optJSONObject("attributes").optJSONObject("key_value_attributes").has("key_values")) {
                     JSONArray keyValuePairArray = eventJson.optJSONObject("attributes").optJSONObject("key_value_attributes").optJSONArray("key_values");
                     for (int i = 0; i < keyValuePairArray.length(); i++) {
@@ -912,6 +914,53 @@ public class Event implements Parcelable {
                 JSONArray zendeskTickets = eventJson.optJSONArray("zendesk_tickets");
                 for (int i = 0; i < zendeskTickets.length(); i++) {
                     faqs.add(EventZendeskTicketObject.parseZendeskObj(zendeskTickets.getJSONObject(i)));
+                }
+            }
+
+
+            //Add Filters
+            if (filters != null) {
+                for (BrowseFilterAttributes filter : filters) {
+                    boolean valueFound = false;
+                    String[] pathArray = filter.getKeyPath().split("\\|");
+                    JSONObject jsonObject = eventJson;
+                    boolean keyNotFound = false;
+                    for (int i = 0; i < pathArray.length - 2; i++) {
+                        if (jsonObject.has(pathArray[i])) {
+                            keyNotFound = false;
+                            jsonObject = jsonObject.optJSONObject(pathArray[i]);
+                        } else {
+                            keyNotFound = true;
+                            break;
+                        }
+                    }
+                    if (!keyNotFound) {
+                        JSONArray filtersArray = jsonObject.optJSONArray(pathArray[pathArray.length - 2]);
+
+                        for (int i = 0; i < filtersArray.length(); i++) {
+                            JSONObject filterObj = filtersArray.optJSONObject(i);
+                            if (filter.getKey().equalsIgnoreCase(filterObj.optString(pathArray[pathArray.length - 1]))) {
+                                valueFound = true;
+                                String value = filterObj.optString(filter.getKeyForValue());
+                                boolean finalValue = false;
+                                if (filter.getValueType().equalsIgnoreCase("boolean")) {
+                                    finalValue = Boolean.valueOf(value);
+                                    attributes.add(new EventFilterAttribute(filter.getName(), finalValue));
+                                    attributeValues.put(filter.getName(), finalValue);
+                                } else if (filter.getValueType().equalsIgnoreCase("integer")) {
+                                    finalValue = Integer.parseInt(value) == Integer.parseInt(filter.getRequiredValue()) ? true : false;
+                                    attributes.add(new EventFilterAttribute(filter.getName(), finalValue));
+                                    attributeValues.put(filter.getName(), finalValue);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (!valueFound || keyNotFound) {
+                        attributes.add(new EventFilterAttribute(filter.getName(), false));
+                        attributeValues.put(filter.getName(), false);
+                    }
+
                 }
             }
 
@@ -982,11 +1031,11 @@ public class Event implements Parcelable {
         }
     }
 
-    public static List<Event> fromJSON(JSONArray jsonArray, boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) {
+    public static List<Event> fromJSON(JSONArray jsonArray, List<BrowseFilterAttributes> filters, boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                Event event = fromJSON(jsonArray.getJSONObject(i));
+                Event event = fromJSON(jsonArray.getJSONObject(i), filters);
                 if (event != null && (includeWithoutLocation || event.location != null)) {
                     events.add(event);
                 }
@@ -1010,11 +1059,11 @@ public class Event implements Parcelable {
     }
 
 
-    public static List<Event> fromJSON(Context context, JSONArray jsonArray, boolean includeWithoutLocation, boolean isForSavingAction) {
+    public static List<Event> fromJSON(Context context, JSONArray jsonArray, List<BrowseFilterAttributes> filters, boolean includeWithoutLocation, boolean isForSavingAction) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                Event event = fromJSON(jsonArray.getJSONObject(i));
+                Event event = fromJSON(jsonArray.getJSONObject(i), filters);
                 if (event != null && (includeWithoutLocation || event.location != null)) {
                     if (isForSavingAction)
                         ((BaseContextActivity) context).recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE, isForSavingAction);
@@ -1029,7 +1078,7 @@ public class Event implements Parcelable {
     }
 
 
-    public static List<Event> parseUpcomingEvents(JSONObject eventsJSON,
+    public static List<Event> parseUpcomingEvents(JSONObject eventsJSON, List<BrowseFilterAttributes> filters,
                                                   boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) throws JSONException {
 
 
@@ -1038,14 +1087,14 @@ public class Event implements Parcelable {
         if (eventsJSON.has("evergreen_events")) {
             JSONArray evergreenEvents = eventsJSON.getJSONArray("evergreen_events");
             if (eventsJSON.has("upcoming_events")) {
-                allEvents.addAll(fromJSON(evergreenEvents, includeWithoutLocation, null));
+                allEvents.addAll(fromJSON(evergreenEvents, filters, includeWithoutLocation, null));
             } else {
-                allEvents.addAll(fromJSON(evergreenEvents, includeWithoutLocation, listener));
+                allEvents.addAll(fromJSON(evergreenEvents, filters, includeWithoutLocation, listener));
             }
         }
         if (eventsJSON.has("upcoming_events")) {
             JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-            allEvents.addAll(fromJSON(upcomingEvents, includeWithoutLocation, listener));
+            allEvents.addAll(fromJSON(upcomingEvents, filters, includeWithoutLocation, listener));
         }
         return allEvents;
     }

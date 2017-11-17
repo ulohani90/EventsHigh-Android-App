@@ -152,7 +152,7 @@ public class DateTimeUtils {
 
     public static int getDaysLater(Event event) {
         Date eventDate = DateTimeUtils.getEventDate(event, 0);
-        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.timezone).getTime();
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), (event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE)).getTime();
         return (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
     }
 
@@ -165,13 +165,13 @@ public class DateTimeUtils {
     public static Date getEventDate(Event event, int occurrenceNo) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(event.eventTimings.get(occurrenceNo)));
-        return toMidnight(cal, event.timezone).getTime();
+        return toMidnight(cal, (event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE)).getTime();
     }
 
     public static Date getEventDate(EventInfoObject event, int occurrenceNo) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(event.eventTimings.get(occurrenceNo)));
-        return toMidnight(cal, event.timezone).getTime();
+        return toMidnight(cal, (event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE)).getTime();
     }
 
 
@@ -204,7 +204,7 @@ public class DateTimeUtils {
         }
 
         return dateToEventTime(new Date(event.eventTimings.get(index)),
-                TimeZone.getTimeZone(event.timezone), event.eventTimings.get(index));
+                TimeZone.getTimeZone(event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE), event.eventTimings.get(index));
     }
 
     public static

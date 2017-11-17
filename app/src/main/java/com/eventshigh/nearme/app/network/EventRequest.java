@@ -82,7 +82,7 @@ public class EventRequest extends JsonRequest<Event> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventJson = new JSONObject(jsonString);
-            return Response.success(Event.fromJSON(eventJson),
+            return Response.success(Event.fromJSON(eventJson, null),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException | ParseException e) {
             Crashlytics.getInstance().core.logException(e);

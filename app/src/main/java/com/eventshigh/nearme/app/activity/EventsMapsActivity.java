@@ -443,7 +443,7 @@ public class EventsMapsActivity extends BaseContextActivity {
                 events.addAll(topicEvents.events);
             }
 
-            mEventsFetcherCallBack.onResponse(new EventsCollection(new ArrayList<>(events), 0),
+            mEventsFetcherCallBack.onResponse(new EventsCollection(new ArrayList<>(events), 0, null, null, null),
                     isIntermediate);
         }
     };
@@ -459,7 +459,7 @@ public class EventsMapsActivity extends BaseContextActivity {
                 events.addAll(topicEvents.events);
             }
 
-            mEventsFetcherCallBack.onResponse(new EventsCollection(new ArrayList<>(events), 0),
+            mEventsFetcherCallBack.onResponse(new EventsCollection(new ArrayList<>(events), 0, null, null, null),
                     isIntermediate);
         }
     };

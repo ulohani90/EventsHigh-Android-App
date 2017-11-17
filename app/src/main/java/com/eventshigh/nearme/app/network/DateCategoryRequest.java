@@ -89,7 +89,7 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>> {
                 JSONObject categoryEvents = dateEventsJson.getJSONObject(category);
                 int numEvents = categoryEvents.getInt("num_events");
                 JSONArray upcomingEvents = categoryEvents.getJSONArray("events");
-                List<Event> events = Event.fromJSON(upcomingEvents, true, null);
+                List<Event> events = Event.fromJSON(upcomingEvents, null, true, null);
 
                 category = category.equals("upcoming") ? IntentUtils.QUERY_ALL : category;
                 if (!events.isEmpty()) {

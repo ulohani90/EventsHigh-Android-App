@@ -22,7 +22,7 @@ public class EventFilterAttribute implements Parcelable {
 
     public boolean value;
 
-    public static final String LOG_TAG = "No Resource Found";
+
 
     protected EventFilterAttribute(Parcel in) {
         name = in.readString();
@@ -95,33 +95,5 @@ public class EventFilterAttribute implements Parcelable {
         this.value = value;
     }
 
-    public int getIconResourceId() {
-        int resId = R.drawable.ic_general_filter;
 
-        try {
-            resId = R.drawable.class.getField("ic_" + Utils.getUnderscoreString(name)).getInt(null);
-        } catch (IllegalAccessException e) {
-            // Ignore
-        } catch (NoSuchFieldException e) {
-            // Ignore
-            Log.d(LOG_TAG, "no icon: " + name, e);
-        }
-
-        return resId;
-    }
-
-    public int getSelectedIconResourceId() {
-        int resId = R.drawable.ic_general_filter_white;
-
-        try {
-            resId = R.drawable.class.getField("ic_" + Utils.getUnderscoreString(name) + "_white").getInt(null);
-        } catch (IllegalAccessException e) {
-            // Ignore
-        } catch (NoSuchFieldException e) {
-            // Ignore
-            Log.d(LOG_TAG, "no icon: " + name, e);
-        }
-
-        return resId;
-    }
 }

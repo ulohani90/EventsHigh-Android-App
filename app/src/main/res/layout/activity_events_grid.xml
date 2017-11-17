@@ -74,9 +74,37 @@
                         android:orientation="vertical">
 
                         <HorizontalScrollView
+                            android:id="@+id/zone_filter"
+                            android:layout_width="match_parent"
+                            android:layout_height="64dp"
+                            android:animateLayoutChanges="true"
+                            android:clipChildren="false"
+                            android:gravity="center_vertical"
+                            android:scrollbars="none">
+
+                            <LinearLayout
+                                android:id="@+id/zone_container"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clipToPadding="false"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp">
+
+                            </LinearLayout>
+                        </HorizontalScrollView>
+
+                        <View
+                            android:id="@+id/date_separator"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#11ffffff" />
+
+                        <HorizontalScrollView
                             android:id="@+id/date_filter"
                             android:layout_width="match_parent"
-                            android:layout_height="56dp"
+                            android:layout_height="64dp"
                             android:animateLayoutChanges="true"
                             android:clipChildren="false"
                             android:gravity="center_vertical"
@@ -104,7 +132,7 @@
                         <HorizontalScrollView
                             android:id="@+id/category_filter"
                             android:layout_width="match_parent"
-                            android:layout_height="56dp"
+                            android:layout_height="64dp"
                             android:animateLayoutChanges="true"
                             android:clipChildren="false"
                             android:gravity="center_vertical"
@@ -112,34 +140,6 @@
 
                             <LinearLayout
                                 android:id="@+id/category_container"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:clipToPadding="false"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                android:paddingLeft="10dp"
-                                android:paddingRight="10dp">
-
-                            </LinearLayout>
-                        </HorizontalScrollView>
-
-                        <View
-                            android:id="@+id/zone_separator"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#11ffffff" />
-
-                        <HorizontalScrollView
-                            android:id="@+id/zone_filter"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:animateLayoutChanges="true"
-                            android:clipChildren="false"
-                            android:gravity="center_vertical"
-                            android:scrollbars="none">
-
-                            <LinearLayout
-                                android:id="@+id/zone_container"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:clipToPadding="false"
@@ -160,7 +160,7 @@
                         <HorizontalScrollView
                             android:id="@+id/price_filter"
                             android:layout_width="match_parent"
-                            android:layout_height="56dp"
+                            android:layout_height="64dp"
                             android:animateLayoutChanges="true"
                             android:clipChildren="false"
                             android:gravity="center_vertical"
@@ -189,7 +189,7 @@
                         <HorizontalScrollView
                             android:id="@+id/sort_container"
                             android:layout_width="match_parent"
-                            android:layout_height="56dp"
+                            android:layout_height="64dp"
                             android:animateLayoutChanges="true"
                             android:clipChildren="false"
                             android:gravity="center_vertical"
@@ -197,7 +197,7 @@
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="56dp"
+                                android:layout_height="64dp"
                                 android:clipToPadding="false"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
@@ -318,10 +318,33 @@
                             android:layout_height="1dp"
                             android:background="#11ffffff" />
 
+                        <HorizontalScrollView
+                            android:id="@+id/localities_filter"
+                            android:layout_width="match_parent"
+                            android:layout_height="64dp"
+                            android:animateLayoutChanges="true"
+                            android:clipChildren="false"
+                            android:gravity="center_vertical"
+                            android:scrollbars="none"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:id="@+id/localities_container"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clipToPadding="false"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp">
+
+                            </LinearLayout>
+                        </HorizontalScrollView>
+
                         <android.support.v7.widget.SwitchCompat
                             android:id="@+id/ticketed_events"
                             android:layout_width="match_parent"
-                            android:layout_height="56dp"
+                            android:layout_height="64dp"
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:checked="false"

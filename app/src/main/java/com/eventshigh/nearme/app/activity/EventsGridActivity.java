@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.BrowseFilterAttributes;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFilterAttribute;
@@ -55,6 +56,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.squareup.timessquare.CalendarPickerView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -75,11 +77,11 @@ public class EventsGridActivity extends BaseContextActivity {
 
     EventsFragment eventsFragment;
 
-    HorizontalScrollView categoryFilter, priceFilter, dateFilter, sortFilter, zoneFilter;
+    HorizontalScrollView categoryFilter, priceFilter, dateFilter, sortFilter, zoneFilter, localitiesFilter;
 
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x002;
 
-    boolean isCategoryFilterVisible, isZoneFilterVisible, isDateFilterVisible;
+    boolean isCategoryFilterVisible, isZoneFilterVisible, isDateFilterVisible, isSortFilterVisible;
 
     boolean isTodaySelected;
 
@@ -98,6 +100,7 @@ public class EventsGridActivity extends BaseContextActivity {
     public static final int ZONE_FILTER = 4;
     public static final int SPECIAL_FILTER = 5;
     public static final int TICKETED_FILTER = 6;
+    public static final int LOCALITY_FILTER = 7;
 
 
     public static final int FREE = 1;
@@ -122,8 +125,11 @@ public class EventsGridActivity extends BaseContextActivity {
 
     boolean isNearMeQuery;
 
+    boolean isNewYearQuery;
+
 
     ArrayList<String> specialFilters, previousSelectedFilters;
+    boolean isShowLocalitiesFilter;
 
     public static final String[] EXPLORE_TAGS = {
             EventCategory.NIGHTLIFE.categoryName,
@@ -142,6 +148,9 @@ public class EventsGridActivity extends BaseContextActivity {
     AutofitRecyclerView specialFilterGrid;
 
     LinearLayout specialFilterLayout;
+
+
+    ArrayList<String> selectedLocalities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +185,7 @@ public class EventsGridActivity extends BaseContextActivity {
         sortFilter = (HorizontalScrollView) findViewById(R.id.sort_container);
         dateFilter = (HorizontalScrollView) findViewById(R.id.date_filter);
         zoneFilter = (HorizontalScrollView) findViewById(R.id.zone_filter);
+        localitiesFilter = (HorizontalScrollView) findViewById(R.id.localities_filter);
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
@@ -272,40 +282,44 @@ public class EventsGridActivity extends BaseContextActivity {
                 }
 
                 isCategoryFilterVisible = true;
-                findViewById(R.id.category_filter).setVisibility(View.VISIBLE);
-                findViewById(R.id.zone_separator).setVisibility(View.VISIBLE);
+                isSortFilterVisible = true;
+                categoryFilter.setVisibility(View.VISIBLE);
+                findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
+                findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
+
             } else {
                 isCategoryFilterVisible = false;
-                findViewById(R.id.category_filter).setVisibility(View.GONE);
-                findViewById(R.id.zone_separator).setVisibility(View.GONE);
+                isSortFilterVisible = true;
+                categoryFilter.setVisibility(View.GONE);
+                findViewById(R.id.category_separator).setVisibility(View.GONE);
+                findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
+
             }
 
-            if (eventsContext.query.equalsIgnoreCase("New Year Parties") || eventsContext.query.equalsIgnoreCase("Parties & Nightlife")) {
-                if (eventsContext.query.equalsIgnoreCase("New Year Parties")) {
-                    isDateFilterVisible = false;
-                    dateFilter.setVisibility(View.GONE);
-                    findViewById(R.id.category_separator).setVisibility(View.GONE);
-                } else {
-                    isDateFilterVisible = true;
-                    findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
-                    dateFilter.setVisibility(View.VISIBLE);
-                }
-                if (eventsContext.city.equals(City.GOA)) {
-                    isZoneFilterVisible = false;
-                    zoneFilter.setVisibility(View.GONE);
-                    findViewById(R.id.price_separator).setVisibility(View.GONE);
-                } else {
-                    isZoneFilterVisible = true;
-                    zoneFilter.setVisibility(View.VISIBLE);
-                    findViewById(R.id.price_separator).setVisibility(View.VISIBLE);
-                }
+            if (eventsContext.query.equalsIgnoreCase("New Year Parties") || eventsContext.query.equalsIgnoreCase("Parties And Nightlife")) {
+
+                isNewYearQuery = true;
+                isDateFilterVisible = false;
+                isSortFilterVisible = false;
+                isCategoryFilterVisible = true;
+                categoryFilter.setVisibility(View.VISIBLE);
+                findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
+                sortFilter.setVisibility(View.GONE);
+                findViewById(R.id.sort_separator).setVisibility(View.GONE);
+                dateFilter.setVisibility(View.GONE);
+                findViewById(R.id.date_separator).setVisibility(View.GONE);
+                isShowLocalitiesFilter = true;
+                isZoneFilterVisible = true;
+                zoneFilter.setVisibility(View.VISIBLE);
+
             } else {
+                isShowLocalitiesFilter = false;
                 isZoneFilterVisible = false;
                 isDateFilterVisible = true;
                 dateFilter.setVisibility(View.VISIBLE);
+                findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
                 zoneFilter.setVisibility(View.GONE);
 
-                findViewById(R.id.price_separator).setVisibility(View.GONE);
             }
 
             boolean showEhInviteForNotification = getIntent() != null &&
@@ -327,7 +341,7 @@ public class EventsGridActivity extends BaseContextActivity {
             // tr.replace(R.id.event_container, thisWeekFragment);
             tr.commit();
         }
-        addFiltersData();
+        //  addFiltersData();
         specialFilterLayout = (LinearLayout) findViewById(R.id.special_filter_layout);
         specialFilterGrid = (AutofitRecyclerView) findViewById(R.id.special_filter_grid);
         findViewById(R.id.close_filter).setOnClickListener(new View.OnClickListener() {
@@ -400,7 +414,8 @@ public class EventsGridActivity extends BaseContextActivity {
     EventsAdapter specialFilterAdapter;
 
     public void addSpecialFilterGrid(ArrayList<EventFilterAttribute> attributes) {
-        if (attributes != null && attributes.size() > 0) {
+        fabSpecialFilter.setVisibility(View.GONE);
+        /*if (attributes != null && attributes.size() > 0) {
             if (isFabFilterVisible) {
                 fabSpecialFilter.setVisibility(View.GONE);
                 fabBrowseMap.setVisibility(View.GONE);
@@ -421,7 +436,7 @@ public class EventsGridActivity extends BaseContextActivity {
             specialFilterGrid.setAdapter(specialFilterAdapter);
         } else {
             fabSpecialFilter.setVisibility(View.GONE);
-        }
+        }*/
     }
 
     EventsMapFragment mapFragment;
@@ -472,95 +487,186 @@ public class EventsGridActivity extends BaseContextActivity {
 
     TextView selectCustomDates, today, tomorrow, weekend;
 
+    List<BrowseFilterAttributes> filters;
+    List<String> browseZones;
+
+    public void setCompoundDrawable(TextView textView, int resId) {
+        Drawable drawable = getDrawable(resId);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        textView.setCompoundDrawables(null, drawable, null, null);
+    }
+
 
     public void addFiltersData() {
+        int iterateCount = 0;
 
         final LinearLayout horizontalCategories = (LinearLayout) findViewById(R.id.category_container);
-        final String[] categories = EXPLORE_TAGS;
-        for (int i = 0; i < categories.length; i++) {
-            View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
-            final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
-            filterText.setText(categories[i]);
-            horizontalCategories.addView(view);
-            filterText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        horizontalCategories.removeAllViews();
+        if (isNewYearQuery && filters != null && filters.size() > 0) {
+            if (filters.size() > 6) {
+                iterateCount = 6;
+            } else {
+                iterateCount = filters.size();
+            }
+            for (int i = 0; i < iterateCount; i++) {
+                final BrowseFilterAttributes attribute = filters.get(i);
+                View view = LayoutInflater.from(this).inflate(R.layout.special_filter_tags_layout, horizontalCategories, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                int lastSpaceIndex = attribute.getName().lastIndexOf(" ");
+                String filterName = attribute.getName().substring(0, lastSpaceIndex) + "\n" + attribute.getName().substring(lastSpaceIndex + 1, attribute.getName().length());
+                filterText.setText(attribute.getName());
+                horizontalCategories.addView(view);
+                setCompoundDrawable(filterText, attribute.getIconResourceId());
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                    if (filterText.isSelected()) {
-                        filterText.setSelected(false);
-                    } else {
-                        filterText.setSelected(true);
+                        if (filterText.isSelected()) {
+                            filterText.setSelected(false);
+                            setCompoundDrawable(filterText, attribute.getIconResourceId());
+                        } else {
+                            filterText.setSelected(true);
+                            setCompoundDrawable(filterText, attribute.getSelectedIconResourceId());
+                        }
+                        eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getKey(), false, null, -1);
+                        reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
                     }
-                    if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
+                });
+            }
+        } else {
+            final String[] categories = EXPLORE_TAGS;
+            for (int i = 0; i < categories.length; i++) {
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                filterText.setText(categories[i]);
+                horizontalCategories.addView(view);
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null, null, false);
-                        //eventsFragment.filterEventsWithCategory("Featured", null);
-                    } else {
-                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null, null, false, null);
-                        //eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
+                        if (filterText.isSelected()) {
+                            filterText.setSelected(false);
+                        } else {
+                            filterText.setSelected(true);
+                        }
+                        if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
+
+                            eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null, null, false, null);
+                            //eventsFragment.filterEventsWithCategory("Featured", null);
+                        } else {
+                            eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null, null, false, null);
+                            //eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
+                        }
+                        reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
                     }
-                    reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
-                }
-            });
+                });
+            }
         }
         LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
-        String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
-        for (int i = 0; i < priceRanges.length; i++) {
-            View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalprice, false);
-            final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
-            filterText.setText(priceRanges[i]);
-            horizontalprice.addView(view);
-            filterText.setTag(i);
-            filterText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = (Integer) filterText.getTag();
-                    if (position == 0) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null, null, false, null);
-                        reportActionToAnalytics("filters", eventsContext.query + "-FREE");
-                        // eventsFragment.filterEventsWithPrice(null, FREE);
-                    } else if (position == 1) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null, null, false, null);
-                        //eventsFragment.filterEventsWithPrice(null, UPTO_250);
-                        reportActionToAnalytics("filters", eventsContext.query + "uptp250");
-                    } else if (position == 2) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null, null, false, null);
-                        reportActionToAnalytics("filters", eventsContext.query + "price250to750");
-                        //eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
-                    } else if (position == 3) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null, null, false, null);
-                        //eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
-                        reportActionToAnalytics("filters", eventsContext.query + "price750to1500");
-                    } else {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null, null, false, null);
-                        reportActionToAnalytics("filters", eventsContext.query + "moreThan1500");
-                        //eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
-                    }
+        horizontalprice.removeAllViews();
+        if (isNewYearQuery) {
 
-                    if (filterText.isSelected()) {
-                        filterText.setSelected(false);
-                    } else {
-                        filterText.setSelected(true);
-                    }
+            if (iterateCount < filters.size()) {
+                horizontalprice.setVisibility(View.VISIBLE);
+                iterateCount = filters.size();
+                for (int i = 6; i < iterateCount; i++) {
+                    final BrowseFilterAttributes attribute = filters.get(i);
+                    View view = LayoutInflater.from(this).inflate(R.layout.special_filter_tags_layout, horizontalprice, false);
+                    final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                    int lastSpaceIndex = attribute.getName().lastIndexOf(" ");
+                    String filterName = attribute.getName().substring(0, lastSpaceIndex) + "\n" + attribute.getName().substring(lastSpaceIndex + 1, attribute.getName().length());
+                    filterText.setText(attribute.getName());
+                    horizontalprice.addView(view);
+                    setCompoundDrawable(filterText, attribute.getIconResourceId());
+                    filterText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            if (filterText.isSelected()) {
+                                filterText.setSelected(false);
+                                setCompoundDrawable(filterText, attribute.getIconResourceId());
+                            } else {
+                                filterText.setSelected(true);
+                                setCompoundDrawable(filterText, attribute.getSelectedIconResourceId());
+                            }
+                            eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getKey(), false, null, -1);
+                            reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
+                        }
+                    });
                 }
-            });
+            } else {
+                horizontalprice.setVisibility(View.GONE);
+            }
+        } else {
+            String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
+            for (int i = 0; i < priceRanges.length; i++) {
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalprice, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                filterText.setText(priceRanges[i]);
+                horizontalprice.addView(view);
+                filterText.setTag(i);
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = (Integer) filterText.getTag();
+                        if (position == 0) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null, null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "-FREE");
+                            // eventsFragment.filterEventsWithPrice(null, FREE);
+                        } else if (position == 1) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null, null, false, null);
+                            //eventsFragment.filterEventsWithPrice(null, UPTO_250);
+                            reportActionToAnalytics("filters", eventsContext.query + "uptp250");
+                        } else if (position == 2) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null, null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "price250to750");
+                            //eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
+                        } else if (position == 3) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null, null, false, null);
+                            //eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
+                            reportActionToAnalytics("filters", eventsContext.query + "price750to1500");
+                        } else {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null, null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "moreThan1500");
+                            //eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
+                        }
+
+                        if (filterText.isSelected()) {
+                            filterText.setSelected(false);
+                        } else {
+                            filterText.setSelected(true);
+                        }
+                    }
+                });
+            }
         }
 
-
         LinearLayout zoneContainer = (LinearLayout) findViewById(R.id.zone_container);
-        final String[] zones = getZonesAccordingToCity();
+        List<String> zones = null;
+        if (browseZones != null) {
+            zones = browseZones;
+        } else {
+            zones = getZonesAccordingToCity();
+        }
+
         if (zones != null) {
-            for (int i = 0; i < zones.length + 1; i++) {
+            for (int i = 0; i < zones.size() + 1; i++) {
+
+                String zone = null;
+                if (i != 0) {
+                    zone = zones.get(i - 1);
+                }
                 View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, zoneContainer, false);
                 final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
                 if (i == 0) {
                     filterText.setText("Zone:");
                 } else {
-                    filterText.setText(zones[i - 1]);
+                    filterText.setText(zones.get(i - 1));
                 }
 
                 zoneContainer.addView(view);
                 filterText.setTag(i);
+                final String finalZone = zone;
                 filterText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -568,8 +674,8 @@ public class EventsGridActivity extends BaseContextActivity {
                         int position = (Integer) filterText.getTag();
                         if (position != 0) {
                             position = position - 1;
-                            eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, zones[position], null, false, null);
-                            reportActionToAnalytics("filters", eventsContext.query + "-" + zones[position]);
+                            eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, finalZone, null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "-" + finalZone);
                             // eventsFragment.filterEventsWithPrice(null, FREE);
 
                             if (filterText.isSelected()) {
@@ -614,18 +720,18 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + 1);
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + 1);
                         reportActionToAnalytics("filters", eventsContext.query + "-Today");
 
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY + 1);
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY + 1);
                         reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
                         // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getWeekEndDates());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getWeekEndDates());
                         reportActionToAnalytics("filters", eventsContext.query + "-Weekend");
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
@@ -730,35 +836,165 @@ public class EventsGridActivity extends BaseContextActivity {
             }
         });
         ticketedEventsSwitch = (SwitchCompat) findViewById(R.id.ticketed_events);
-        ticketedEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, true);
-                    reportActionToAnalytics("filters", eventsContext.query + "-showTicketedEvents");
-                } else {
-                    eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, false);
-                    reportActionToAnalytics("filters", eventsContext.query + "-showAllEvents");
+        if (isShowLocalitiesFilter) {
+            localitiesFilter.setVisibility(View.VISIBLE);
+            ticketedEventsSwitch.setVisibility(View.GONE);
+            addLocalitiesDataToContainer(selectedLocalities);
+
+        } else {
+            localitiesFilter.setVisibility(View.GONE);
+            ticketedEventsSwitch.setVisibility(View.VISIBLE);
+            ticketedEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, true, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "-showTicketedEvents");
+                    } else {
+                        eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, false, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "-showAllEvents");
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
-    public String[] getZonesAccordingToCity() {
+    public void addLocalitiesDataToContainer(final List<String> selectedLocalities) {
+        final LinearLayout localitiesContainer = (LinearLayout) findViewById(R.id.localities_container);
+        localitiesContainer.removeAllViews();
+
+        if (selectedLocalities != null) {
+            for (int i = 0; i < selectedLocalities.size() + 1; i++) {
+                final int position = i;
+
+                final View view = LayoutInflater.from(this).inflate(R.layout.locality_filter_tag_layout, localitiesContainer, false);
+                LinearLayout parentLayout = (LinearLayout) view.findViewById(R.id.parent_layout);
+                ImageView cancelImg = (ImageView) view.findViewById(R.id.cancel);
+                final TextView filterText = (TextView) view.findViewById(R.id.locality_name);
+                View separator = view.findViewById(R.id.separator);
+                if (i == 0) {
+                    filterText.setText("Select Locality");
+                    filterText.setTextColor(Color.parseColor("#3e3e3e"));
+                    cancelImg.setVisibility(View.GONE);
+                    parentLayout.setBackground(getDrawable(R.drawable.white_bg));
+                    separator.setVisibility(View.GONE);
+                } else {
+                    filterText.setText(selectedLocalities.get(i - 1));
+                    filterText.setTextColor(getResources().getColor(android.R.color.white));
+                    parentLayout.setBackground(getDrawable(R.drawable.locality_tag_bg));
+                    cancelImg.setVisibility(View.VISIBLE);
+                    separator.setVisibility(View.VISIBLE);
+                }
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (position == 0) {
+                            showLocalitiesList();
+                        }
+                    }
+                });
+
+
+                cancelImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View image) {
+
+                        if (EventsGridActivity.this.selectedLocalities.contains(selectedLocalities.get(position - 1))) {
+                            EventsGridActivity.this.selectedLocalities.remove(selectedLocalities.get(position - 1));
+                        }
+                        addLocalitiesDataToContainer(EventsGridActivity.this.selectedLocalities);
+                        eventsFragment.startFilterAsyncTask(LOCALITY_FILTER, null, null, -1, null, null, false, EventsGridActivity.this.selectedLocalities);
+                    }
+                });
+                localitiesContainer.addView(view);
+
+            }
+        } else {
+            View view = LayoutInflater.from(this).inflate(R.layout.locality_filter_tag_layout, localitiesContainer, false);
+            final TextView filterText = (TextView) view.findViewById(R.id.locality_name);
+            view.findViewById(R.id.separator).setVisibility(View.GONE);
+            filterText.setText("Select Locality");
+            filterText.setTextColor(Color.parseColor("#3e3e3e"));
+            view.findViewById(R.id.cancel).setVisibility(View.GONE);
+            LinearLayout parentLayout = (LinearLayout) view.findViewById(R.id.parent_layout);
+            parentLayout.setBackground(getDrawable(R.drawable.white_bg));
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showLocalitiesList();
+                }
+            });
+            localitiesContainer.addView(view);
+        }
+    }
+
+    List<String> localities;
+
+    public boolean[] getBooleanList(CharSequence[] dialogList) {
+        boolean[] isCheckedList = new boolean[dialogList.length];
+        if (selectedLocalities != null) {
+            for (int i = 0; i < dialogList.length; i++) {
+
+                if (selectedLocalities.contains(dialogList[i].toString())) {
+                    isCheckedList[i] = true;
+                } else {
+                    isCheckedList[i] = false;
+                }
+            }
+        }
+        return isCheckedList;
+    }
+
+    public void showLocalitiesList() {
+
+        final CharSequence[] dialogList = localities.toArray(new CharSequence[localities.size()]);
+
+        boolean[] is_checked = getBooleanList(dialogList);
+        new AlertDialog.Builder(this).setTitle("Select Locality").setMultiChoiceItems(dialogList, is_checked, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i, boolean isChecked) {
+                if (selectedLocalities != null) {
+                    if (selectedLocalities.contains(dialogList[i].toString())) {
+                        selectedLocalities.remove(dialogList[i].toString());
+                    } else {
+                        selectedLocalities.add(dialogList[i].toString());
+                    }
+                } else {
+                    selectedLocalities = new ArrayList<>();
+                    selectedLocalities.add(dialogList[i].toString());
+                }
+            }
+        }).setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+                addLocalitiesDataToContainer(selectedLocalities);
+                eventsFragment.startFilterAsyncTask(LOCALITY_FILTER, null, null, -1, null, null, false, selectedLocalities);
+
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        }).show();
+    }
+
+    public List<String> getZonesAccordingToCity() {
         if (account.getLastCity() == City.BANGALORE) {
-            return new String[]{"Central Bangalore", "East Bangalore", "North Bangalore", "South Bangalore", "West Bangalore", "Outside " + Utils.capitalize(City.BANGALORE.name())};
+            return Arrays.asList(new String[]{"Central Bangalore", "East Bangalore", "North Bangalore", "South Bangalore", "West Bangalore", "Outside " + Utils.capitalize(City.BANGALORE.name())});
         } else if (account.getLastCity() == City.CHENNAI) {
-            return new String[]{"Central Chennai", "North Chennai", "South Chennai", "Outside " + Utils.capitalize(City.CHENNAI.name())};
+            return Arrays.asList(new String[]{"Central Chennai", "North Chennai", "South Chennai", "Outside " + Utils.capitalize(City.CHENNAI.name())});
         } else if (account.getLastCity() == City.DELHI) {
-            return new String[]{"Central Delhi", "East Delhi", "Ghaziabad", "Greater Noida", "Gurgaon", "Noida", "South Delhi", "South West Delhi", "West Delhi", "Outside " + Utils.capitalize(City.DELHI.name())};
+            return Arrays.asList(new String[]{"Central Delhi", "East Delhi", "Ghaziabad", "Greater Noida", "Gurgaon", "Noida", "South Delhi", "South West Delhi", "West Delhi", "Outside " + Utils.capitalize(City.DELHI.name())});
         } else if (account.getLastCity() == City.MUMBAI) {
-            return new String[]{"Mumbai Central Suburbs", "Mumbai Harbour", "Mumbai Mira Road & Beyond", "Mumbai South", "Mumbai Western Suburbs", "Outside " + Utils.capitalize(City.MUMBAI.name())};
+            return Arrays.asList(new String[]{"Mumbai Central Suburbs", "Mumbai Harbour", "Mumbai Mira Road & Beyond", "Mumbai South", "Mumbai Western Suburbs", "Outside " + Utils.capitalize(City.MUMBAI.name())});
         } else if (account.getLastCity() == City.HYDERABAD) {
-            return new String[]{"Central Hyderabad", "East Hyderabad", "North Hyderabad", "South Hyderabad", "West Hyderabad", "Hyderabad Outer"};
+            return Arrays.asList(new String[]{"Central Hyderabad", "East Hyderabad", "North Hyderabad", "South Hyderabad", "West Hyderabad", "Hyderabad Outer"});
         } else if (account.getLastCity() == City.KOLKATA) {
-            return new String[]{"Kolkata Central", "Kolkata East", "Kolkata North", "Kolkata South"};
+            return Arrays.asList(new String[]{"Kolkata Central", "Kolkata East", "Kolkata North", "Kolkata South"});
         } else if (account.getLastCity() == City.PUNE) {
-            return new String[]{"Central Pune", "East Pune", "North Pune", "South Pune", "West Pune", "Pune Outer"};
+            return Arrays.asList(new String[]{"Central Pune", "East Pune", "North Pune", "South Pune", "West Pune", "Pune Outer"});
         } else {
             return null;
         }
@@ -838,7 +1074,7 @@ public class EventsGridActivity extends BaseContextActivity {
                 }
                 builder.append(DateTimeUtils.getDateFromMillisTime(selectedDates.get(i).getTime()));
             }
-            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, dates);
+            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, dates);
             reportActionToAnalytics("filters", eventsContext.query + "-" + builder.toString());
             //eventsFragment.filterEventsWithDate(null, dates);
         }
@@ -1052,29 +1288,63 @@ public class EventsGridActivity extends BaseContextActivity {
             if (eventsFragment.isMapShown) {
                 if (isZoneFilterVisible) {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 5), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        }
+
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        }
+
                     }
                 } else {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        }
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 2), getResources().getDisplayMetrics());
+                        }
                     }
                 }
             } else {
                 if (isZoneFilterVisible) {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 6), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 6), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 5), getResources().getDisplayMetrics());
+                        }
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 5), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        }
                     }
                 } else {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 5), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        }
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        }
                     }
                 }
 
@@ -1084,30 +1354,62 @@ public class EventsGridActivity extends BaseContextActivity {
             if (eventsFragment.isMapShown) {
                 if (isZoneFilterVisible) {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        }
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 2), getResources().getDisplayMetrics());
+                        }
                     }
                 } else {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 2), getResources().getDisplayMetrics());
+                        }
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 2), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 1), getResources().getDisplayMetrics());
+                        }
                     }
                 }
 
             } else {
                 if (isZoneFilterVisible) {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 5), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        }
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        }
                     }
                 } else {
                     if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 4), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        }
                     } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                        if (isSortFilterVisible) {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 3), getResources().getDisplayMetrics());
+                        } else {
+                            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64 * 2), getResources().getDisplayMetrics());
+                        }
                     }
                 }
 
@@ -1183,7 +1485,7 @@ public class EventsGridActivity extends BaseContextActivity {
 
     public void collapseAnimation(final int hideValue) {
 
-        ResizeAnimation resizeAnimation = new ResizeAnimation(filtersContainer, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56), getResources().getDisplayMetrics()));
+        ResizeAnimation resizeAnimation = new ResizeAnimation(filtersContainer, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (64), getResources().getDisplayMetrics()));
         resizeAnimation.setDuration(200);
         resizeAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
         resizeAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -1298,7 +1600,7 @@ public class EventsGridActivity extends BaseContextActivity {
             public void onAnimationEnd(Animator animation) {
                 isFabFilterVisible = false;
                 if (specialFilters != null && isRefreshData) {
-                    eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, specialFilters, false, -1);
+                    //eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, specialFilters, false, -1);
                     // Toast.makeText(EventsGridActivity.this, specialFilters.size() + " filters selected", Toast.LENGTH_SHORT).show();
 
                 }

@@ -95,7 +95,7 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
                 JSONArray eventsJsonArray = eventsJson.getJSONArray("events");
 
                 for (int i = 0; i < eventsJsonArray.length(); i++) {
-                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), includeWithoutLocation, null);
+                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"),null, includeWithoutLocation, null);
                     account.setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
                     MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"), topicEvents, eventsJsonArray.getJSONObject(i).getInt("event_count"));
                     events.add(eventData);

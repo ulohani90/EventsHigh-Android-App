@@ -32,16 +32,15 @@ import java.util.List;
 public class MultiEventsRequest extends JsonRequest<List<Event>> {
 
 
-
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param listener callback on success.
+     * @param listener      callback on success.
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext, List<String> eventIds,
-            Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,boolean isFilterOldEvents,
-            Listener<List<Event>> listener, ErrorListener errorListener) {
+                              Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation, boolean isFilterOldEvents,
+                              Listener<List<Event>> listener, ErrorListener errorListener) {
 
 
         if (eventIds.isEmpty()) {
@@ -57,8 +56,8 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             return;
         }
 
-        MultiEventsRequest request = new MultiEventsRequest(context,eventsContext, url, priority,
-                shouldBypassCache, includeWithoutLocation,isFilterOldEvents, listener, errorListener);
+        MultiEventsRequest request = new MultiEventsRequest(context, eventsContext, url, priority,
+                shouldBypassCache, includeWithoutLocation, isFilterOldEvents, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
@@ -69,8 +68,8 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
     private final boolean includeWithoutLocation;
     private Context mContext;
 
-    public MultiEventsRequest(Context context,EventsContext eventsContext, String url, Priority priority,
-                              boolean shouldBypassCache, boolean includeWithoutLocation,boolean isFilterOldEvents,
+    public MultiEventsRequest(Context context, EventsContext eventsContext, String url, Priority priority,
+                              boolean shouldBypassCache, boolean includeWithoutLocation, boolean isFilterOldEvents,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -98,7 +97,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             Iterator<String> keys = eventsJson.keys();
             while (keys.hasNext()) {
                 try {
-                    Event event = Event.fromJSON(eventsJson.getJSONObject(keys.next()));
+                    Event event = Event.fromJSON(eventsJson.getJSONObject(keys.next()), null);
                     if (includeWithoutLocation || event.location != null) {
                         events.add(event);
                     }
@@ -108,8 +107,8 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             }
 
             //events are not required to be filter always.
-            if(isFilterOldEvents)
-                EventCollectionRequest.filterOldEvents(mContext,events);
+            if (isFilterOldEvents)
+                EventCollectionRequest.filterOldEvents(mContext, events);
 
             // Sort the event list to user.
             Collections.sort(events, new EventComparator(eventsContext.location));

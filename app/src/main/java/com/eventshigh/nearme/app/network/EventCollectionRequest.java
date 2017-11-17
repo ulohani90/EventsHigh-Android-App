@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.data.BrowseFilterAttributes;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -21,11 +22,14 @@ import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.facebook.share.model.GameRequestContent;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -40,11 +44,21 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
     public static class EventsCollection {
         public final List<Event> events;
+
         public final int numFollowers;
 
-        public EventsCollection(List<Event> events, int numFollowers) {
+        public final List<BrowseFilterAttributes> filters;
+
+        public final List<String> zones;
+
+        public final List<String> localities;
+
+        public EventsCollection(List<Event> events, int numFollowers, List<BrowseFilterAttributes> filters, List<String> zones, List<String> localities) {
             this.events = events;
             this.numFollowers = numFollowers;
+            this.filters = filters;
+            this.zones = zones;
+            this.localities = localities;
         }
     }
 
@@ -153,14 +167,20 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         String jsonString = new String(response.data, "UTF-8");
         final JSONObject eventsJson = new JSONObject(jsonString);
 
+        final List<BrowseFilterAttributes> filters = BrowseFilterAttributes.parseFiltersArray(eventsJson.optJSONArray("filters"));
+
+        final List<String> zones = readFacetsArray(eventsJson.optJSONObject("facets"), "zones");
+
+        final List<String> localities = readFacetsArray(eventsJson.optJSONObject("facets"), "localities");
+
         if (listener != null) {
-            Event.parseUpcomingEvents(eventsJson, includeWithoutLocation, new Event.OnPartialDataLoadingComplete() {
+            Event.parseUpcomingEvents(eventsJson, filters, includeWithoutLocation, new Event.OnPartialDataLoadingComplete() {
                 @Override
                 public void onPartialLoadingComplete(List<Event> events) {
                     filterOldEvents(context, events);
                     // Sort the event list to user.
                     Collections.sort(events, new EventComparator(eventsContext.location));
-                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers")), false);
+                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities), false);
 
 
                 }
@@ -170,23 +190,34 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                     filterOldEvents(context, events);
                     // Sort the event list to user.
                     Collections.sort(events, new EventComparator(eventsContext.location));
-                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers")), true);
+                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities), true);
                 }
             });
         } else {
-            List<Event> events = Event.parseUpcomingEvents(eventsJson, includeWithoutLocation, null);
+            List<Event> events = Event.parseUpcomingEvents(eventsJson, filters, includeWithoutLocation, null);
             filterOldEvents(context, events);
-
             // Sort the event list to user.
             Collections.sort(events, new EventComparator(eventsContext.location));
 
-            return new EventsCollection(events, eventsJson.optInt("num_followers"));
-
+            return new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities);
         }
         return null;
 
     }
 
+    public static List<String> readFacetsArray(JSONObject jsonObj, String key) {
+        List<String> names = new ArrayList<>();
+        if (jsonObj != null) {
+            JSONArray jsonArray = jsonObj.optJSONArray(key);
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String venueName = jsonArray.optJSONObject(i).optString("name");
+                    names.add(venueName);
+                }
+            }
+        }
+        return names;
+    }
 
     // Filter out the events which has started more than three hours back.
     public static void filterOldEvents(Context context, List<Event> events) {
@@ -207,7 +238,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                 }
 
                 EventTime eventTime = DateTimeUtils.dateToEventTime(new Date(eventTiming),
-                        TimeZone.getTimeZone(event.timezone));
+                        TimeZone.getTimeZone(event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE));
                 if (eventTime.time != null && eventTiming < threeHoursBack) {
                     continue;
                 }

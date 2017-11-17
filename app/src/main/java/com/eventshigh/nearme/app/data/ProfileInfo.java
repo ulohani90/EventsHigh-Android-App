@@ -159,7 +159,7 @@ public class ProfileInfo implements Parcelable {
 
                 for (int i = 0; i < eventsJsonArray.length(); i++) {
 
-                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true, null);
+                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), null, true, null);
 
                     if (profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email))
                         new Account(context).setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
@@ -192,7 +192,7 @@ public class ProfileInfo implements Parcelable {
 
 
             if (jsonObject.has("fav_events")) {
-                List<Event> topicEvents = Event.fromJSON(context, jsonObject.getJSONArray("fav_events"), true, profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email));
+                List<Event> topicEvents = Event.fromJSON(context, jsonObject.getJSONArray("fav_events"),null, true, profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email));
                 favouriteTopicEvents.add(new MyEventsRequest.TopicEvents(MyEventsRequest.FAVOURITES_NAME, topicEvents));
             }
             List<NewSocialFriend> friendList = new ArrayList<>();

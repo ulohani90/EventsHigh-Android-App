@@ -85,7 +85,7 @@ public class FetchUserInterestsRequest extends JsonRequest<List<MyEventsRequest.
 
                 for (int i = 0; i < eventsJsonArray.length(); i++) {
 
-                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true, null);
+                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), null, true, null);
 
                     if (profileId.equalsIgnoreCase(new Account(context).getUserInfo().email))
                         new Account(context).setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
@@ -100,6 +100,6 @@ public class FetchUserInterestsRequest extends JsonRequest<List<MyEventsRequest.
             return Response.error(new ParseError(e));
         }
 
-        
+
     }
 }

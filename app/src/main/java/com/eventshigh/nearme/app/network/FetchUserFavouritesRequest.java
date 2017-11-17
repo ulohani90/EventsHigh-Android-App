@@ -79,7 +79,7 @@ public class FetchUserFavouritesRequest extends JsonRequest<List<Event>> {
             List<Event> events = new ArrayList<>();
 
             if (eventsJson.has("fav_events")) {
-                events = Event.fromJSON(context, eventsJson.getJSONArray("fav_events"), true, profileId.equalsIgnoreCase(new Account(context).getUserInfo().email));
+                events = Event.fromJSON(context, eventsJson.getJSONArray("fav_events"),null, true, profileId.equalsIgnoreCase(new Account(context).getUserInfo().email));
             }
 
             return Response.success(events, HttpHeaderParser.parseCacheHeaders(networkResponse));

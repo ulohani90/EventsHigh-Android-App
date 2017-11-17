@@ -2,9 +2,9 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- finger down -->
-    <item android:color="#353535" android:state_selected="true" />
+    <item android:color="#7A7A7A" android:state_selected="true" />
 
-    <item android:color="#353535" android:state_focused="true" />
+    <item android:color="#7A7A7A" android:state_focused="true" />
 
     <!-- Default, "just hanging' out" state. -->
     <item android:color="@android:color/white" />
