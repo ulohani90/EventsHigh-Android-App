@@ -38,11 +38,14 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.DisplayZoneObject;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventDistanceComparator;
 import com.eventshigh.nearme.app.data.EventPriceComparator;
 import com.eventshigh.nearme.app.data.EventScoreComparator;
+import com.eventshigh.nearme.app.data.EventSpecialFilterComparator;
 import com.eventshigh.nearme.app.data.EventTimeComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.ProfileInfo;
@@ -74,6 +77,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.io.SyncFailedException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -339,8 +343,11 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
         }
         if (!isFilterApplied()) {
-            if (showHeaderCard && filteredEvents.size() > 5)
+            if (showHeaderCard && filteredEvents.size() > 5) {
                 addBrowseCarousel(filteredEvents.subList(0, 5));
+            } else {
+                stopCarousel();
+            }
             if (showEditorPicks && filteredEvents.size() > 13)
                 addEditorPicks(filteredEvents.subList(5, 13));
         }
@@ -495,6 +502,7 @@ public class EventsFragment extends BaseEventsFragment {
                                             } else {
                                                 noMyEventsView.setVisibility(View.GONE);
                                             }
+                                            ((EventsGridActivity) getActivity()).computeFilters();
                                             if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
                                                 ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
                                             }
@@ -526,6 +534,8 @@ public class EventsFragment extends BaseEventsFragment {
                                         eventsAdapter.setBrowseHeader(filteredEvents.size());
                                         if (showHeaderCard && filteredEvents.size() > 5) {
                                             addBrowseCarousel(filteredEvents.subList(0, 5));
+                                        } else {
+                                            stopCarousel();
                                         }
                                         if (showEditorPicks && filteredEvents.size() > 13) {
                                             addEditorPicks(filteredEvents.subList(5, 13));
@@ -753,7 +763,7 @@ public class EventsFragment extends BaseEventsFragment {
                     ((EventsGridActivity) getActivity()).filters = eventsCollection.filters;
                     ((EventsGridActivity) getActivity()).browseZones = eventsCollection.zones;
                     ((EventsGridActivity) getActivity()).localities = eventsCollection.localities;
-                    ((EventsGridActivity) getActivity()).addFiltersData();
+                    ((EventsGridActivity) getActivity()).computeFilters();
                     String seeAllQuery = eventsContext.query.isEmpty() ||
                             eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
                     if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
@@ -794,6 +804,8 @@ public class EventsFragment extends BaseEventsFragment {
 
                     if (showHeaderCard && filteredEvents.size() > 5) {
                         addBrowseCarousel(filteredEvents.subList(0, 5));
+                    } else {
+                        stopCarousel();
                     }
 
                     if (showEditorPicks && filteredEvents.size() > 13) {
@@ -910,9 +922,9 @@ public class EventsFragment extends BaseEventsFragment {
         return null;
     }
 
-    ArrayList<String> filterZoneName;
+    ArrayList<DisplayZoneObject> filterZoneName;
 
-    public List<Event> filterEventsWithZone(String zone, List<Event> totalEvents) {
+    public List<Event> filterEventsWithZone(DisplayZoneObject zone, List<Event> totalEvents) {
         List<Event> allEvents;
 
         if (totalEvents == null && eventsCollection != null) {
@@ -935,11 +947,31 @@ public class EventsFragment extends BaseEventsFragment {
             List<Event> filteredEvents = new ArrayList<>();
             if (filterZoneName.size() > 0) {
                 for (int i = 0; i < allEvents.size(); i++) {
+                    Event event = allEvents.get(i);
                     for (int j = 0; j < filterZoneName.size(); j++) {
-
-                        if (allEvents.get(i).zone.equalsIgnoreCase(filterZoneName.get(j))) {
-                            filteredEvents.add(allEvents.get(i));
-                            break;
+                        if (filterZoneName.get(j).getSynonyms() != null) {
+                            for (String synonymName : filterZoneName.get(j).getSynonyms()) {
+                                if ((event.zone != null && synonymName.equalsIgnoreCase(event.zone))
+                                        || event.title.toLowerCase().contains(synonymName.toLowerCase())
+                                        || (event.locality != null && synonymName.equalsIgnoreCase(event.locality))
+                                        || (event.venue != null && event.venue.toLowerCase().contains(synonymName.toLowerCase()))
+                                        || (event.destination != null && event.destination.toLowerCase().contains(synonymName.toLowerCase()))
+                                        || (event.address != null && event.address.toLowerCase().contains(synonymName.toLowerCase()))) {
+                                    filteredEvents.add(event);
+                                    break;
+                                }
+                            }
+                        } else {
+                            String displayName = filterZoneName.get(j).getDisplayName();
+                            if (displayName.equalsIgnoreCase(event.zone)
+                                    || event.title.toLowerCase().contains(displayName.toLowerCase())
+                                    || (event.locality != null && displayName.equalsIgnoreCase(event.locality))
+                                    || (event.venue != null && event.venue.toLowerCase().contains(displayName.toLowerCase()))
+                                    || (event.destination != null && event.destination.toLowerCase().contains(displayName.toLowerCase()))
+                                    || (event.address != null && event.address.toLowerCase().contains(displayName.toLowerCase()))) {
+                                filteredEvents.add(event);
+                                break;
+                            }
                         }
                     }
                 }
@@ -984,6 +1016,7 @@ public class EventsFragment extends BaseEventsFragment {
             if (filterEventTimes == null) {
                 filterEventTimes = new ArrayList<>();
             }
+
             for (long time : times) {
                 if (time != -1) {
                     if (filterEventTimes.contains(time)) {
@@ -1004,8 +1037,8 @@ public class EventsFragment extends BaseEventsFragment {
                             break secondLoop;
                         } else {
                             for (int k = 0; k < allEvents.get(i).eventTimings.size(); k++) {
-                                if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime() ||
-                                        filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime() + 1) {
+                                long eventTime = allEvents.get(i).eventTimings.get(k);
+                                if (filterEventTimes.get(j) < eventTime && eventTime < filterEventTimes.get(j) + DateTimeUtils.MILLISECONDS_IN_A_DAY) {
                                     filteredEvents.add(allEvents.get(i));
                                     break secondLoop;
 
@@ -1014,6 +1047,8 @@ public class EventsFragment extends BaseEventsFragment {
                         }
                     }
                 }
+
+
             } else {
                 filteredEvents = allEvents;
             }
@@ -1229,9 +1264,19 @@ public class EventsFragment extends BaseEventsFragment {
             if (filterLocalities.size() > 0) {
                 for (int i = 0; i < allEvents.size(); i++) {
                     Event event = allEvents.get(i);
-                //    Log.i("Filter Locality", event.locality);
-                    if (filterLocalities.contains(event.locality)) {
+                    //    Log.i("Filter Locality", event.locality);
+                    if (((event.locality != null && filterLocalities.contains(event.locality))
+                            || (event.zone != null && filterLocalities.contains(event.zone)))) {
                         filteredEvents.add(event);
+                    } else {
+                        for (String localityName : filterLocalities) {
+                            if ((event.venue != null && event.venue.contains(localityName))
+                                    || (event.address != null && event.address.contains(localityName))
+                                    || (event.destination != null && event.destination.contains(localityName))
+                                    || (event.title != null && event.title.contains(localityName))) {
+                                filteredEvents.add(event);
+                            }
+                        }
                     }
                 }
             } else {
@@ -1318,6 +1363,8 @@ public class EventsFragment extends BaseEventsFragment {
                 if (!isFilterApplied()) {
                     if (showHeaderCard && filteredEvents.size() > 5) {
                         addBrowseCarousel(filteredEvents.subList(0, 5));
+                    } else {
+                        stopCarousel();
                     }
                     if (showEditorPicks && filteredEvents.size() > 13) {
                         addEditorPicks(filteredEvents.subList(5, 13));
@@ -1325,6 +1372,13 @@ public class EventsFragment extends BaseEventsFragment {
                 }
             }
 
+        }
+    }
+
+    public void stopCarousel() {
+        if (activity.timer != null) {
+            activity.timer.cancel();
+            activity.timer = null;
         }
     }
 
@@ -1341,6 +1395,7 @@ public class EventsFragment extends BaseEventsFragment {
     public void addEditorPicks(List<Event> events) {
         int width = getResources().getDisplayMetrics().widthPixels -
                 3 * ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()));
+        Collections.shuffle(events);
         eventsAdapter.addEditorPicks(events, width / 2);
     }
 
@@ -1348,7 +1403,7 @@ public class EventsFragment extends BaseEventsFragment {
     public void sortData() {
         if (filteredEvents != null) {
             if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
-                Collections.sort(filteredEvents, new EventScoreComparator());
+                Collections.sort(filteredEvents, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_UBER_SCORE));
                 arrangeEventsForSponsered();
             } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
                 Collections.sort(filteredEvents, new EventPriceComparator());
@@ -1381,7 +1436,44 @@ public class EventsFragment extends BaseEventsFragment {
         }
     }
 
-    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, String specialFilter, boolean showTicketedEvents, ArrayList<String> localities, long... times) {
+
+    public boolean isNewYearQuery() {
+        if (eventsContext.query.equalsIgnoreCase("New Year Parties") || eventsContext.query.equalsIgnoreCase("New Year Party")
+                || eventsContext.query.toLowerCase().contains("new year parties")
+                || eventsContext.query.toLowerCase().contains("new year party")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isOutdoorsQuery() {
+        if (eventsContext.query.equalsIgnoreCase("Outdoors") || eventsContext.query.equalsIgnoreCase("Outdoor")
+                || eventsContext.query.toLowerCase().contains("outdoors")
+                || eventsContext.query.toLowerCase().contains("outdoor")) {
+            return true;
+        }
+        return false;
+    }
+
+    public List<Event> sortEventsAsPerSpecialFilters(List<Event> events) {
+        if (isNewYearQuery()) {
+            if (filterSpecialFilters != null && filterSpecialFilters.size() > 0) {
+                Collections.sort(events, new EventSpecialFilterComparator(filterSpecialFilters));
+            } else {
+                Collections.sort(events, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_NYE_UBER_SCORE));
+            }
+        } else if (isOutdoorsQuery()) {
+            if (filterSpecialFilters != null && filterSpecialFilters.size() > 0) {
+                Collections.sort(events, new EventSpecialFilterComparator(filterSpecialFilters));
+            } else {
+                Collections.sort(events, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_OUTDOOR_UBER_SCORE));
+            }
+        }
+
+        return events;
+    }
+
+    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, DisplayZoneObject zone, String specialFilter, boolean showTicketedEvents, ArrayList<String> localities, long... times) {
 
         if (isMapListShown) {
             hideMapEvents(-1);
@@ -1390,7 +1482,7 @@ public class EventsFragment extends BaseEventsFragment {
         if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
             filterAsyncTask.cancel(true);
         }
-
+        stopCarousel();
         filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, zone, specialFilter, showTicketedEvents, localities, times);
         filterAsyncTask.execute();
 
@@ -1400,9 +1492,15 @@ public class EventsFragment extends BaseEventsFragment {
 
 
     public boolean isFilterApplied() {
-        if (checkIsPriceFilterApplied || checkIsDateFilterApplied || checkIsCategoryFilterApplied || checkIsZoneFilterApplied || checkIsSpecialFilterApplied)
-            return true;
-        return false;
+        if ((filterSpecialFilters == null || filterSpecialFilters.size() == 0)
+                && (filterLocalities == null || filterLocalities.size() == 0)
+                && (filterZoneName == null || filterZoneName.size() == 0)
+                && (filterCategoryName == null || filterCategoryName.size() == 0)
+                && (filterEventPrices == null || filterEventPrices.size() == 0)
+                && (filterEventTimes == null || filterEventTimes.size() == 0)
+                && !showTicketedEvents)
+            return false;
+        return true;
     }
 
     public class FilterAsyncTask extends AsyncTask<Void, Void, List<Event>> {
@@ -1413,7 +1511,7 @@ public class EventsFragment extends BaseEventsFragment {
         long[] times;
         int type;
 
-        String zone;
+        DisplayZoneObject zone;
 
         String specialFilter;
 
@@ -1421,7 +1519,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         boolean showTicketedEvents;
 
-        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, String specialFilter, boolean showTicketedEvents, ArrayList<String> localities, long... times) {
+        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, DisplayZoneObject zone, String specialFilter, boolean showTicketedEvents, ArrayList<String> localities, long... times) {
             this.type = type;
             this.totalEvents = totalEvents;
             this.category = category;
@@ -1440,24 +1538,34 @@ public class EventsFragment extends BaseEventsFragment {
 
         @Override
         protected List<Event> doInBackground(Void... params) {
+            List<Event> filteredEvents = new ArrayList<>();
             switch (type) {
                 case EventsGridActivity.PRICE_FILTER:
-                    return filterEventsWithPrice(totalEvents, priceValue);
+                    filteredEvents = filterEventsWithPrice(totalEvents, priceValue);
+                    break;
                 case EventsGridActivity.DATE_FILTER:
-                    return filterEventsWithDate(totalEvents, times);
+                    filteredEvents = filterEventsWithDate(totalEvents, times);
+                    break;
                 case EventsGridActivity.CATEGORY_FILTER:
-                    return filterEventsWithCategory(category, totalEvents);
+                    filteredEvents = filterEventsWithCategory(category, totalEvents);
+                    break;
                 case EventsGridActivity.ZONE_FILTER:
-                    return filterEventsWithZone(zone, totalEvents);
+                    filteredEvents = filterEventsWithZone(zone, totalEvents);
+                    break;
                 case EventsGridActivity.SPECIAL_FILTER:
-                    return filterEventsWithSpecialFilters(totalEvents, specialFilter);
+                    filteredEvents = filterEventsWithSpecialFilters(totalEvents, specialFilter);
+                    break;
                 case EventsGridActivity.TICKETED_FILTER:
-                    return filterEventsForTicketedEvents(totalEvents, showTicketedEvents);
+                    filteredEvents = filterEventsForTicketedEvents(totalEvents, showTicketedEvents);
+                    break;
                 case EventsGridActivity.LOCALITY_FILTER:
-                    return filterEventsWithLocality(totalEvents, localities);
+                    filteredEvents = filterEventsWithLocality(totalEvents, localities);
+                    break;
             }
 
-            return null;
+            //eventsContext.query
+            //filteredEvents = sortEventsAsPerSpecialFilters(filteredEvents);
+            return filteredEvents;
         }
 
         @Override
@@ -1470,8 +1578,12 @@ public class EventsFragment extends BaseEventsFragment {
                 if (isMapShown) {
                     mapMarkerManager.setEvents(map, filteredEvents);
                 } else {
-
-                    sortData();
+                    if (isNewYearQuery() || isOutdoorsQuery()) {
+                        System.out.println("New Year Sorting");
+                        sortEventsAsPerSpecialFilters(filteredEvents);
+                    } else {
+                        sortData();
+                    }
 
                     eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                     eventsAdapter.setBrowseHeader(filteredEvents.size());
@@ -1480,8 +1592,11 @@ public class EventsFragment extends BaseEventsFragment {
                                 eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
                     }
                     if (!isFilterApplied()) {
-                        if (showHeaderCard && filteredEvents.size() > 5)
+                        if (showHeaderCard && filteredEvents.size() > 5) {
                             addBrowseCarousel(filteredEvents.subList(0, 5));
+                        } else {
+                            stopCarousel();
+                        }
                         if (showEditorPicks && filteredEvents.size() > 13)
                             addEditorPicks(filteredEvents.subList(5, 13));
                     }
@@ -1489,7 +1604,6 @@ public class EventsFragment extends BaseEventsFragment {
                 }
                 if (events.isEmpty() && getView() != null) {
                     Snackbar.make(getView(), R.string.no_events, Snackbar.LENGTH_SHORT).show();
-
                 }
             }
         }

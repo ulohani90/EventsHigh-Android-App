@@ -158,9 +158,7 @@ public class SelectInterestsActivity extends BaseActivity {
                     textView.clearFocus();
                     textView.setText("");
                     ((InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(textView.getWindowToken(), 0);
-
                 }
-
                 return false;
             }
         });
@@ -279,7 +277,6 @@ public class SelectInterestsActivity extends BaseActivity {
             }
             subCategories.put(eventCategory, getEventCategories(eventCategory));
         }
-
 
         adapter = new SelectInterestAdapter(SelectInterestsActivity.this, categories, subCategories, new SelectInterestAdapter.OnFollowUnfollowOptionClick() {
             @Override

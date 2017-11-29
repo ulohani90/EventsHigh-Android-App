@@ -129,6 +129,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void setCarouselEvents(List<Event> events) {
+        Collections.shuffle(events);
         dataToShow.add(0, new BrowseCarouselCardData(activity, events));
         notifyDataSetChanged();
     }
@@ -270,7 +271,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     }
 
-    public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags, boolean showNewYearImage) {
+    public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags, boolean showNewYearImage, int width) {
         dataToShow.clear();
         if (eventCollection != null) {
             //if (!eventCollection.events.isEmpty()) {
@@ -278,7 +279,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
                     eventCollection.events));
             //}
         }
-        dataToShow.add(new ExploreCategoryHeaderData(activity, showNewYearImage));
+        dataToShow.add(new ExploreCategoryHeaderData(activity, showNewYearImage, width));
 
         for (String tag : tags) {
             dataToShow.add(new NewExploreCategoryData(tag, activity, this));

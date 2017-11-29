@@ -7,9 +7,25 @@ import java.util.Comparator;
  */
 public class EventScoreComparator implements Comparator<Event> {
 
+    public static final int SCORE_TYPE_UBER_SCORE = 1;
+    public static final int SCORE_TYPE_NYE_UBER_SCORE = 2;
+    public static final int SCORE_TYPE_OUTDOOR_UBER_SCORE = 3;
+
+    int scoreType;
+
+    public EventScoreComparator(int scoreType) {
+        this.scoreType = scoreType;
+    }
+
 
     @Override
     public int compare(Event lhs, Event rhs) {
-        return Float.compare( rhs.uberScore,lhs.uberScore);
+        if (scoreType == SCORE_TYPE_UBER_SCORE) {
+            return Float.compare(rhs.uberScore, lhs.uberScore);
+        } else if (scoreType == SCORE_TYPE_NYE_UBER_SCORE) {
+            return Double.compare(rhs.nyeUberScore, lhs.nyeUberScore);
+        } else {
+            return Double.compare(rhs.outdoorsUberScore, lhs.outdoorsUberScore);
+        }
     }
 }

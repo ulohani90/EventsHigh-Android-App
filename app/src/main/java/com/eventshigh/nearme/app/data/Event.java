@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -155,6 +156,14 @@ public class Event implements Parcelable {
 
     public final String dominantBgColor;
 
+    public final double nyeUberScore;
+
+    public final double outdoorsUberScore;
+
+    public final HashMap<String, Double> nyeUberScoresMap;
+
+    public final String config;
+
     public static final String DEFAULT_TIME_ZONE = "Asia/Calcutta";
 
     public Event(String id, String city, String title, EventCategory category,
@@ -171,7 +180,8 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination, String timezone, String dominantBgColor) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination, String timezone, String dominantBgColor
+            , double nyeUberScore, double outdoorsUberScore, HashMap<String, Double> nyeUberScoresMap, String config) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -239,6 +249,10 @@ public class Event implements Parcelable {
         this.destination = destination;
         this.timezone = timezone;
         this.dominantBgColor = dominantBgColor;
+        this.nyeUberScore = nyeUberScore;
+        this.outdoorsUberScore = outdoorsUberScore;
+        this.nyeUberScoresMap = nyeUberScoresMap;
+        this.config = config;
     }
 
     public Event(Parcel in) {
@@ -321,6 +335,11 @@ public class Event implements Parcelable {
         destination = in.readString();
         timezone = in.readString();
         dominantBgColor = in.readString();
+        nyeUberScore = in.readDouble();
+        outdoorsUberScore = in.readDouble();
+        nyeUberScoresMap = new HashMap<>();
+        in.readMap(nyeUberScoresMap, Double.class.getClassLoader());
+        config = in.readString();
     }
 
     @Override
@@ -382,6 +401,10 @@ public class Event implements Parcelable {
         dest.writeString(destination);
         dest.writeString(timezone);
         dest.writeString(dominantBgColor);
+        dest.writeDouble(nyeUberScore);
+        dest.writeDouble(outdoorsUberScore);
+        dest.writeMap(nyeUberScoresMap);
+        dest.writeString(config);
     }
 
     public Uri getEventDetailsURI() {
@@ -498,7 +521,7 @@ public class Event implements Parcelable {
     /**********************************
      * Helper static methods, used for JSON parsing
      *********************************/
-    public static Event fromJSON(JSONObject eventJson, List<BrowseFilterAttributes> filters) throws JSONException, ParseException {
+    public static Event fromJSON(JSONObject eventJson, BrowseFilterObject filters) throws JSONException, ParseException {
         if (eventJson.optBoolean("junk")) {
             // Junk event.
             throw new ParseException("junk event", 0);
@@ -698,6 +721,9 @@ public class Event implements Parcelable {
             boolean skipRequestToCall = eventJson.optBoolean("skip_request_to_call");
             String skipCallBackupPhone = eventJson.optString("skip_call_backup_phone");
 
+            /*if (id.equalsIgnoreCase("c25025446ff5659a04d81ebaa2e84131")) {
+                System.out.println("Stop Here");
+            }*/
             // Price.
             double minPrice = -1, maxPrice = -1;
             String ehPriceName = "";
@@ -739,8 +765,8 @@ public class Event implements Parcelable {
                     value = ehPrice.optDouble("value", -1);
                 }*/
                     if (discountValue > 0) {
-                        minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
-                        maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
+                        minPrice = minPrice < 0 ? discountValue : Math.min(minPrice, discountValue);
+                        maxPrice = maxPrice < 0 ? discountValue : Math.max(maxPrice, discountValue);
                     } else if (value > 0) {
                         minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
                         maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
@@ -870,39 +896,122 @@ public class Event implements Parcelable {
                 zone = "Outside " + (city);
             }
 
+            double nyeUberScore = 0.00;
+            if (eventJson.has("nye_uber_score")) {
+                nyeUberScore = eventJson.getDouble("nye_uber_score");
+            }
+            double outdoorsUberScore = 0.00;
+            if (eventJson.has("outdoor_uber_score")) {
+                outdoorsUberScore = eventJson.optDouble("outdoor_uber_score");
+            }
+
+            HashMap<String, Double> nyeUberScoresMap = new HashMap<>();
+            if (eventJson.has("nye_filter_uber_scores")) {
+                JSONArray filterUberScoresArray = eventJson.optJSONArray("nye_filter_uber_scores");
+                for (int i = 0; i < filterUberScoresArray.length(); i++) {
+                    JSONObject nyeFilterObj = filterUberScoresArray.optJSONObject(i);
+                    nyeUberScoresMap.put(nyeFilterObj.optString("nye_filter"), nyeFilterObj.optDouble("nye_filter_uber_score"));
+                }
+
+            }
+
             String discountPercentage = null;
+            String discountValue = null;
             String discountPercentageText = null;
             ArrayList<EventFilterAttribute> attributes = new ArrayList<>();
             HashMap<String, Boolean> attributeValues = new HashMap<>();
+            //String eventSubType = null;
+            String config = null;
             if (eventJson.has("attributes")) {
-               /* if (eventJson.optJSONObject("attributes").has("include_value_attributes")) {
-                    if (eventJson.optJSONObject("attributes").optJSONObject("include_value_attributes").has("include_values")) {
-                        JSONArray jsonArray = eventJson.optJSONObject("attributes").optJSONObject("include_value_attributes").optJSONArray("include_values");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            String name = jsonObject.optString("name");
-                            boolean value = jsonObject.optBoolean("is_included");
-                            attributes.add(new EventFilterAttribute(name, value));
-                            attributeValues.put(name, value);
-                        }
-
-                        //attributes = EventFilterAttribute.getAttributes(jsonArray);
-                    }
-                }*/
-                if (eventJson.optJSONObject("attributes").has("key_value_attributes") && eventJson.optJSONObject("attributes").optJSONObject("key_value_attributes").has("key_values")) {
-                    JSONArray keyValuePairArray = eventJson.optJSONObject("attributes").optJSONObject("key_value_attributes").optJSONArray("key_values");
-                    for (int i = 0; i < keyValuePairArray.length(); i++) {
-                        JSONObject obj = keyValuePairArray.optJSONObject(i);
-                        if (obj.getString("key").equalsIgnoreCase(CONSTANT_DISCOUNT_PERCENTAGE_TEXT)) {
-                            discountPercentageText = obj.getString("value");
-                        }
-                        if (obj.getString("key").equalsIgnoreCase(CONSTANT_DISCOUNT_PERCENTAGE)) {
-                            discountPercentage = obj.getString("value");
-                        }
-
+                //  eventSubType = eventJson.optJSONObject("attributes").optString("event_sub_type");
+                //Add Event Prices
+                if (ehPrices.size() == 0 && eventJson.optJSONObject("attributes").has("pricing_info")) {
+                    JSONObject pricingInfoObj = eventJson.optJSONObject("attributes").optJSONObject("pricing_info");
+                    if (pricingInfoObj.has("discount_value") && pricingInfoObj.optDouble("discount_value") > 0.01) {
+                        minPrice = pricingInfoObj.optDouble("discount_value");
+                        maxPrice = minPrice;
+                    } else if (pricingInfoObj.has("max") && pricingInfoObj.has("min")) {
+                        maxPrice = pricingInfoObj.getDouble("max");
+                    } else {
+                        minPrice = maxPrice = pricingInfoObj.has("value") ? pricingInfoObj.optDouble("value") : 0.00;
                     }
                 }
 
+
+                if (eventJson.getJSONObject("attributes").has("configs")) {
+                    config = eventJson.getJSONObject("attributes").getJSONObject("configs").toString();
+                }
+                //Add Filters
+                if (filters != null && eventJson.getJSONObject("attributes").has("configs")) {
+
+
+                    for (BrowseFilterAttributes filter : filters.getFilterAttributes()) {
+                        boolean valueFound = false;
+                        String[] pathArray = filter.getPath().split("\\.");
+
+                        JSONObject jsonObject = eventJson.optJSONObject("attributes").optJSONObject("configs");
+                        if (jsonObject != null) {
+                            boolean keyNotFound = false;
+                            for (int i = 0; i < pathArray.length; i++) {
+                                if (jsonObject.has(pathArray[i])) {
+                                    keyNotFound = false;
+                                    jsonObject = jsonObject.optJSONObject(pathArray[i]);
+                                } else {
+                                    keyNotFound = true;
+                                    break;
+                                }
+                            }
+                            if (!keyNotFound) {
+                                String value = jsonObject.optString("value");
+
+                                if (value != null && value.length() > 0) {
+                                    String[] valuesArray = value.split(",");
+                                    if (filter.getExpressionType() != null) {
+                                        //Special Case for day night filters
+                                        int numDays = 0;
+                                        for (String durationValue : valuesArray) {
+                                            if (durationValue.trim().toLowerCase().contains("days")) {
+                                                numDays = Integer.parseInt(durationValue.trim().split(" ")[0]);
+                                            }
+                                        }
+                                        if (numDays > 0) {
+                                            if (filter.getExpressionType().equalsIgnoreCase("equal to")) {
+                                                if (numDays == Integer.parseInt(filter.getValue())) {
+                                                    valueFound = true;
+                                                    attributes.add(new EventFilterAttribute(filter.getName(), true));
+                                                    attributeValues.put(filter.getName(), true);
+                                                }
+                                            } else if (filter.getExpressionType().equalsIgnoreCase("greater than")) {
+                                                if (numDays > Integer.parseInt(filter.getValue())) {
+                                                    valueFound = true;
+                                                    attributes.add(new EventFilterAttribute(filter.getName(), true));
+                                                    attributeValues.put(filter.getName(), true);
+                                                }
+                                            }
+                                        } else {
+                                            valueFound = false;
+                                        }
+                                    } else {
+                                        for (String valueSeen : valuesArray) {
+                                            if (Arrays.asList(filter.getValue().split(",")).contains(valueSeen)) {
+                                                valueFound = true;
+                                                attributes.add(new EventFilterAttribute(filter.getName(), true));
+                                                attributeValues.put(filter.getName(), true);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    valueFound = false;
+                                }
+                            }
+                            if (!valueFound || keyNotFound) {
+                                attributes.add(new EventFilterAttribute(filter.getName(), false));
+                                attributeValues.put(filter.getName(), false);
+                            }
+                        }
+                    }
+                }
             }
 
             boolean isEvergreen = eventJson.optBoolean("evergreen");
@@ -914,53 +1023,6 @@ public class Event implements Parcelable {
                 JSONArray zendeskTickets = eventJson.optJSONArray("zendesk_tickets");
                 for (int i = 0; i < zendeskTickets.length(); i++) {
                     faqs.add(EventZendeskTicketObject.parseZendeskObj(zendeskTickets.getJSONObject(i)));
-                }
-            }
-
-
-            //Add Filters
-            if (filters != null) {
-                for (BrowseFilterAttributes filter : filters) {
-                    boolean valueFound = false;
-                    String[] pathArray = filter.getKeyPath().split("\\|");
-                    JSONObject jsonObject = eventJson;
-                    boolean keyNotFound = false;
-                    for (int i = 0; i < pathArray.length - 2; i++) {
-                        if (jsonObject.has(pathArray[i])) {
-                            keyNotFound = false;
-                            jsonObject = jsonObject.optJSONObject(pathArray[i]);
-                        } else {
-                            keyNotFound = true;
-                            break;
-                        }
-                    }
-                    if (!keyNotFound) {
-                        JSONArray filtersArray = jsonObject.optJSONArray(pathArray[pathArray.length - 2]);
-
-                        for (int i = 0; i < filtersArray.length(); i++) {
-                            JSONObject filterObj = filtersArray.optJSONObject(i);
-                            if (filter.getKey().equalsIgnoreCase(filterObj.optString(pathArray[pathArray.length - 1]))) {
-                                valueFound = true;
-                                String value = filterObj.optString(filter.getKeyForValue());
-                                boolean finalValue = false;
-                                if (filter.getValueType().equalsIgnoreCase("boolean")) {
-                                    finalValue = Boolean.valueOf(value);
-                                    attributes.add(new EventFilterAttribute(filter.getName(), finalValue));
-                                    attributeValues.put(filter.getName(), finalValue);
-                                } else if (filter.getValueType().equalsIgnoreCase("integer")) {
-                                    finalValue = Integer.parseInt(value) == Integer.parseInt(filter.getRequiredValue()) ? true : false;
-                                    attributes.add(new EventFilterAttribute(filter.getName(), finalValue));
-                                    attributeValues.put(filter.getName(), finalValue);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    if (!valueFound || keyNotFound) {
-                        attributes.add(new EventFilterAttribute(filter.getName(), false));
-                        attributeValues.put(filter.getName(), false);
-                    }
-
                 }
             }
 
@@ -1022,16 +1084,20 @@ public class Event implements Parcelable {
                     discountPercentage,
                     discountPercentageText,
                     skipRequestToCall,
-                    skipCallBackupPhone, destination, timeZone, dominantBgColor
+                    skipCallBackupPhone, destination, timeZone, dominantBgColor,
+                    nyeUberScore, outdoorsUberScore, nyeUberScoresMap, config
             );
-        } catch (IllegalArgumentException e) {
+        } catch (
+                IllegalArgumentException e)
+
+        {
             Log.i("Exception caught", e.getMessage());
             Crashlytics.logException(e);
             return null;
         }
     }
 
-    public static List<Event> fromJSON(JSONArray jsonArray, List<BrowseFilterAttributes> filters, boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) {
+    public static List<Event> fromJSON(JSONArray jsonArray, BrowseFilterObject filters, boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
@@ -1059,7 +1125,7 @@ public class Event implements Parcelable {
     }
 
 
-    public static List<Event> fromJSON(Context context, JSONArray jsonArray, List<BrowseFilterAttributes> filters, boolean includeWithoutLocation, boolean isForSavingAction) {
+    public static List<Event> fromJSON(Context context, JSONArray jsonArray, BrowseFilterObject filters, boolean includeWithoutLocation, boolean isForSavingAction) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
@@ -1078,7 +1144,7 @@ public class Event implements Parcelable {
     }
 
 
-    public static List<Event> parseUpcomingEvents(JSONObject eventsJSON, List<BrowseFilterAttributes> filters,
+    public static List<Event> parseUpcomingEvents(JSONObject eventsJSON, BrowseFilterObject filters,
                                                   boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) throws JSONException {
 
 

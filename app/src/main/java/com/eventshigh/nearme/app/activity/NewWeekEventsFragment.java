@@ -322,9 +322,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                                     ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
                             }
                             if (isLoadingFinished) {
-                                if(NewWeekEventsFragment.this.eventsCollection == null){
+                                if (NewWeekEventsFragment.this.eventsCollection == null) {
                                     NewWeekEventsFragment.this.eventsCollection = eventsCollection;
-                                }else {
+                                } else {
                                     NewWeekEventsFragment.this.eventsCollection.events.addAll(eventsCollection.events);
                                 }
                             } else {
@@ -937,7 +937,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     public void sortData() {
         if (filteredEvents != null) {
             if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
-                Collections.sort(filteredEvents, new EventScoreComparator());
+                Collections.sort(filteredEvents, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_UBER_SCORE));
                 arrangeEventsForSponsered();
             } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
                 Collections.sort(filteredEvents, new EventPriceComparator());
@@ -950,7 +950,6 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                 Collections.sort(filteredEvents, new EventTimeComparator());
             }
         }
-
 
     }
 

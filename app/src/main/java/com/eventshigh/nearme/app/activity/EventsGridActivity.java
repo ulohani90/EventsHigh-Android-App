@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,10 +39,13 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.BrowseFilterAttributes;
+import com.eventshigh.nearme.app.data.BrowseFilterObject;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.DisplayZoneObject;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFilterAttribute;
 import com.eventshigh.nearme.app.data.LocalityLatLong;
+import com.eventshigh.nearme.app.data.stream.ZoneLocalityMapObject;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
@@ -81,7 +85,7 @@ public class EventsGridActivity extends BaseContextActivity {
 
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x002;
 
-    boolean isCategoryFilterVisible, isZoneFilterVisible, isDateFilterVisible, isSortFilterVisible;
+    boolean isCategoryFilterVisible, isZoneFilterVisible, isDateFilterVisible, isSortFilterVisible, isPriceFilterVisible;
 
     boolean isTodaySelected;
 
@@ -266,61 +270,8 @@ public class EventsGridActivity extends BaseContextActivity {
             isFromNotification = true;
         }
 
-        // Add Events Fragment.
-        Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
 
-            if (eventsContext.query.equalsIgnoreCase("this week") || eventsContext.query.equalsIgnoreCase("today") || eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
-                if (eventsContext.query.equalsIgnoreCase("today"))
-                    isTodaySelected = true;
-
-                if (eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
-                    isNearMeQuery = true;
-                    showFollowCard = false;
-                } else {
-                    isNearMeQuery = false;
-                }
-
-                isCategoryFilterVisible = true;
-                isSortFilterVisible = true;
-                categoryFilter.setVisibility(View.VISIBLE);
-                findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
-                findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
-
-            } else {
-                isCategoryFilterVisible = false;
-                isSortFilterVisible = true;
-                categoryFilter.setVisibility(View.GONE);
-                findViewById(R.id.category_separator).setVisibility(View.GONE);
-                findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
-
-            }
-
-            if (eventsContext.query.equalsIgnoreCase("New Year Parties") || eventsContext.query.equalsIgnoreCase("Parties And Nightlife")) {
-
-                isNewYearQuery = true;
-                isDateFilterVisible = false;
-                isSortFilterVisible = false;
-                isCategoryFilterVisible = true;
-                categoryFilter.setVisibility(View.VISIBLE);
-                findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
-                sortFilter.setVisibility(View.GONE);
-                findViewById(R.id.sort_separator).setVisibility(View.GONE);
-                dateFilter.setVisibility(View.GONE);
-                findViewById(R.id.date_separator).setVisibility(View.GONE);
-                isShowLocalitiesFilter = true;
-                isZoneFilterVisible = true;
-                zoneFilter.setVisibility(View.VISIBLE);
-
-            } else {
-                isShowLocalitiesFilter = false;
-                isZoneFilterVisible = false;
-                isDateFilterVisible = true;
-                dateFilter.setVisibility(View.VISIBLE);
-                findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
-                zoneFilter.setVisibility(View.GONE);
-
-            }
 
             boolean showEhInviteForNotification = getIntent() != null &&
                     getIntent().getAction() != null && getIntent().getAction().startsWith(NOTIFICATION_ACTION);
@@ -333,12 +284,6 @@ public class EventsGridActivity extends BaseContextActivity {
             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
             tr.replace(R.id.event_container, eventsFragment);
             //
-            tr.commit();
-        } else {
-            NewWeekEventsFragment thisWeekFragment = NewWeekEventsFragment.getInstance(eventsContext, false);
-            FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-            //tr.setCustomAnimations(R.anim.animate_slide_up, R.anim.stay);
-            // tr.replace(R.id.event_container, thisWeekFragment);
             tr.commit();
         }
         //  addFiltersData();
@@ -371,6 +316,570 @@ public class EventsGridActivity extends BaseContextActivity {
 
             }
         });
+    }
+
+
+    public void computeFilters() {
+        if (eventsContext.query.equalsIgnoreCase("this week") || eventsContext.query.equalsIgnoreCase("today") || eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
+            if (eventsContext.query.equalsIgnoreCase("today"))
+                isTodaySelected = true;
+
+            if (eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
+                isNearMeQuery = true;
+
+            } else {
+                isNearMeQuery = false;
+            }
+            //Hide Zone filters
+            zoneFilter.setVisibility(View.GONE);
+            isZoneFilterVisible = false;
+
+            //Add date filter
+            isDateFilterVisible = true;
+            findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
+            addDateFilterData();
+
+            //Add Category Data
+            isCategoryFilterVisible = true;
+            findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
+            categoryFilter.setVisibility(View.VISIBLE);
+            addCategoryFilterData();
+
+            //Add Price Data
+            isPriceFilterVisible = true;
+            findViewById(R.id.price_separator).setVisibility(View.VISIBLE);
+            addPriceFilterData();
+
+            isSortFilterVisible = true;
+            findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
+            addSortFilterData();
+            //
+            isShowLocalitiesFilter = false; //Equivalent to showEhTicketedSwitch
+            addEventsEhTicketedSwitch();
+
+
+        } else if (filters != null) {
+            if (filters.getDisplayZones() != null && filters.getDisplayZones().size() > 0) {
+                isZoneFilterVisible = true;
+                zoneFilter.setVisibility(View.VISIBLE);
+                addZoneFiltersData();
+            } else {
+                isZoneFilterVisible = false;
+                zoneFilter.setVisibility(View.GONE);
+            }
+
+            if (filters.getDateFilters() != null && filters.getDateFilters().size() > 0) {
+                isDateFilterVisible = true;
+                findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
+                dateFilter.setVisibility(View.VISIBLE);
+                addDateFilterData();
+            } else {
+                isDateFilterVisible = false;
+                findViewById(R.id.date_separator).setVisibility(View.GONE);
+                dateFilter.setVisibility(View.GONE);
+            }
+
+            if (filters.getFilterAttributes() != null && filters.getFilterAttributes().size() > 0) {
+                isCategoryFilterVisible = true;
+                findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
+                categoryFilter.setVisibility(View.VISIBLE);
+                addCategoryFilterData();
+            } else {
+                isCategoryFilterVisible = false;
+                findViewById(R.id.category_separator).setVisibility(View.GONE);
+                categoryFilter.setVisibility(View.GONE);
+            }
+
+            if (filters.getFilterAttributes() != null && filters.getFilterAttributes().size() > 8) {
+                isPriceFilterVisible = true;
+                findViewById(R.id.price_separator).setVisibility(View.VISIBLE);
+                priceFilter.setVisibility(View.VISIBLE);
+                addPriceFilterData();
+            } else {
+                isPriceFilterVisible = false;
+                findViewById(R.id.price_separator).setVisibility(View.GONE);
+                priceFilter.setVisibility(View.GONE);
+            }
+            if (localities != null && localities.size() > 0) {
+                isShowLocalitiesFilter = true;
+            } else {
+                isShowLocalitiesFilter = false;
+            }
+
+            //Hide Sort Filter
+            isSortFilterVisible = false;
+            sortFilter.setVisibility(View.GONE);
+            findViewById(R.id.sort_separator).setVisibility(View.GONE);
+
+            addEventsEhTicketedSwitch();
+
+        } else {
+
+            zoneFilter.setVisibility(View.GONE);
+            isZoneFilterVisible = false;
+
+            //Show Date Filter
+            isDateFilterVisible = true;
+            findViewById(R.id.date_separator).setVisibility(View.VISIBLE);
+            addDateFilterData();
+
+
+            //Show Price Filter
+            isPriceFilterVisible = true;
+            findViewById(R.id.price_separator).setVisibility(View.VISIBLE);
+            addPriceFilterData();
+
+            //Hide category filter
+            categoryFilter.setVisibility(View.GONE);
+            isCategoryFilterVisible = false;
+            findViewById(R.id.category_separator).setVisibility(View.GONE);
+
+            //Add Sort Filter
+            isSortFilterVisible = true;
+            sortFilter.setVisibility(View.VISIBLE);
+            findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
+            addSortFilterData();
+
+            isShowLocalitiesFilter = false;
+            addEventsEhTicketedSwitch();
+
+        }
+        collapseAnimation(-1);
+
+    }
+
+    //Add filters for zone.
+    public void addZoneFiltersData() {
+        LinearLayout zoneContainer = (LinearLayout) findViewById(R.id.zone_container);
+        zoneContainer.removeAllViews();
+        List<DisplayZoneObject> zones = filters.getDisplayZones();
+
+        if (zones != null) {
+            for (int i = 0; i < zones.size(); i++) {
+
+                final DisplayZoneObject zone = zones.get(i);
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, zoneContainer, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                filterText.setText(zone.getDisplayName());
+
+                zoneContainer.addView(view);
+                filterText.setTag(i);
+
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, zone, null, false, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "-" + zone.getDisplayName());
+
+                        if (filterText.isSelected()) {
+                            filterText.setSelected(false);
+                        } else {
+                            filterText.setSelected(true);
+                        }
+
+                    }
+                });
+            }
+        }
+
+    }
+
+    //Add Date Filters data
+    public void addDateFilterData() {
+        LinearLayout horizontalDate = (LinearLayout) findViewById(R.id.date_container);
+        horizontalDate.removeAllViews();
+        if (filters != null && filters.getDateFilters() != null && filters.getDateFilters().size() > 0) {
+
+            for (int i = 0; i < filters.getDateFilters().size(); i++) {
+                final BrowseFilterAttributes attribute = filters.getDateFilters().get(i);
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalDate, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                filterText.setText(attribute.getName());
+
+                horizontalDate.addView(view);
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (attribute.getValue().equalsIgnoreCase("this_weekend")) {
+                            //  checkIfCustomDateSelected();
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getWeekEndDates());
+                            reportActionToAnalytics("filters", eventsContext.query + "-This Weekend");
+                            //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
+                        } else if (attribute.getValue().equalsIgnoreCase("next_weekend")) {
+                            // checkIfCustomDateSelected();
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getNextWeekendDates());
+                            reportActionToAnalytics("filters", eventsContext.query + "-Next Weekend");
+                        } else if (attribute.getValue().equalsIgnoreCase("nye_weekend")) {
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getNyeWeekendDates());
+                            reportActionToAnalytics("filters", eventsContext.query + "-NYE Weekend");
+                        }
+                        filterText.setSelected(!filterText.isSelected());
+                    }
+                });
+            }
+        } else {
+            String finalDates[];
+            if (isPartiesQuery(eventsContext.query)) {
+                String[] dateRanges = {"Today", "Tomorrow", "Weekend", "NYE Weekend", "Custom Dates"};
+                finalDates = dateRanges;
+            } else {
+                String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates"};
+                finalDates = dateRanges;
+            }
+
+            for (int i = 0; i < finalDates.length; i++) {
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalDate, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                filterText.setText(finalDates[i]);
+                if (i == finalDates.length - 1) {
+                    selectCustomDates = filterText;
+                    // selectCustomDates.setVisibility(View.GONE);
+                } else if (i == finalDates.length - 2) {
+                    weekend = filterText;
+                    //weekend.setVisibility(View.GONE);
+                } else if (i == finalDates.length - 3) {
+                    tomorrow = filterText;
+                } else {
+                    today = filterText;
+                    if (isTodaySelected) {
+                        today.setSelected(true);
+                    } else {
+                        today.setSelected(false);
+                    }
+                }
+
+                horizontalDate.addView(view);
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (filterText.getText().toString().equalsIgnoreCase("Today")) {
+                            checkIfCustomDateSelected();
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + 1);
+                            reportActionToAnalytics("filters", eventsContext.query + "-Today");
+
+                            //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
+                            checkIfCustomDateSelected();
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY + 1);
+                            reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
+                            // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
+                            checkIfCustomDateSelected();
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getWeekEndDates());
+                            reportActionToAnalytics("filters", eventsContext.query + "-Weekend");
+                            //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
+                        } else if (filterText.getText().toString().equalsIgnoreCase("NYE Weekend")) {
+                            checkIfCustomDateSelected();
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getNyeWeekendDates());
+                            reportActionToAnalytics("filters", eventsContext.query + "-NYE Weekend");
+                            //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
+                        } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
+
+                            showDateDialog();
+                            Calendar currentYear = Calendar.getInstance();
+                            Calendar nextYear = Calendar.getInstance();
+                            nextYear.add(Calendar.DAY_OF_MONTH, 45);
+
+                            if (selectedDates != null) {
+                                dialogView.init(currentYear.getTime(), nextYear.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE).withSelectedDates(selectedDates);
+
+                            } else {
+                                dialogView.init(currentYear.getTime(), nextYear.getTime()) //
+                                        .inMode(CalendarPickerView.SelectionMode.MULTIPLE);
+                            }
+                        }
+                        if (!(filterText.getText().toString().equalsIgnoreCase("Custom Dates"))) {
+                            if (filterText.isSelected()) {
+                                filterText.setSelected(false);
+                            } else {
+                                filterText.setSelected(true);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    public boolean isPartiesQuery(String query) {
+        if (query.equalsIgnoreCase("partiesandnightlife") || query.equalsIgnoreCase("parties and nightlife") ||
+                query.equalsIgnoreCase("parties&nightlife")
+                || query.equalsIgnoreCase("parties & nightlife")
+                || query.equalsIgnoreCase("parties") || query.equalsIgnoreCase("party")) {
+            return true;
+        }
+        return false;
+    }
+
+    //Add data for price filters
+    public void addPriceFilterData() {
+
+        LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
+        horizontalprice.removeAllViews();
+        if (filters != null) {
+            if (filters.getFilterAttributes() != null && filters.getFilterAttributes().size() > 8) {
+
+                horizontalprice.setVisibility(View.VISIBLE);
+
+                for (int i = 8; i < filters.getFilterAttributes().size(); i++) {
+                    final BrowseFilterAttributes attribute = filters.getFilterAttributes().get(i);
+                    View view = LayoutInflater.from(this).inflate(R.layout.special_filter_tags_layout, horizontalprice, false);
+                    final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                    int lastSpaceIndex = attribute.getName().lastIndexOf(" ");
+                    final LinearLayout filterBoxLayout = (LinearLayout) view.findViewById(R.id.filter_box_layout);
+                    // String filterName = attribute.getName().substring(0, lastSpaceIndex) + "\n" + attribute.getName().substring(lastSpaceIndex + 1, attribute.getName().length());
+                    filterText.setText(attribute.getName());
+                    final ImageView filterImg = (ImageView) view.findViewById(R.id.filter_icon);
+                    horizontalprice.addView(view);
+                    filterImg.setImageResource(attribute.getIconResourceId());
+                    //setCompoundDrawable(filterText, attribute.getIconResourceId());
+                    filterBoxLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            if (filterText.isSelected()) {
+                                filterText.setSelected(false);
+                                filterBoxLayout.setSelected(false);
+                                filterImg.setImageResource(attribute.getIconResourceId());
+                                //setCompoundDrawable(filterText, attribute.getIconResourceId());
+                            } else {
+                                filterImg.setImageResource(attribute.getSelectedIconResourceId());
+                                filterText.setSelected(true);
+                                filterBoxLayout.setSelected(true);
+                                //setCompoundDrawable(filterText, attribute.getSelectedIconResourceId());
+                            }
+                            eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getName(), false, null, -1);
+                            reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
+                        }
+                    });
+                }
+            } else {
+                horizontalprice.setVisibility(View.GONE);
+            }
+        } else {
+            String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
+            for (int i = 0; i < priceRanges.length; i++) {
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalprice, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                filterText.setText(priceRanges[i]);
+                horizontalprice.addView(view);
+                filterText.setTag(i);
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = (Integer) filterText.getTag();
+                        if (position == 0) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null, null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "-FREE");
+                            // eventsFragment.filterEventsWithPrice(null, FREE);
+                        } else if (position == 1) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null, null, false, null);
+                            //eventsFragment.filterEventsWithPrice(null, UPTO_250);
+                            reportActionToAnalytics("filters", eventsContext.query + "uptp250");
+                        } else if (position == 2) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null, null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "price250to750");
+                            //eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
+                        } else if (position == 3) {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null, null, false, null);
+                            //eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
+                            reportActionToAnalytics("filters", eventsContext.query + "price750to1500");
+                        } else {
+                            eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null, null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "moreThan1500");
+                            //eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
+                        }
+
+                        if (filterText.isSelected()) {
+                            filterText.setSelected(false);
+                        } else {
+                            filterText.setSelected(true);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    // Add data for category filters
+    public void addCategoryFilterData() {
+        int iterateCount = 0;
+        final LinearLayout horizontalCategories = (LinearLayout) findViewById(R.id.category_container);
+        horizontalCategories.removeAllViews();
+        if (filters != null) {
+            if (filters.getFilterAttributes() != null && filters.getFilterAttributes().size() > 0) {
+                horizontalCategories.setVisibility(View.VISIBLE);
+                if (filters.getFilterAttributes().size() > 8) {
+                    iterateCount = 8;
+                } else {
+                    iterateCount = filters.getFilterAttributes().size();
+                }
+                for (int i = 0; i < iterateCount; i++) {
+                    final BrowseFilterAttributes attribute = filters.getFilterAttributes().get(i);
+                    View view = LayoutInflater.from(this).inflate(R.layout.special_filter_tags_layout, horizontalCategories, false);
+                    final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                    final LinearLayout filterBoxLayout = (LinearLayout) view.findViewById(R.id.filter_box_layout);
+                    int lastSpaceIndex = attribute.getName().lastIndexOf(" ");
+                    filterText.setText(attribute.getName());
+                    horizontalCategories.addView(view);
+                    final ImageView filterIcon = (ImageView) view.findViewById(R.id.filter_icon);
+                    filterIcon.setImageResource(attribute.getIconResourceId());
+                    //setCompoundDrawable(filterText, attribute.getIconResourceId());
+                    filterBoxLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            if (filterText.isSelected()) {
+                                filterText.setSelected(false);
+                                filterBoxLayout.setSelected(false);
+                                filterIcon.setImageResource(attribute.getIconResourceId());
+                                //setCompoundDrawable(filterText, attribute.getIconResourceId());
+                            } else {
+                                filterText.setSelected(true);
+                                filterBoxLayout.setSelected(true);
+                                filterIcon.setImageResource(attribute.getSelectedIconResourceId());
+                                // setCompoundDrawable(filterText, attribute.getSelectedIconResourceId());
+                            }
+                            eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getName(), false, null, -1);
+                            reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
+                        }
+                    });
+                }
+            } else {
+                horizontalCategories.setVisibility(View.GONE);
+            }
+        } else {
+            final String[] categories = EXPLORE_TAGS;
+            for (int i = 0; i < categories.length; i++) {
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                filterText.setText(categories[i]);
+                horizontalCategories.addView(view);
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (filterText.isSelected()) {
+                            filterText.setSelected(false);
+                        } else {
+                            filterText.setSelected(true);
+                        }
+                        if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
+
+                            eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null, null, false, null);
+                            //eventsFragment.filterEventsWithCategory("Featured", null);
+                        } else {
+                            eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null, null, false, null);
+                            //eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
+                        }
+                        reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
+                    }
+                });
+            }
+        }
+    }
+
+    public void addSortFilterData() {
+        trending = (TextView) findViewById(R.id.sort_trending);
+        price = (TextView) findViewById(R.id.sort_price);
+        distance = (TextView) findViewById(R.id.sort_distance);
+        time = (TextView) findViewById(R.id.sort_time);
+        if (EventsHighEndpoints.isNearMeQuery(eventsContext.query) && (new Account(this).getLastLocality() != null || getUserLocation() != null)) {
+            distance.setSelected(true);
+        } else {
+            trending.setSelected(true);
+        }
+        trending.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(eventsFragment.sortState == SORT_STATE_TRENDING)) {
+                    trending.setSelected(true);
+                    price.setSelected(false);
+                    distance.setSelected(false);
+                    time.setSelected(false);
+                    eventsFragment.sortAccToSortState(SORT_STATE_TRENDING);
+                    reportActionToAnalytics("filters", eventsContext.query + "-sortTrending");
+                }
+            }
+        });
+
+
+        price.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(eventsFragment.sortState == SORT_STATE_PRICE)) {
+                    trending.setSelected(false);
+                    price.setSelected(true);
+                    distance.setSelected(false);
+                    time.setSelected(false);
+                    eventsFragment.sortAccToSortState(SORT_STATE_PRICE);
+                    reportActionToAnalytics("filters", eventsContext.query + "-sortPrice");
+                }
+            }
+        });
+
+        time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(eventsFragment.sortState == SORT_STATE_TIME)) {
+                    trending.setSelected(false);
+                    price.setSelected(false);
+                    distance.setSelected(false);
+                    time.setSelected(true);
+                    eventsFragment.sortAccToSortState(SORT_STATE_TIME);
+                    reportActionToAnalytics("filters", eventsContext.query + "-sortTime");
+                }
+            }
+        });
+
+
+        if (account.getLastLocality() != null) {
+            distance.setText("Distance from " + Utils.capitalize(account.getLastLocality().getName()));
+        }
+        distance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (account.getLastLocality() != null) {
+                    if (!(eventsFragment.sortState == SORT_STATE_DISTANCE)) {
+                        trending.setSelected(false);
+                        price.setSelected(false);
+                        distance.setSelected(true);
+                        time.setSelected(false);
+                        eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
+                        reportActionToAnalytics("filters", eventsContext.query + "-sortDistance");
+                    }
+                } else {
+                    Intent intent = new Intent(EventsGridActivity.this, PlacesAutocompleteBoundedActivity.class);
+                    intent.putExtra("show_special_text", true);
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                }
+            }
+        });
+    }
+
+    public void addEventsEhTicketedSwitch() {
+        ticketedEventsSwitch = (SwitchCompat) findViewById(R.id.ticketed_events);
+        if (isShowLocalitiesFilter) {
+            localitiesFilter.setVisibility(View.VISIBLE);
+            ticketedEventsSwitch.setVisibility(View.GONE);
+            addLocalitiesDataToContainer(selectedLocalities);
+
+        } else {
+            localitiesFilter.setVisibility(View.GONE);
+            ticketedEventsSwitch.setVisibility(View.VISIBLE);
+            ticketedEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, true, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "-showTicketedEvents");
+                    } else {
+                        eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, false, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "-showAllEvents");
+                    }
+                }
+            });
+        }
     }
 
     public void copyArrayListContents(ArrayList<String> copyFrom, ArrayList<String> copyTo) {
@@ -487,7 +996,7 @@ public class EventsGridActivity extends BaseContextActivity {
 
     TextView selectCustomDates, today, tomorrow, weekend;
 
-    List<BrowseFilterAttributes> filters;
+    BrowseFilterObject filters;
     List<String> browseZones;
 
     public void setCompoundDrawable(TextView textView, int resId) {
@@ -502,18 +1011,17 @@ public class EventsGridActivity extends BaseContextActivity {
 
         final LinearLayout horizontalCategories = (LinearLayout) findViewById(R.id.category_container);
         horizontalCategories.removeAllViews();
-        if (isNewYearQuery && filters != null && filters.size() > 0) {
-            if (filters.size() > 6) {
+        if (filters != null && filters.getFilterAttributes().size() > 0) {
+            if (filters.getFilterAttributes().size() > 8) {
                 iterateCount = 6;
             } else {
-                iterateCount = filters.size();
+                iterateCount = filters.getFilterAttributes().size();
             }
             for (int i = 0; i < iterateCount; i++) {
-                final BrowseFilterAttributes attribute = filters.get(i);
+                final BrowseFilterAttributes attribute = filters.getFilterAttributes().get(i);
                 View view = LayoutInflater.from(this).inflate(R.layout.special_filter_tags_layout, horizontalCategories, false);
                 final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
                 int lastSpaceIndex = attribute.getName().lastIndexOf(" ");
-                String filterName = attribute.getName().substring(0, lastSpaceIndex) + "\n" + attribute.getName().substring(lastSpaceIndex + 1, attribute.getName().length());
                 filterText.setText(attribute.getName());
                 horizontalCategories.addView(view);
                 setCompoundDrawable(filterText, attribute.getIconResourceId());
@@ -528,7 +1036,7 @@ public class EventsGridActivity extends BaseContextActivity {
                             filterText.setSelected(true);
                             setCompoundDrawable(filterText, attribute.getSelectedIconResourceId());
                         }
-                        eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getKey(), false, null, -1);
+                        eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getName(), false, null, -1);
                         reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
                     }
                 });
@@ -564,17 +1072,17 @@ public class EventsGridActivity extends BaseContextActivity {
         }
         LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
         horizontalprice.removeAllViews();
-        if (isNewYearQuery) {
+        if (isNewYearQuery && filters != null && filters.getFilterAttributes().size() > 0) {
 
-            if (iterateCount < filters.size()) {
+            if (iterateCount < filters.getFilterAttributes().size()) {
                 horizontalprice.setVisibility(View.VISIBLE);
-                iterateCount = filters.size();
+                iterateCount = filters.getFilterAttributes().size();
                 for (int i = 6; i < iterateCount; i++) {
-                    final BrowseFilterAttributes attribute = filters.get(i);
+                    final BrowseFilterAttributes attribute = filters.getFilterAttributes().get(i);
                     View view = LayoutInflater.from(this).inflate(R.layout.special_filter_tags_layout, horizontalprice, false);
                     final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
                     int lastSpaceIndex = attribute.getName().lastIndexOf(" ");
-                    String filterName = attribute.getName().substring(0, lastSpaceIndex) + "\n" + attribute.getName().substring(lastSpaceIndex + 1, attribute.getName().length());
+                    // String filterName = attribute.getName().substring(0, lastSpaceIndex) + "\n" + attribute.getName().substring(lastSpaceIndex + 1, attribute.getName().length());
                     filterText.setText(attribute.getName());
                     horizontalprice.addView(view);
                     setCompoundDrawable(filterText, attribute.getIconResourceId());
@@ -589,7 +1097,7 @@ public class EventsGridActivity extends BaseContextActivity {
                                 filterText.setSelected(true);
                                 setCompoundDrawable(filterText, attribute.getSelectedIconResourceId());
                             }
-                            eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getKey(), false, null, -1);
+                            eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, attribute.getName(), false, null, -1);
                             reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
                         }
                     });
@@ -641,222 +1149,7 @@ public class EventsGridActivity extends BaseContextActivity {
             }
         }
 
-        LinearLayout zoneContainer = (LinearLayout) findViewById(R.id.zone_container);
-        List<String> zones = null;
-        if (browseZones != null) {
-            zones = browseZones;
-        } else {
-            zones = getZonesAccordingToCity();
-        }
 
-        if (zones != null) {
-            for (int i = 0; i < zones.size() + 1; i++) {
-
-                String zone = null;
-                if (i != 0) {
-                    zone = zones.get(i - 1);
-                }
-                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, zoneContainer, false);
-                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
-                if (i == 0) {
-                    filterText.setText("Zone:");
-                } else {
-                    filterText.setText(zones.get(i - 1));
-                }
-
-                zoneContainer.addView(view);
-                filterText.setTag(i);
-                final String finalZone = zone;
-                filterText.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        int position = (Integer) filterText.getTag();
-                        if (position != 0) {
-                            position = position - 1;
-                            eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, finalZone, null, false, null);
-                            reportActionToAnalytics("filters", eventsContext.query + "-" + finalZone);
-                            // eventsFragment.filterEventsWithPrice(null, FREE);
-
-                            if (filterText.isSelected()) {
-                                filterText.setSelected(false);
-                            } else {
-                                filterText.setSelected(true);
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        collapseAnimation(-1);
-        LinearLayout horizontalDate = (LinearLayout) findViewById(R.id.date_container);
-        String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates"};
-        for (int i = 0; i < dateRanges.length; i++) {
-            View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
-            final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
-            filterText.setText(dateRanges[i]);
-            if (i == dateRanges.length - 1) {
-                selectCustomDates = filterText;
-                // selectCustomDates.setVisibility(View.GONE);
-            } else if (i == dateRanges.length - 2) {
-                weekend = filterText;
-                //weekend.setVisibility(View.GONE);
-            } else if (i == dateRanges.length - 3) {
-                tomorrow = filterText;
-            } else {
-                today = filterText;
-                if (isTodaySelected) {
-                    today.setSelected(true);
-                } else {
-                    today.setSelected(false);
-                }
-            }
-
-
-            horizontalDate.addView(view);
-            filterText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (filterText.getText().toString().equalsIgnoreCase("Today")) {
-                        checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + 1);
-                        reportActionToAnalytics("filters", eventsContext.query + "-Today");
-
-                        //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
-                    } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
-                        checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY + 1);
-                        reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
-                        // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
-                    } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
-                        checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, DateTimeUtils.getWeekEndDates());
-                        reportActionToAnalytics("filters", eventsContext.query + "-Weekend");
-                        //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
-                    } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
-
-                        showDateDialog();
-                        Calendar currentYear = Calendar.getInstance();
-                        Calendar nextYear = Calendar.getInstance();
-                        nextYear.add(Calendar.DAY_OF_MONTH, 45);
-
-                        if (selectedDates != null) {
-                            dialogView.init(currentYear.getTime(), nextYear.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE).withSelectedDates(selectedDates);
-
-                        } else {
-                            dialogView.init(currentYear.getTime(), nextYear.getTime()) //
-                                    .inMode(CalendarPickerView.SelectionMode.MULTIPLE);
-                        }
-                    }
-                    if (!(filterText.getText().toString().equalsIgnoreCase("Custom Dates"))) {
-                        if (filterText.isSelected()) {
-                            filterText.setSelected(false);
-                        } else {
-                            filterText.setSelected(true);
-                        }
-                    }
-                }
-            });
-        }
-
-        trending = (TextView) findViewById(R.id.sort_trending);
-        price = (TextView) findViewById(R.id.sort_price);
-        distance = (TextView) findViewById(R.id.sort_distance);
-        time = (TextView) findViewById(R.id.sort_time);
-        if (EventsHighEndpoints.isNearMeQuery(eventsContext.query) && (new Account(this).getLastLocality() != null || getUserLocation() != null)) {
-            distance.setSelected(true);
-        } else {
-            trending.setSelected(true);
-        }
-        trending.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!(eventsFragment.sortState == SORT_STATE_TRENDING)) {
-                    trending.setSelected(true);
-                    price.setSelected(false);
-                    distance.setSelected(false);
-                    time.setSelected(false);
-                    eventsFragment.sortAccToSortState(SORT_STATE_TRENDING);
-                    reportActionToAnalytics("filters", eventsContext.query + "-sortTrending");
-                }
-            }
-        });
-
-
-        price.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!(eventsFragment.sortState == SORT_STATE_PRICE)) {
-                    trending.setSelected(false);
-                    price.setSelected(true);
-                    distance.setSelected(false);
-                    time.setSelected(false);
-                    eventsFragment.sortAccToSortState(SORT_STATE_PRICE);
-                    reportActionToAnalytics("filters", eventsContext.query + "-sortPrice");
-                }
-            }
-        });
-
-        time.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!(eventsFragment.sortState == SORT_STATE_TIME)) {
-                    trending.setSelected(false);
-                    price.setSelected(false);
-                    distance.setSelected(false);
-                    time.setSelected(true);
-                    eventsFragment.sortAccToSortState(SORT_STATE_TIME);
-                    reportActionToAnalytics("filters", eventsContext.query + "-sortTime");
-                }
-            }
-        });
-
-
-        if (account.getLastLocality() != null) {
-            distance.setText("Distance from " + Utils.capitalize(account.getLastLocality().getName()));
-        }
-        distance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (account.getLastLocality() != null) {
-                    if (!(eventsFragment.sortState == SORT_STATE_DISTANCE)) {
-                        trending.setSelected(false);
-                        price.setSelected(false);
-                        distance.setSelected(true);
-                        time.setSelected(false);
-                        eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
-                        reportActionToAnalytics("filters", eventsContext.query + "-sortDistance");
-                    }
-                } else {
-                    Intent intent = new Intent(EventsGridActivity.this, PlacesAutocompleteBoundedActivity.class);
-                    intent.putExtra("show_special_text", true);
-                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                }
-            }
-        });
-        ticketedEventsSwitch = (SwitchCompat) findViewById(R.id.ticketed_events);
-        if (isShowLocalitiesFilter) {
-            localitiesFilter.setVisibility(View.VISIBLE);
-            ticketedEventsSwitch.setVisibility(View.GONE);
-            addLocalitiesDataToContainer(selectedLocalities);
-
-        } else {
-            localitiesFilter.setVisibility(View.GONE);
-            ticketedEventsSwitch.setVisibility(View.VISIBLE);
-            ticketedEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, true, null);
-                        reportActionToAnalytics("filters", eventsContext.query + "-showTicketedEvents");
-                    } else {
-                        eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, false, null);
-                        reportActionToAnalytics("filters", eventsContext.query + "-showAllEvents");
-                    }
-                }
-            });
-        }
     }
 
     public void addLocalitiesDataToContainer(final List<String> selectedLocalities) {
@@ -928,7 +1221,7 @@ public class EventsGridActivity extends BaseContextActivity {
         }
     }
 
-    List<String> localities;
+    ArrayList<ZoneLocalityMapObject> localities;
 
     public boolean[] getBooleanList(CharSequence[] dialogList) {
         boolean[] isCheckedList = new boolean[dialogList.length];
@@ -946,8 +1239,23 @@ public class EventsGridActivity extends BaseContextActivity {
     }
 
     public void showLocalitiesList() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("zones", localities);
+        bundle.putStringArrayList("selected_localities", selectedLocalities);
+        ZoneFiltersDialogFragment dialogFragment = ZoneFiltersDialogFragment.newInstance(bundle);
+        dialogFragment.setOnAcceptClickListener(new ZoneFiltersDialogFragment.OnAcceptClickListener() {
+            @Override
+            public void onAcceptClick(ArrayList<String> selectedLocalities) {
+                EventsGridActivity.this.selectedLocalities = selectedLocalities;
+                addLocalitiesDataToContainer(selectedLocalities);
 
-        final CharSequence[] dialogList = localities.toArray(new CharSequence[localities.size()]);
+                eventsFragment.startFilterAsyncTask(LOCALITY_FILTER, null, null, -1, null, null, false, selectedLocalities);
+            }
+        });
+        dialogFragment.show(getSupportFragmentManager(), ZoneFiltersDialogFragment.class.getCanonicalName());
+
+
+        /*final CharSequence[] dialogList = localities.toArray(new CharSequence[localities.size()]);
 
         boolean[] is_checked = getBooleanList(dialogList);
         new AlertDialog.Builder(this).setTitle("Select Locality").setMultiChoiceItems(dialogList, is_checked, new DialogInterface.OnMultiChoiceClickListener() {
@@ -968,8 +1276,7 @@ public class EventsGridActivity extends BaseContextActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.cancel();
-                addLocalitiesDataToContainer(selectedLocalities);
-                eventsFragment.startFilterAsyncTask(LOCALITY_FILTER, null, null, -1, null, null, false, selectedLocalities);
+
 
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -977,7 +1284,7 @@ public class EventsGridActivity extends BaseContextActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.cancel();
             }
-        }).show();
+        }).show();*/
     }
 
     public List<String> getZonesAccordingToCity() {
@@ -1432,9 +1739,9 @@ public class EventsGridActivity extends BaseContextActivity {
                 isFiltersShown = true;
                 updateExpandBtn();
 
-                if (!weekend.isShown())
+                if (weekend != null && !weekend.isShown())
                     weekend.setVisibility(View.VISIBLE);
-                if (!selectCustomDates.isShown()) {
+                if (selectCustomDates != null && !selectCustomDates.isShown()) {
                     selectCustomDates.setVisibility(View.VISIBLE);
                     /*dateFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
                     dateFilter.postDelayed(new Runnable() {

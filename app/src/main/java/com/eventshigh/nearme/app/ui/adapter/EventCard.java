@@ -20,10 +20,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
+import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
@@ -395,7 +397,7 @@ public class EventCard extends ViewHolder {
         bindEventView(event, activity, position, listener);
         eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
-        Account account = new Account(activity);
+        final Account account = new Account(activity);
         // Set the travel time.
         if (event.location.latitude > 0 && event.location.longitude > 0) {
             if (account.getLastLocality() != null) {
@@ -428,23 +430,26 @@ public class EventCard extends ViewHolder {
         favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventMark oldMark = (EventMark) favouriteView.getTag();
-                EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
-                if (newMark == EventMark.FAVOURITE && !(new Account(activity).getUserInfo().isSignedIn)) {
-                    FBSigninDialog.show(activity, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 0);
-                }
-
-                activity.reportEventAction(event,
-                        EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
-                        position);
-                activity.recordEventMark(event, newMark, false);
-                setFavouriteView(newMark);
-                if (EventMark.isFavourite(newMark)) {
-                    activity.showMessage("Added to My Events");
+                if (account.getUserInfo() == null || account.getUserInfo().phoneNo == null) {
+                    PhoneVerificationDialog.show(activity, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
                 } else {
-                    activity.showMessage("Removed from My Events");
-                }
+                    EventMark oldMark = (EventMark) favouriteView.getTag();
+                    EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
+                    /*if (newMark == EventMark.FAVOURITE && !(new Account(activity).getUserInfo().isSignedIn)) {
+                        FBSigninDialog.show(activity, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 0);
+                    }*/
 
+                    activity.reportEventAction(event,
+                            EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                            position);
+                    activity.recordEventMark(event, newMark, false);
+                    setFavouriteView(newMark);
+                    if (EventMark.isFavourite(newMark)) {
+                        activity.showMessage("Added to My Events");
+                    } else {
+                        activity.showMessage("Removed from My Events");
+                    }
+                }
             }
         });
 

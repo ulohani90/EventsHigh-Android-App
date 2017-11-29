@@ -6,18 +6,33 @@
     android:paddingLeft="5dp"
     android:paddingRight="5dp">
 
-    <TextView
-        android:id="@+id/filter_text"
+    <LinearLayout
+        android:id="@+id/filter_box_layout"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="@drawable/special_filter_tag_selector_bg"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:background="@drawable/filter_tag_selector_bg"
+        android:orientation="vertical"
         android:paddingBottom="5dp"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
-        android:paddingTop="5dp"
-        android:text="DJ"
-        android:textColor="@color/filter_tag_color_selector"
-        android:textSize="10sp" />
+        android:paddingTop="5dp">
 
+        <ImageView
+            android:id="@+id/filter_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/filter_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+
+            android:text="DJ"
+            android:textColor="@color/filter_tag_color_selector"
+            android:textSize="14sp" />
+    </LinearLayout>
 </LinearLayout>

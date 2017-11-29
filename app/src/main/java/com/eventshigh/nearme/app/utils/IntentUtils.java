@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -15,6 +16,8 @@ import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
+import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Preferences;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -44,8 +47,9 @@ public class IntentUtils {
     private void processIntent(Intent inIntent) {
         param = inIntent.getParcelableExtra(EXTRA_EVENT_CONTEXT);
         inIntent.getParcelableExtra("special_obj");
+        City city = new Account(activity).getLastCity();
         if (param == null) {
-            param = new EventsContext(null, "");
+            param = new EventsContext(city != null ? city.cityBounds.getCenter() : null, "");
         }
         System.out.println("Notification param" + param.query);
         if (inIntent.getAction() != null) {

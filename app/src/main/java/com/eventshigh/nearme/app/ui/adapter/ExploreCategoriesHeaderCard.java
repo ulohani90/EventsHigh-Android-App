@@ -1,10 +1,13 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
@@ -23,6 +26,8 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
 
     ImageView whatsHot, nearBy, newYearImage;
 
+    FrameLayout newYearLayout;
+
     public static ExploreCategoriesHeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.explore_categories_header_card, parent, false);
         return new ExploreCategoriesHeaderCard(view);
@@ -33,19 +38,26 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         whatsHot = (ImageView) itemView.findViewById(R.id.whats_hot);
         nearBy = (ImageView) itemView.findViewById(R.id.nearby);
         newYearImage = (ImageView) itemView.findViewById(R.id.new_year_img);
+        newYearLayout = (FrameLayout) itemView.findViewById(R.id.new_year_layout);
     }
 
-    public void bindData(final BaseContextActivity activity, boolean showNewYearCard) {
+    public void bindData(final BaseContextActivity activity, boolean showNewYearCard, int width) {
         whatsHot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 activity.showSearchView(EventsHighEndpoints.QUERY_FEATURED);
             }
         });
+        Drawable drawable = activity.getDrawable(R.drawable.nye_poster);
+        int height = (drawable.getIntrinsicHeight() * width) / drawable.getIntrinsicWidth();
+        newYearLayout.getLayoutParams().width = width;
+        newYearLayout.getLayoutParams().height = height;
 
         if (!showNewYearCard) {
+            newYearLayout.setVisibility(View.GONE);
             newYearImage.setVisibility(View.GONE);
         } else {
+            newYearLayout.setVisibility(View.VISIBLE);
             newYearImage.setVisibility(View.VISIBLE);
             newYearImage.setOnClickListener(new View.OnClickListener() {
                 @Override

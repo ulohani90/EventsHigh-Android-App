@@ -13,9 +13,12 @@ public class ExploreCategoryHeaderData implements AdapterData {
 
     boolean showNewYearImage;
 
-    public ExploreCategoryHeaderData(BaseContextActivity activity, boolean showNewYearImage) {
+    int width;
+
+    public ExploreCategoryHeaderData(BaseContextActivity activity, boolean showNewYearImage, int width) {
         this.activity = activity;
         this.showNewYearImage = showNewYearImage;
+        this.width = width;
     }
 
     @Override
@@ -25,7 +28,7 @@ public class ExploreCategoryHeaderData implements AdapterData {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder card, int position) {
-        ((ExploreCategoriesHeaderCard) card).bindData(activity, showNewYearImage);
+        ((ExploreCategoriesHeaderCard) card).bindData(activity, showNewYearImage, width);
     }
 
     @Override

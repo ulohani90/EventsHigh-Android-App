@@ -124,6 +124,8 @@ public class EventInfoObject implements Parcelable {
 
     public final String timezone;
 
+    public final String config;
+
     public EventInfoObject(Event event) {
 
         this.id = event.id;
@@ -191,6 +193,7 @@ public class EventInfoObject implements Parcelable {
         this.skipCallbackupPhone = event.skipCallbackupPhone;
         this.destination = event.destination;
         this.timezone = event.timezone;
+        this.config = event.config;
     }
 
     protected EventInfoObject(Parcel in) {
@@ -248,6 +251,7 @@ public class EventInfoObject implements Parcelable {
         skipCallbackupPhone = in.readString();
         destination = in.readString();
         timezone = in.readString();
+        config = in.readString();
     }
 
     @Override
@@ -302,6 +306,7 @@ public class EventInfoObject implements Parcelable {
         dest.writeString(skipCallbackupPhone);
         dest.writeString(destination);
         dest.writeString(timezone);
+        dest.writeString(config);
     }
 
     @Override

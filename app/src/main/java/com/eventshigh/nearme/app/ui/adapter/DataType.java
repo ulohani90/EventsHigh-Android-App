@@ -60,7 +60,8 @@ public enum DataType {
                 || typeId == EXPLORE_CATEGORY_HEADER.typeId || typeId == MY_TICKETS_CARD.typeId
                 || typeId == EVENT_INFO_CARD.typeId || typeId == MY_REVIEW_CARD.typeId
                 || typeId == EVENT_FAQ_CARD.typeId || typeId == BROWSE_CAROUSEL_CARD.typeId || typeId == EVENT.typeId
-                || typeId == BROWSE_HEADER_CARD.typeId || typeId == BROWSE_SPONSORED_EVENTS.typeId;
+                || typeId == BROWSE_HEADER_CARD.typeId || typeId == BROWSE_SPONSORED_EVENTS.typeId
+                || typeId == EH_INVITE_NOTIFICATION.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {

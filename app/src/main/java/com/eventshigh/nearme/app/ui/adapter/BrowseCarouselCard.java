@@ -25,6 +25,7 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.TopCropImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -112,7 +113,7 @@ public class BrowseCarouselCard extends ViewHolder {
 
         public BrowseCarouselCardAdapter(BaseContextActivity activity, List<Event> events) {
             this.activity = activity;
-            this.events = events;
+            this.events = new ArrayList<>(events);
         }
 
         @Override

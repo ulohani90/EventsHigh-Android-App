@@ -13,10 +13,12 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.BrowseFilterAttributes;
+import com.eventshigh.nearme.app.data.BrowseFilterObject;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.stream.ZoneLocalityMapObject;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -32,8 +34,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -47,13 +51,13 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         public final int numFollowers;
 
-        public final List<BrowseFilterAttributes> filters;
+        public final BrowseFilterObject filters;
 
         public final List<String> zones;
 
-        public final List<String> localities;
+        public final ArrayList<ZoneLocalityMapObject> localities;
 
-        public EventsCollection(List<Event> events, int numFollowers, List<BrowseFilterAttributes> filters, List<String> zones, List<String> localities) {
+        public EventsCollection(List<Event> events, int numFollowers, BrowseFilterObject filters, List<String> zones, ArrayList<ZoneLocalityMapObject> localities) {
             this.events = events;
             this.numFollowers = numFollowers;
             this.filters = filters;
@@ -130,7 +134,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                                   Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
                                   Listener<EventsCollection> listener, ErrorListener errorListener, OnDataProcessComplete pListener) {
         super(Method.GET, url, null, listener, errorListener);
-        setShouldBypassCache(shouldBypassCache);
+        setShouldCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
         this.context = context;
         this.eventsContext = eventsContext;
@@ -167,11 +171,12 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         String jsonString = new String(response.data, "UTF-8");
         final JSONObject eventsJson = new JSONObject(jsonString);
 
-        final List<BrowseFilterAttributes> filters = BrowseFilterAttributes.parseFiltersArray(eventsJson.optJSONArray("filters"));
+
+        final BrowseFilterObject filters = BrowseFilterObject.parseFromJson(eventsJson);
 
         final List<String> zones = readFacetsArray(eventsJson.optJSONObject("facets"), "zones");
 
-        final List<String> localities = readFacetsArray(eventsJson.optJSONObject("facets"), "localities");
+        final ArrayList<ZoneLocalityMapObject> localities = readLocalitiesFacets(eventsJson.optJSONObject("facets"), "localities");
 
         if (listener != null) {
             Event.parseUpcomingEvents(eventsJson, filters, includeWithoutLocation, new Event.OnPartialDataLoadingComplete() {
@@ -217,6 +222,45 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             }
         }
         return names;
+    }
+
+    public static ArrayList<ZoneLocalityMapObject> readLocalitiesFacets(JSONObject jsonObj, String key) {
+        ArrayList<ZoneLocalityMapObject> objs = new ArrayList<>();
+        HashMap<String, ArrayList<String>> zonesLocalityMap = new HashMap<>();
+        if (jsonObj != null) {
+            JSONArray jsonArray = jsonObj.optJSONArray(key);
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.optJSONObject(i);
+
+                    if (jsonObject.has("zones") && jsonObject.has("name")) {
+                        String zoneName = jsonObject.optString("zones");
+                        if (zoneName.equalsIgnoreCase("unknown")) {
+                            continue;
+                        }
+                        String localityName = jsonObject.optString("name");
+                        if (localityName.length() == 0) {
+                            continue;
+                        }
+                        if (zonesLocalityMap.containsKey(zoneName)) {
+                            if (!localityName.equalsIgnoreCase(zoneName))
+                                ((ArrayList<String>) zonesLocalityMap.get(zoneName)).add(localityName);
+                        } else {
+                            ArrayList<String> localities = new ArrayList<>();
+                            if (!localityName.equalsIgnoreCase(zoneName))
+                                localities.add(localityName);
+                            zonesLocalityMap.put(zoneName, localities);
+                        }
+                    }
+                }
+            }
+        }
+        Iterator it = zonesLocalityMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            objs.add(new ZoneLocalityMapObject((String) pair.getKey(), (ArrayList<String>) pair.getValue()));
+        }
+        return objs;
     }
 
     // Filter out the events which has started more than three hours back.

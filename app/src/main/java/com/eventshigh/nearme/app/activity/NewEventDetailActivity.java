@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -17,6 +19,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -24,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -49,6 +53,7 @@ import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.InviteFriendsDialog;
+import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -57,6 +62,7 @@ import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.ContactListView;
 import com.eventshigh.nearme.app.view.SmartViewPager;
 import com.google.ads.conversiontracking.AdWordsRemarketingReporter;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -106,10 +112,13 @@ public class NewEventDetailActivity extends BaseContextActivity {
     TextView bookView;
     View joinView;
 
+    View configLayout, configParentLayout;
+
     public static final int REQUEST_FOR_RESULT_BOOK_TICKETS = 0x009;
     public static final int REQUEST_FOR_RESULT_AMA = 0x010;
     public static final int REQUEST_FOR_RESULT_CALL_EVENT = 0x011;
     public static final int REQUEST_FOR_RESULT_WRITE_REVIEW = 0x012;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +136,10 @@ public class NewEventDetailActivity extends BaseContextActivity {
         bookView = (TextView) findViewById(R.id.book_ticket);
         joinView = findViewById(R.id.join_event);
         statsLayout = (LinearLayout) findViewById(R.id.stats_layout);
+        configLayout = findViewById(R.id.event_highlights_layout);
+        configParentLayout = findViewById(R.id.event_highlights_parent_layout);
+        configParentLayout.setY(MOVE_VIEW_TO_POS);
+
 
     }
 
@@ -153,15 +166,20 @@ public class NewEventDetailActivity extends BaseContextActivity {
             @Override
             public void onClick(View v) {
                 if (event != null) {
-                    if (favAction.isSelected()) {
-                        removeFavourite(v);
-                        favAction.setSelected(false);
-                        showMessage("Removed from favourites");
+                    if (account.getUserInfo().phoneNo == null) {
+                        //FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 1);
+                        PhoneVerificationDialog.show(NewEventDetailActivity.this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
                     } else {
-                        addFavourite(v);
-                        favAction.setSelected(true);
-                        showMessage("Added to favourites");
+                        if (favAction.isSelected()) {
+                            removeFavourite(v);
+                            favAction.setSelected(false);
+                            showMessage("Removed from favourites");
+                        } else {
+                            addFavourite(v);
+                            favAction.setSelected(true);
+                            showMessage("Added to favourites");
 
+                        }
                     }
                 }
             }
@@ -238,11 +256,6 @@ public class NewEventDetailActivity extends BaseContextActivity {
     public void addFavourite(View v) {
         if (v != null) {
             reportEventAction(event, "addFavourite");
-
-            Account account = new Account(this);
-            if (!account.getUserInfo().isSignedIn) {
-                FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 1);
-            }
         }
 
         EventsMarkerManager.Editor eventsMarkerEditor =
@@ -326,7 +339,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            this.finish();
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -473,9 +486,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
         TABS = new ArrayList<>();
 
         TABS.add(INFO_TAB);
-        if (event.faqs != null && event.faqs.size() > 0) {
-            TABS.add(FAQS_TAB);
-        }
+
         if (event.descriptionSections != null && event.descriptionSections.size() > 0) {
             for (EventDescriptionSection section : event.descriptionSections) {
                 TABS.add(section.name);
@@ -483,6 +494,10 @@ public class NewEventDetailActivity extends BaseContextActivity {
         }
         if (event.sessions != null && event.sessions.size() > 0) {
             TABS.add(event.sessionTitlePhrase != null ? event.sessionTitlePhrase : "Sessions");
+        }
+
+        if (event.faqs != null && event.faqs.size() > 0) {
+            TABS.add(FAQS_TAB);
         }
 
 
@@ -690,7 +705,6 @@ public class NewEventDetailActivity extends BaseContextActivity {
             Bundle bundle = new Bundle();
             if (position == 0) {
 
-
                 bundle.putParcelable("event_info_object", new EventInfoObject(event));
                 // System.out.println("Bundle size " + bundle.size());
                 fragment = EventInfoFragment.newInstance(bundle);
@@ -698,7 +712,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
             }
 
             if (event.faqs != null && event.faqs.size() > 0) {
-                if (position == 1) {
+                if (position == TABS.size() - 1) {
                     bundle.putParcelableArrayList("faqs", event.faqs);
                     return EventFaqsSection.newInstance(bundle);
                 } else {
@@ -709,7 +723,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                     return EventDetailCustomFragment.newInstance(bundle);
                 }
             } else {
-                if (event.sessions != null && event.sessions.size() > 0 && position == TABS.size() - 1) {
+                if (event.sessions != null && event.sessions.size() > 0 && position == TABS.size() - 2) {
                     return EventSessionDetailFragment.newInstance((ArrayList) event.sessions, event.city);
                 }
                 bundle.putString("description", event.descriptionSections.get(position - 1).description);
@@ -879,6 +893,717 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
                 }
             }
+        }
+    }
+
+    boolean isConfigLayoutShown = false;
+
+    public void showHideConfigsLayout() {
+        if (isConfigLayoutShown) {
+            hideConfigLayout();
+        } else {
+            showConfigLayout();
+        }
+    }
+
+    public static final int MOVE_VIEW_TO_POS = 2500;
+
+    public void hideConfigLayout() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(configParentLayout, View.TRANSLATION_Y, 0, MOVE_VIEW_TO_POS);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isConfigLayoutShown = false;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
+    public void showConfigLayout() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(configParentLayout, View.TRANSLATION_Y, MOVE_VIEW_TO_POS, 0);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isConfigLayoutShown = true;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
+    public String getCommaSeparatedString(ArrayList<String> items) {
+        StringBuilder builder = new StringBuilder();
+        for (String item : items) {
+            if (builder.length() > 0) {
+                builder.append(", ");
+            }
+            builder.append(item);
+        }
+        return builder.toString();
+    }
+
+
+    public boolean addConfigsData(LinkedTreeMap<String, Object> configMap) {
+        boolean isKeyAdded = false;
+        configLayout.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Hide layout
+                hideConfigLayout();
+            }
+        });
+        if (checkIfKeyHasValue("special_highlights", configMap) || checkIfKeyHasValue("artists_performing", configMap)) {
+            configLayout.findViewById(R.id.highlights_layout).setVisibility(View.VISIBLE);
+            // configLayout.findViewById(R.id.highlights_border).setVisibility(View.VISIBLE);
+            if (checkIfKeyHasValue("special_highlights", configMap)) {
+                isKeyAdded = true;
+                LinearLayout highlightsContainer = (LinearLayout) configLayout.findViewById(R.id.highlights_container);
+                highlightsContainer.setVisibility(View.VISIBLE);
+                configLayout.findViewById(R.id.highlights_title).setVisibility(View.VISIBLE);
+                String[] value;
+                if (((LinkedTreeMap<String, Object>) configMap.get("special_highlights")).get("value") instanceof String) {
+                    value = ((String) ((LinkedTreeMap<String, Object>) configMap.get("special_highlights")).get("value")).split(",");
+                } else {
+                    value = (String[]) ((ArrayList) ((LinkedTreeMap<String, Object>) configMap.get("special_highlights")).get("value")).toArray();
+                }
+                for (int i = 0; i < value.length; i++) {
+                    View highlightView = getLayoutInflater().inflate(R.layout.textview_layout, highlightsContainer, false);
+                    TextView textView = (TextView) highlightView.findViewById(R.id.textview_text);
+                    textView.setText("\u2022 " + value[i].trim());
+                    highlightsContainer.addView(highlightView);
+                }
+            } else {
+                configLayout.findViewById(R.id.highlights_container).setVisibility(View.GONE);
+                configLayout.findViewById(R.id.highlights_title).setVisibility(View.GONE);
+            }
+
+            if (checkIfKeyHasValue("artists_performing", configMap)) {
+                isKeyAdded = true;
+                LinearLayout artistsContainer = (LinearLayout) configLayout.findViewById(R.id.artists_container);
+                artistsContainer.setVisibility(View.VISIBLE);
+                configLayout.findViewById(R.id.artists_title).setVisibility(View.VISIBLE);
+                String[] value;
+                if (((LinkedTreeMap<String, Object>) configMap.get("artists_performing")).get("value") instanceof String) {
+                    value = ((String) ((LinkedTreeMap<String, Object>) configMap.get("artists_performing")).get("value")).split(",");
+                } else {
+                    value = (String[]) ((ArrayList) ((LinkedTreeMap<String, Object>) configMap.get("artists_performing")).get("value")).toArray();
+                }
+                for (int i = 0; i < value.length; i++) {
+                    View highlightView = getLayoutInflater().inflate(R.layout.textview_layout, artistsContainer, false);
+                    TextView textView = (TextView) highlightView.findViewById(R.id.textview_text);
+                    textView.setText("\u2022 " + value[i].trim());
+                    artistsContainer.addView(highlightView);
+                }
+            } else {
+                configLayout.findViewById(R.id.artists_container).setVisibility(View.GONE);
+                configLayout.findViewById(R.id.artists_title).setVisibility(View.GONE);
+            }
+
+
+        } else {
+            //  configLayout.findViewById(R.id.highlights_border).setVisibility(View.GONE);
+            configLayout.findViewById(R.id.highlights_layout).setVisibility(View.GONE);
+        }
+        //Add party
+
+        if (checkIfParentChildKeyHasValue("is_parties_and_nightlife", "party_venue_type", configMap)
+                || checkIfParentChildKeyHasValue("is_parties_and_nightlife", "venue_view", configMap)
+                || checkIfKeyHasValue("is_unlimited_food", configMap)
+                || checkIfKeyHasValue("is_unlimited_alcohol", configMap)
+                || checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_stags_allowed", configMap)
+                || checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_parking_available", configMap)
+                || checkIfKeyHasValue("is_group_discounts", configMap)) {
+            LinearLayout partyLayout = (LinearLayout) configLayout.findViewById(R.id.party_info_layout);
+            partyLayout.setVisibility(View.VISIBLE);
+            if ((configLayout.findViewById(R.id.highlights_layout)).isShown()) {
+                configLayout.findViewById(R.id.highlights_border).setVisibility(View.VISIBLE);
+            } else {
+                configLayout.findViewById(R.id.highlights_border).setVisibility(View.GONE);
+            }
+
+            int partyLayoutCount = 1;
+            int childCount = 0;
+            if (checkIfParentChildKeyHasValue("is_parties_and_nightlife", "party_venue_type", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("party_venue_type")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("party_venue_type")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("party_venue_type")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(partyLayoutCount, childCount, "Venue Type", value, "party_info_layout_", "party_info_textview_");
+
+            }
+            if (checkIfParentChildKeyHasValue("is_parties_and_nightlife", "venue_view", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("venue_view")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("venue_view")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("venue_view")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(partyLayoutCount, childCount, "Venue View", value, "party_info_layout_", "party_info_textview_");
+            }
+            if (checkIfKeyHasValue("is_unlimited_food", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_unlimited_food")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(partyLayoutCount, childCount, "Unlimited Food Available", finalValue, "party_info_layout_", "party_info_textview_");
+            }
+            if (checkIfKeyHasValue("is_unlimited_alcohol", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_unlimited_alcohol")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(partyLayoutCount, childCount, "Unlimited Alcohol Available", finalValue, "party_info_layout_", "party_info_textview_");
+            }
+
+            if (checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_stags_allowed", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("is_stags_allowed")).get("value");
+
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(partyLayoutCount, childCount, "Stag Entry Allowed", finalValue, "party_info_layout_", "party_info_textview_");
+            }
+
+            if (checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_parking_available", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_parties_and_nightlife")).get("is_parking_available")).get("value");
+
+                isKeyAdded = true;
+                addPartyVenue(partyLayoutCount, childCount, "Parking Available", value, "party_info_layout_", "party_info_textview_");
+            }
+            if (checkIfKeyHasValue("is_group_discounts", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_group_discounts")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(partyLayoutCount, childCount, "Group Discounts", finalValue, "party_info_layout_", "party_info_textview_");
+            }
+
+        } else {
+            configLayout.findViewById(R.id.party_info_layout).setVisibility(View.GONE);
+            configLayout.findViewById(R.id.highlights_border).setVisibility(View.GONE);
+        }
+        //Add Outdoors
+        boolean showOutdoors = false;
+        if (configMap.containsKey("is_outdoors") && ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).containsKey("value")) {
+            String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("value");
+            showOutdoors = value.equalsIgnoreCase("true") ? true : false;
+        }
+        if (showOutdoors && (checkIfParentChildKeyHasValue("is_outdoors", "is_transportation_available", configMap)
+                || checkIfParentChildKeyHasValue("is_outdoors", "is_alcohol_allowed", configMap)
+                || checkIfParentChildKeyHasValue("is_outdoors", "tour_duration", configMap)
+                || checkIfParentChildKeyHasValue("is_outdoors", "outdoor_venue_type", configMap)
+                || checkIfParentChildKeyHasValue("is_outdoors", "stay_type", configMap)
+                || checkIfParentChildKeyHasValue("is_outdoors", "tent_sharing_type", configMap)
+                || checkIfParentChildKeyHasValue("is_outdoors", "food_type", configMap)
+                || checkIfParentChildKeyHasValue("is_outdoors", "activity_type", configMap))) {
+            configLayout.findViewById(R.id.outdoor_info_layout).setVisibility(View.VISIBLE);
+            if ((configLayout.findViewById(R.id.party_info_layout)).isShown()) {
+                configLayout.findViewById(R.id.party_border).setVisibility(View.VISIBLE);
+            } else {
+                configLayout.findViewById(R.id.party_border).setVisibility(View.GONE);
+            }
+
+            int outdoorLayoutCount = 1;
+            int outdoorChildCount = 0;
+            if (checkIfParentChildKeyHasValue("is_outdoors", "is_transportation_available", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("is_transportation_available")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Transportation Available", finalValue, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+
+            if (checkIfParentChildKeyHasValue("is_outdoors", "is_alcohol_allowed", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("is_alcohol_allowed")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Alcohol Allowed", finalValue, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+
+            if (checkIfParentChildKeyHasValue("is_outdoors", "tour_duration", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("tour_duration")).get("value");
+                isKeyAdded = true;
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Duration", value, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+            if (checkIfParentChildKeyHasValue("is_outdoors", "outdoor_venue_type", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("outdoor_venue_type")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("outdoor_venue_type")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("outdoor_venue_type")).get("value"));
+                }
+                isKeyAdded = true;
+
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Venue type", value, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+            if (checkIfParentChildKeyHasValue("is_outdoors", "stay_type", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("stay_type")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("stay_type")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("stay_type")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Stay type", value, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+
+            if (checkIfParentChildKeyHasValue("is_outdoors", "tent_sharing_type", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("tent_sharing_type")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("tent_sharing_type")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("tent_sharing_type")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Tent sharing type", value, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+            if (checkIfParentChildKeyHasValue("is_outdoors", "food_type", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("food_type")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("food_type")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("food_type")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Food type", value, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+            if (checkIfParentChildKeyHasValue("is_outdoors", "activity_type", configMap)) {
+                if (outdoorChildCount == 2) {
+                    outdoorLayoutCount += 1;
+                    outdoorChildCount = 1;
+                } else {
+                    outdoorChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("activity_type")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("activity_type")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_outdoors")).get("activity_type")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Activity type", value, "outdoor_info_layout_", "outdoor_info_textview_");
+
+            }
+
+        } else {
+            configLayout.findViewById(R.id.outdoor_info_layout).setVisibility(View.GONE);
+            configLayout.findViewById(R.id.party_border).setVisibility(View.GONE);
+        }
+
+        //Add Kid friendly
+        boolean showKidFriendly = false;
+        if (configMap.containsKey("is_kid_friendly") && ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).containsKey("value")) {
+            String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("value");
+            showKidFriendly = value.equalsIgnoreCase("true") ? true : false;
+        }
+        if (showKidFriendly && (checkIfKeyHasValue("is_kid_friendly", configMap)
+                || checkIfParentChildKeyHasValue("is_kid_friendly", "is_free_for_kids_below_five", configMap)
+                || checkIfParentChildKeyHasValue("is_kid_friendly", "is_child_care_zone", configMap)
+                || checkIfParentChildKeyHasValue("is_kid_friendly", "max_age_kids_pricing", configMap)
+                || checkIfParentChildKeyHasValue("is_kid_friendly", "kid_activities", configMap))) {
+            configLayout.findViewById(R.id.kids_info_layout).setVisibility(View.VISIBLE);
+            if ((configLayout.findViewById(R.id.outdoor_info_layout)).isShown())
+                configLayout.findViewById(R.id.outdoor_border).setVisibility(View.VISIBLE);
+            else
+                configLayout.findViewById(R.id.outdoor_border).setVisibility(View.GONE);
+
+            int kidsLayoutCount = 1;
+            int kidsChildCount = 0;
+            if (checkIfKeyHasValue("is_kid_friendly", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Kids Friendly", finalValue, "kids_info_layout_", "kids_info_textview_");
+            }
+
+            if (checkIfParentChildKeyHasValue("is_kid_friendly", "is_free_for_kids_below_five", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("is_free_for_kids_below_five")).get("value");
+
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Free for kids below 5 years", finalValue, "kids_info_layout_", "kids_info_textview_");
+            }
+
+            if (checkIfParentChildKeyHasValue("is_kid_friendly", "is_child_care_zone", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("is_child_care_zone")).get("value");
+
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Child care zone available", finalValue, "kids_info_layout_", "kids_info_textview_");
+            }
+
+            if (checkIfParentChildKeyHasValue("is_kid_friendly", "max_age_kids_pricing", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("max_age_kids_pricing")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("max_age_kids_pricing")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("max_age_kids_pricing")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Max age for kids pricing ", value, "kids_info_layout_", "kids_info_textview_");
+            }
+
+            if (checkIfParentChildKeyHasValue("is_kid_friendly", "kid_activities", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("kid_activities")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("kid_activities")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_kid_friendly")).get("kid_activities")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Activities for Kids", value, "kids_info_layout_", "kids_info_textview_");
+            }
+
+        } else {
+            configLayout.findViewById(R.id.kids_info_layout).setVisibility(View.GONE);
+            configLayout.findViewById(R.id.outdoor_border).setVisibility(View.GONE);
+        }
+
+        //Add Stay Type
+        boolean showStayProvided = false;
+        if (configMap.containsKey("is_stay_provided") && ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).containsKey("value")) {
+            String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("value");
+            showStayProvided = value.equalsIgnoreCase("true") ? true : false;
+        }
+        if (showStayProvided && (checkIfKeyHasValue("is_stay_provided", configMap)
+                || checkIfParentChildKeyHasValue("is_stay_provided", "is_breakfast_included", configMap)
+                || checkIfParentChildKeyHasValue("is_stay_provided", "is_extra_bed_available", configMap)
+                || checkIfParentChildKeyHasValue("is_stay_provided", "check_in_time", configMap)
+                || checkIfParentChildKeyHasValue("is_stay_provided", "check_out_time", configMap))) {
+            configLayout.findViewById(R.id.stay_info_layout).setVisibility(View.VISIBLE);
+            if ((configLayout.findViewById(R.id.kids_info_layout)).isShown())
+                configLayout.findViewById(R.id.kids_border).setVisibility(View.VISIBLE);
+            else
+                configLayout.findViewById(R.id.kids_border).setVisibility(View.GONE);
+
+            int kidsLayoutCount = 1;
+            int kidsChildCount = 0;
+            if (checkIfKeyHasValue("is_stay_provided", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Stay Provided", finalValue, "stay_info_layout_", "stay_info_textview_");
+            }
+            if (checkIfParentChildKeyHasValue("is_stay_provided", "is_breakfast_included", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("is_breakfast_included")).get("value");
+
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Breakfast included", finalValue, "stay_info_layout_", "stay_info_textview_");
+            }
+            if (checkIfParentChildKeyHasValue("is_stay_provided", "is_extra_bed_available", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("is_extra_bed_available")).get("value");
+
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : "");
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Extra Bed Available", finalValue, "stay_info_layout_", "stay_info_textview_");
+            }
+            if (checkIfParentChildKeyHasValue("is_stay_provided", "check_in_time", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("check_in_time")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("check_in_time")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("check_in_time")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Check in time", value, "stay_info_layout_", "stay_info_textview_");
+            }
+            if (checkIfParentChildKeyHasValue("is_stay_provided", "check_out_time", configMap)) {
+                if (kidsChildCount == 2) {
+                    kidsLayoutCount += 1;
+                    kidsChildCount = 1;
+                } else {
+                    kidsChildCount += 1;
+                }
+                String value;
+                if (((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("check_out_time")).get("value") instanceof String) {
+                    value = (String) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("check_out_time")).get("value");
+                } else {
+                    value = getCommaSeparatedString((ArrayList<String>) ((LinkedTreeMap<String, Object>) ((LinkedTreeMap<String, Object>) configMap.get("is_stay_provided")).get("check_out_time")).get("value"));
+                }
+                isKeyAdded = true;
+                addPartyVenue(kidsLayoutCount, kidsChildCount, "Check out time", value, "stay_info_layout_", "stay_info_textview_");
+            }
+
+        } else {
+            configLayout.findViewById(R.id.stay_info_layout).setVisibility(View.GONE);
+            configLayout.findViewById(R.id.kids_border).setVisibility(View.GONE);
+        }
+        return isKeyAdded;
+    }
+
+    public void addPartyVenue(int layoutCount, int childCount, String keyName, String value, String layoutName, String textViewName) {
+        try {
+            int layoutKey = R.id.class.getField(layoutName + layoutCount).getInt(null);
+            int textViewKey = R.id.class.getField(textViewName + layoutCount + childCount).getInt(null);
+            configLayout.findViewById(layoutKey).setVisibility(View.VISIBLE);
+            TextView textView = (TextView) configLayout.findViewById(textViewKey);
+            textView.setVisibility(View.VISIBLE);
+            SpannableString string = new SpannableString(keyName + " : " + value);
+            string.setSpan(new StyleSpan(Typeface.BOLD), keyName.length(), string.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            textView.setText(string);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+
+        }
+    }
+
+    public boolean checkIfKeyHasValue(String key, LinkedTreeMap<String, Object> configMap) {
+        if (configMap.containsKey(key)) {
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) configMap.get(key);
+            if (map.containsKey("value")
+                    && map.get("value") != null
+                    && (map.get("value") instanceof String && ((String) map.get("value")).length() > 0
+                    && !((String) map.get("value")).equalsIgnoreCase("n/a"))
+                    && !((String) map.get("value")).equalsIgnoreCase("false")
+                    || (map.get("value") instanceof ArrayList && ((ArrayList) map.get("value")).size() > 0
+                    && !((ArrayList) map.get("value")).contains("n/a"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkIfParentChildKeyHasValue(String parentKey, String childkey, LinkedTreeMap<String, Object> configMap) {
+        if (configMap.containsKey(parentKey)) {
+            LinkedTreeMap<String, Object> map = (LinkedTreeMap<String, Object>) configMap.get(parentKey);
+            if (map.containsKey(childkey)) {
+                LinkedTreeMap<String, Object> childMap = (LinkedTreeMap<String, Object>) map.get(childkey);
+                if (childMap.containsKey("value")
+                        && childMap.get("value") != null
+                        && (childMap.get("value") instanceof String && ((String) childMap.get("value")).length() > 0 &&
+                        !((String) childMap.get("value")).equalsIgnoreCase("n/a"))
+                        && !((String) childMap.get("value")).equalsIgnoreCase("false")
+                        || (childMap.get("value") instanceof ArrayList && ((ArrayList) childMap.get("value")).size() > 0
+                        && !((ArrayList) childMap.get("value")).contains("n/a"))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (isConfigLayoutShown) {
+            hideConfigLayout();
+        } else {
+            super.onBackPressed();
         }
     }
 }

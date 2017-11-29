@@ -93,7 +93,6 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.select_interest_item_layout, parent, false);
             ViewHolder holder = new ViewHolder(convertView);
             convertView.setTag(holder);
-
         }
 
         final ViewHolder holder = new ViewHolder(convertView);

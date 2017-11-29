@@ -158,7 +158,7 @@ public class DateTimeUtils {
 
     public static int getDaysLater(EventInfoObject event) {
         Date eventDate = DateTimeUtils.getEventDate(event, 0);
-        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.timezone).getTime();
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE).getTime();
         return (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
     }
 
@@ -183,7 +183,7 @@ public class DateTimeUtils {
 
     public static Calendar toMidnight(Calendar cal, @Nullable String timeZone) {
         if (timeZone != null) {
-            cal.setTimeZone(TimeZone.getTimeZone(timeZone));
+            cal.setTimeZone(TimeZone.getTimeZone(timeZone != null ? timeZone : Event.DEFAULT_TIME_ZONE));
         }
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
@@ -215,7 +215,7 @@ public class DateTimeUtils {
         }
 
         return dateToEventTime(new Date(event.eventTimings.get(index)),
-                TimeZone.getTimeZone(event.timezone), event.eventTimings.get(index));
+                TimeZone.getTimeZone(event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE), event.eventTimings.get(index));
     }
 
 
@@ -404,6 +404,35 @@ public class DateTimeUtils {
         return weekendDates;
 
     }
+
+    public static long[] getNextWeekendDates() {
+        long[] weekendDates = new long[2];
+        Calendar c = Calendar.getInstance();
+        int i = c.get(Calendar.WEEK_OF_MONTH);
+        c.set(Calendar.WEEK_OF_MONTH, ++i);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        weekendDates[0] = toMidnight(c, null).getTime().getTime();
+        weekendDates[1] = weekendDates[0] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
+        return weekendDates;
+    }
+
+    public static long[] getNyeWeekendDates() {
+        long[] weekendDates = new long[4];
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.MONTH, Calendar.DECEMBER);
+        c.set(Calendar.DAY_OF_MONTH, 29);
+        weekendDates[0] = toMidnight(c, null).getTime().getTime();
+        System.out.println("Weekend date 1::" + weekendDates[0]);
+        weekendDates[1] = weekendDates[0] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
+        System.out.println("Weekend date 2::" + weekendDates[1]);
+        weekendDates[2] = weekendDates[1] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
+        System.out.println("Weekend date::" + weekendDates[2]);
+        weekendDates[3] = weekendDates[2] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
+        System.out.println("Weekend date::" + weekendDates[3]);
+        return weekendDates;
+
+    }
+
 
     private static final SimpleDateFormat HH_MM_SS_FORMAT = new SimpleDateFormat("hh:mm:ss");
 

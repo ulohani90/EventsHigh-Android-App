@@ -12,6 +12,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.EventsGridActivity;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
@@ -71,7 +72,7 @@ public class EventInvitationCard extends ViewHolder {
 
         if(special.coupon!=null){
             validBeforeText.setVisibility(View.VISIBLE);
-            validBeforeText.setText("* Valid before " + DateTimeUtils.dateToEventTime(new Date(special.coupon.validTillTimestamp), TimeZone.getTimeZone(new Account(activity).getLastCity().timeZone)));
+            validBeforeText.setText("* Valid before " + DateTimeUtils.dateToEventTime(new Date(special.coupon.validTillTimestamp), TimeZone.getTimeZone(Event.DEFAULT_TIME_ZONE)));
         }
 
         itemView.setOnClickListener(new OnClickListener() {

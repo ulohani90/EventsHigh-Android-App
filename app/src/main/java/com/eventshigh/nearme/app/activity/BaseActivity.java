@@ -557,7 +557,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         if (date != null) {
             intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
-            if (DateTimeUtils.getTimeString(date, TimeZone.getTimeZone(event.timezone)) == null) {
+            if (DateTimeUtils.getTimeString(date, TimeZone.getTimeZone(event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE)) == null) {
                 intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
             }
         }

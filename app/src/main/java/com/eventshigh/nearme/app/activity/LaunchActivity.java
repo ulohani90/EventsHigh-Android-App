@@ -340,16 +340,6 @@ public class LaunchActivity extends BaseContextActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         this.setIntent(intent);
-       /* if (intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
-
-            drawer.closeDrawers();
-            showExploreScreen(-1);
-        }*//*else if(intent != null && intent.getAction()!=null && intent.getAction().equalsIgnoreCase(Intent.ACTION_SEARCH)){
-            eventsContext = IntentUtils.processIntent(this,intent);
-            showNextScreen();
-        }*/
-
-
     }
 
 
@@ -360,9 +350,7 @@ public class LaunchActivity extends BaseContextActivity {
         if (toolbar != null) {
             setLightToolbarIcons();
         }
-        /*if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
-            getIntent().setAction(null);
-        }*/
+
 
         //invalidateOptionsMenu();
         // We show the onboarding If this is first activity and there was no

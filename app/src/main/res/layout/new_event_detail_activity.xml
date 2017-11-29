@@ -270,6 +270,23 @@
             tools:visibility="visible" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/event_highlights_parent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:background="@android:color/white"
+        >
+
+        <include
+            android:id="@+id/event_highlights_layout"
+            layout="@layout/event_highlights_dialog_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
     <include
         android:id="@+id/verify_phone_container"
         layout="@layout/view_phone_snack_bar"
