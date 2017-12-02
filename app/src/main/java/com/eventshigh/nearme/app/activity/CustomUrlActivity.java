@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -141,7 +142,7 @@ public class CustomUrlActivity extends BaseActivity {
 
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
     public void setupNewWebView(WebView webView, final BaseActivity activity, boolean useProgressBar) {
         // Enable Javascript
         WebSettings webSettings = webView.getSettings();
@@ -149,7 +150,8 @@ public class CustomUrlActivity extends BaseActivity {
         webSettings.setSupportZoom(false);
         webSettings.setBuiltInZoomControls(false);
         WebView.setWebContentsDebuggingEnabled(true);
-
+        JavaScriptInterface myJavaScriptInterface = new JavaScriptInterface(activity);
+        webView.addJavascriptInterface(myJavaScriptInterface,"Android");
         // Enable Caching.
         File dir = activity.getCacheDir();
         if (!dir.exists()) {
@@ -254,12 +256,12 @@ public class CustomUrlActivity extends BaseActivity {
         // Enable Javascript
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+
         webSettings.setSupportZoom(false);
         webSettings.setBuiltInZoomControls(false);
         WebView.setWebContentsDebuggingEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(true);
-
 
         // Enable Caching.
         File dir = activity.getCacheDir();
@@ -381,4 +383,13 @@ public class CustomUrlActivity extends BaseActivity {
             return false;
         }
     }
+
+    public class JavaScriptInterface {
+        Context mContext;
+
+        JavaScriptInterface(Context c) {
+            mContext = c;
+        }
+    }
+
 }

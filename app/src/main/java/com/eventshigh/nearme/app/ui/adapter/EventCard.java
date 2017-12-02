@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,6 +33,8 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.ContactListView;
+
+import org.w3c.dom.Text;
 
 import java.util.Set;
 
@@ -65,6 +68,8 @@ public class EventCard extends ViewHolder {
     private final ImageView trustedPartner;
     private final TextView sponsoredEvent;
     private final TextView discountTag;
+    private final FrameLayout offerMessageLayout;
+    private final TextView offerMessageText;
 
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
@@ -114,6 +119,8 @@ public class EventCard extends ViewHolder {
         sponsoredEvent = (TextView) cardView.findViewById(R.id.is_sponsered_event);
         addShadow = isAddShadow;
         discountTag = (TextView) cardView.findViewById(R.id.event_discount);
+        offerMessageLayout = (FrameLayout) cardView.findViewById(R.id.offer_message_layout);
+        offerMessageText = (TextView) cardView.findViewById(R.id.offer_message_text);
     }
 
 
@@ -386,6 +393,14 @@ public class EventCard extends ViewHolder {
             sponsoredEvent.setVisibility(View.VISIBLE);
         } else {
             sponsoredEvent.setVisibility(View.GONE);
+        }
+
+        //Add offer message
+        if (event.offerMessage != null && event.offerMessage.length() > 0) {
+            offerMessageLayout.setVisibility(View.VISIBLE);
+            offerMessageText.setText(event.offerMessage);
+        } else {
+            offerMessageLayout.setVisibility(View.GONE);
         }
     }
 

@@ -71,4 +71,5 @@
 
     <color name="switch_on_color">#51cf63</color>
     <color name="switch_off_color">#e5e6e8</color>
+    <color name="offer_message_bg">#4e9a36</color>
 </resources>

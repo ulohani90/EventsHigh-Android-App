@@ -68,6 +68,8 @@ import java.util.List;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
+import static com.eventshigh.nearme.app.activity.ExploreFragment.endDate;
+
 /**
  * Shows the events in Grid layout.
  */
@@ -519,7 +521,7 @@ public class EventsGridActivity extends BaseContextActivity {
             }
         } else {
             String finalDates[];
-            if (isPartiesQuery(eventsContext.query)) {
+            if (isPartiesQuery(eventsContext.query) &&  (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(endDate))) {
                 String[] dateRanges = {"Today", "Tomorrow", "Weekend", "NYE Weekend", "Custom Dates"};
                 finalDates = dateRanges;
             } else {

@@ -719,7 +719,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                     if (event.sessions != null && event.sessions.size() > 0 && position == TABS.size() - 1) {
                         return EventSessionDetailFragment.newInstance((ArrayList) event.sessions, event.city);
                     }
-                    bundle.putString("description", event.descriptionSections.get(position - 2).description);
+                    bundle.putString("description", event.descriptionSections.get(position - 1).description);
                     return EventDetailCustomFragment.newInstance(bundle);
                 }
             } else {

@@ -164,6 +164,8 @@ public class Event implements Parcelable {
 
     public final String config;
 
+    public final String offerMessage;
+
     public static final String DEFAULT_TIME_ZONE = "Asia/Calcutta";
 
     public Event(String id, String city, String title, EventCategory category,
@@ -181,7 +183,7 @@ public class Event implements Parcelable {
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
                  ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination, String timezone, String dominantBgColor
-            , double nyeUberScore, double outdoorsUberScore, HashMap<String, Double> nyeUberScoresMap, String config) {
+            , double nyeUberScore, double outdoorsUberScore, HashMap<String, Double> nyeUberScoresMap, String config, String offerMessage) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -253,6 +255,7 @@ public class Event implements Parcelable {
         this.outdoorsUberScore = outdoorsUberScore;
         this.nyeUberScoresMap = nyeUberScoresMap;
         this.config = config;
+        this.offerMessage = offerMessage;
     }
 
     public Event(Parcel in) {
@@ -340,6 +343,7 @@ public class Event implements Parcelable {
         nyeUberScoresMap = new HashMap<>();
         in.readMap(nyeUberScoresMap, Double.class.getClassLoader());
         config = in.readString();
+        offerMessage = in.readString();
     }
 
     @Override
@@ -405,6 +409,7 @@ public class Event implements Parcelable {
         dest.writeDouble(outdoorsUberScore);
         dest.writeMap(nyeUberScoresMap);
         dest.writeString(config);
+        dest.writeString(offerMessage);
     }
 
     public Uri getEventDetailsURI() {
@@ -922,7 +927,11 @@ public class Event implements Parcelable {
             HashMap<String, Boolean> attributeValues = new HashMap<>();
             //String eventSubType = null;
             String config = null;
+            String offerMessage = null;
             if (eventJson.has("attributes")) {
+                if (eventJson.getJSONObject("attributes").has("offer_message")) {
+                    offerMessage = eventJson.getJSONObject("attributes").optString("offer_message");
+                }
                 //  eventSubType = eventJson.optJSONObject("attributes").optString("event_sub_type");
                 //Add Event Prices
                 if (ehPrices.size() == 0 && eventJson.optJSONObject("attributes").has("pricing_info")) {
@@ -1085,7 +1094,7 @@ public class Event implements Parcelable {
                     discountPercentageText,
                     skipRequestToCall,
                     skipCallBackupPhone, destination, timeZone, dominantBgColor,
-                    nyeUberScore, outdoorsUberScore, nyeUberScoresMap, config
+                    nyeUberScore, outdoorsUberScore, nyeUberScoresMap, config, offerMessage
             );
         } catch (
                 IllegalArgumentException e)

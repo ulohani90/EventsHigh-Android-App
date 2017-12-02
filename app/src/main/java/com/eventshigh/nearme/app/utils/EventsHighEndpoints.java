@@ -30,7 +30,7 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_DATE_FORMAT =
             API_URI_BASE + "api/date/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_DATE_CATEGORY_FORMAT =
-            API_URI_BASE + "api/get_mobile_date_explore_screen/%s/%s?mobile=1";
+            API_URI_BASE + "api/get_mobile_date_explore_screen/%s/%s?mobile=1&limit=100";
     private static final String API_ENDPOINT_QUERY_FORMAT =
             API_URI_BASE + "api/events/%s/%s?limit=100&mobile=1&filter=1";
     private static final String API_ENDPOINT_QUERY_DATE_FORMAT =

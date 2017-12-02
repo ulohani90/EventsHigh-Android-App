@@ -87,12 +87,12 @@ public class BrowseSponsoredEventsCard extends RecyclerView.ViewHolder {
 
             final ImageView eventImage = (ImageView) view.findViewById(R.id.event_img);
 
-            Glide.with(itemView.getContext()).load(event.bannerUrl).asBitmap().centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
+            Glide.with(itemView.getContext()).load(event.bannerUrl.trim()).asBitmap().centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(new BitmapImageViewTarget(eventImage) {
                         @Override
                         public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
                             super.onResourceReady(bitmap, anim);
-                            Glide.with(itemView.getContext()).load(event.bannerUrl).centerCrop().into(eventImage);
+                            Glide.with(itemView.getContext()).load(event.bannerUrl.trim()).centerCrop().into(eventImage);
                         }
                     });
 
