@@ -502,7 +502,10 @@ public class EventsFragment extends BaseEventsFragment {
                                             } else {
                                                 noMyEventsView.setVisibility(View.GONE);
                                             }
-                                            ((EventsGridActivity) getActivity()).computeFilters();
+                                            if (getActivity() != null && getActivity() instanceof EventsGridActivity) {
+                                                ((EventsGridActivity) getActivity()).computeFilters();
+                                            }
+
                                             if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
                                                 ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
                                             }
@@ -763,7 +766,9 @@ public class EventsFragment extends BaseEventsFragment {
                     ((EventsGridActivity) getActivity()).filters = eventsCollection.filters;
                     ((EventsGridActivity) getActivity()).browseZones = eventsCollection.zones;
                     ((EventsGridActivity) getActivity()).localities = eventsCollection.localities;
-                    ((EventsGridActivity) getActivity()).computeFilters();
+                    if (getActivity() != null && getActivity() instanceof EventsGridActivity) {
+                        ((EventsGridActivity) getActivity()).computeFilters();
+                    }
                     String seeAllQuery = eventsContext.query.isEmpty() ||
                             eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
                     if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
