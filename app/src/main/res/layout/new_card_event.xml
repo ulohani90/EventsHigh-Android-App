@@ -183,9 +183,11 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center_vertical"
                 android:paddingLeft="12dp"
+                android:singleLine="true"
+                android:ellipsize="none"
                 android:text="Buy 3 Tickets, Get Rs 200 Off"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </FrameLayout>
     </RelativeLayout>
 

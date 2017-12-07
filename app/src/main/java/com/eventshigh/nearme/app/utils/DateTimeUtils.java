@@ -399,8 +399,9 @@ public class DateTimeUtils {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         weekendDates[0] = toMidnight(c, null).getTime().getTime();
-
-        weekendDates[1] = weekendDates[0] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
+        c.add(Calendar.DAY_OF_WEEK, 2);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
+        ;
         return weekendDates;
 
     }
@@ -412,25 +413,64 @@ public class DateTimeUtils {
         c.set(Calendar.WEEK_OF_MONTH, ++i);
         c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         weekendDates[0] = toMidnight(c, null).getTime().getTime();
-        weekendDates[1] = weekendDates[0] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
+        c.add(Calendar.DAY_OF_WEEK, 2);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
         return weekendDates;
     }
 
     public static long[] getNyeWeekendDates() {
-        long[] weekendDates = new long[4];
+        long[] weekendDates = new long[2];
         Calendar c = Calendar.getInstance();
         c.set(Calendar.MONTH, Calendar.DECEMBER);
         c.set(Calendar.DAY_OF_MONTH, 29);
         weekendDates[0] = toMidnight(c, null).getTime().getTime();
-        System.out.println("Weekend date 1::" + weekendDates[0]);
-        weekendDates[1] = weekendDates[0] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
-        System.out.println("Weekend date 2::" + weekendDates[1]);
-        weekendDates[2] = weekendDates[1] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
-        System.out.println("Weekend date::" + weekendDates[2]);
-        weekendDates[3] = weekendDates[2] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
-        System.out.println("Weekend date::" + weekendDates[3]);
+        c.add(Calendar.DAY_OF_MONTH, 4);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
         return weekendDates;
 
+    }
+
+    public static long[] getThisWeekDates() {
+        long[] weekendDates = new long[2];
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        weekendDates[0] = toMidnight(c, null).getTime().getTime();
+        c.add(Calendar.DAY_OF_WEEK, 7);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
+        return weekendDates;
+    }
+
+    public static long[] getNextWeekDates() {
+        long[] weekendDates = new long[2];
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.WEEK_OF_MONTH, 1);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        weekendDates[0] = toMidnight(c, null).getTime().getTime();
+        c.add(Calendar.DAY_OF_WEEK, 7);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
+        return weekendDates;
+    }
+
+    public static long[] getThisMonthDates() {
+        long[] weekendDates = new long[2];
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        weekendDates[0] = toMidnight(c, null).getTime().getTime();
+        c.add(Calendar.MONTH, 1);
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
+        return weekendDates;
+    }
+
+    public static long[] getXmasWeekendDates() {
+        long[] weekendDates = new long[2];
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.MONTH, Calendar.DECEMBER);
+        c.set(Calendar.DAY_OF_MONTH, 22);
+        weekendDates[0] = toMidnight(c, null).getTime().getTime();
+        c.add(Calendar.DAY_OF_MONTH, 4);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
+        return weekendDates;
     }
 
 

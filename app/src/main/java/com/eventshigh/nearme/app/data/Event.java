@@ -69,6 +69,8 @@ public class Event implements Parcelable {
     public final int numSaves;
     public final boolean ehRecommended;
     public final float uberScore;
+    public final float outdoorUberScore;
+    public final float nyeUberScore;
 
     public final List<Long> eventTimings;    // each start time is stored as milliseconds since epoch.
 
@@ -156,11 +158,7 @@ public class Event implements Parcelable {
 
     public final String dominantBgColor;
 
-    public final double nyeUberScore;
-
-    public final double outdoorsUberScore;
-
-    public final HashMap<String, Double> nyeUberScoresMap;
+    public final HashMap<String, Float> nyeUberScoresMap;
 
     public final String config;
 
@@ -183,7 +181,7 @@ public class Event implements Parcelable {
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
                  ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination, String timezone, String dominantBgColor
-            , double nyeUberScore, double outdoorsUberScore, HashMap<String, Double> nyeUberScoresMap, String config, String offerMessage) {
+            , float nyeUberScore, float outdoorsUberScore, HashMap<String, Float> nyeUberScoresMap, String config, String offerMessage) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -252,7 +250,7 @@ public class Event implements Parcelable {
         this.timezone = timezone;
         this.dominantBgColor = dominantBgColor;
         this.nyeUberScore = nyeUberScore;
-        this.outdoorsUberScore = outdoorsUberScore;
+        this.outdoorUberScore = outdoorsUberScore;
         this.nyeUberScoresMap = nyeUberScoresMap;
         this.config = config;
         this.offerMessage = offerMessage;
@@ -338,8 +336,8 @@ public class Event implements Parcelable {
         destination = in.readString();
         timezone = in.readString();
         dominantBgColor = in.readString();
-        nyeUberScore = in.readDouble();
-        outdoorsUberScore = in.readDouble();
+        nyeUberScore = in.readFloat();
+        outdoorUberScore = in.readFloat();
         nyeUberScoresMap = new HashMap<>();
         in.readMap(nyeUberScoresMap, Double.class.getClassLoader());
         config = in.readString();
@@ -405,8 +403,8 @@ public class Event implements Parcelable {
         dest.writeString(destination);
         dest.writeString(timezone);
         dest.writeString(dominantBgColor);
-        dest.writeDouble(nyeUberScore);
-        dest.writeDouble(outdoorsUberScore);
+        dest.writeFloat(nyeUberScore);
+        dest.writeFloat(outdoorUberScore);
         dest.writeMap(nyeUberScoresMap);
         dest.writeString(config);
         dest.writeString(offerMessage);
@@ -901,21 +899,21 @@ public class Event implements Parcelable {
                 zone = "Outside " + (city);
             }
 
-            double nyeUberScore = 0.00;
+            float nyeUberScore = 0;
             if (eventJson.has("nye_uber_score")) {
-                nyeUberScore = eventJson.getDouble("nye_uber_score");
+                nyeUberScore = (float) eventJson.optDouble("nye_uber_score");
             }
-            double outdoorsUberScore = 0.00;
+            float outdoorsUberScore = 0;
             if (eventJson.has("outdoor_uber_score")) {
-                outdoorsUberScore = eventJson.optDouble("outdoor_uber_score");
+                outdoorsUberScore = (float) eventJson.optDouble("outdoor_uber_score");
             }
 
-            HashMap<String, Double> nyeUberScoresMap = new HashMap<>();
+            HashMap<String, Float> nyeUberScoresMap = new HashMap<>();
             if (eventJson.has("nye_filter_uber_scores")) {
                 JSONArray filterUberScoresArray = eventJson.optJSONArray("nye_filter_uber_scores");
                 for (int i = 0; i < filterUberScoresArray.length(); i++) {
                     JSONObject nyeFilterObj = filterUberScoresArray.optJSONObject(i);
-                    nyeUberScoresMap.put(nyeFilterObj.optString("nye_filter"), nyeFilterObj.optDouble("nye_filter_uber_score"));
+                    nyeUberScoresMap.put(nyeFilterObj.optString("nye_filter"), (float) nyeFilterObj.optDouble("nye_filter_uber_score"));
                 }
 
             }

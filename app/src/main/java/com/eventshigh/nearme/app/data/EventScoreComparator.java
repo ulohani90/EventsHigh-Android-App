@@ -23,9 +23,37 @@ public class EventScoreComparator implements Comparator<Event> {
         if (scoreType == SCORE_TYPE_UBER_SCORE) {
             return Float.compare(rhs.uberScore, lhs.uberScore);
         } else if (scoreType == SCORE_TYPE_NYE_UBER_SCORE) {
-            return Double.compare(rhs.nyeUberScore, lhs.nyeUberScore);
+            return Float.compare(getUberScore(rhs), getUberScore(lhs));
         } else {
-            return Double.compare(rhs.outdoorsUberScore, lhs.outdoorsUberScore);
+            return Float.compare(getUberScore(rhs), getUberScore(lhs));
+        }
+    }
+
+
+    public Float getUberScore(Event event) {
+        if (event.nyeUberScoresMap != null) {
+            if (scoreType == SCORE_TYPE_OUTDOOR_UBER_SCORE) {
+                if (event.nyeUberScoresMap.containsKey("Camping / Outdoors")) {
+                    return event.nyeUberScoresMap.get("Camping / Outdoors");
+                } else if (event.outdoorUberScore != 0) {
+                    return event.outdoorUberScore;
+                } else {
+                    return (event.uberScore);
+                }
+            } else if (scoreType == SCORE_TYPE_NYE_UBER_SCORE) {
+                if (event.nyeUberScoresMap.containsKey("Default")) {
+                    return event.nyeUberScoresMap.get("Default");
+                } else if (event.nyeUberScore != 0) {
+                    return (event.nyeUberScore);
+                } else {
+                    return event.uberScore;
+                }
+            } else {
+                return (event.uberScore);
+            }
+
+        } else {
+            return (event.uberScore);
         }
     }
 }

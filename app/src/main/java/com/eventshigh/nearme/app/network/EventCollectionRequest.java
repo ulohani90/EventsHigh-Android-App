@@ -57,12 +57,15 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         public final ArrayList<ZoneLocalityMapObject> localities;
 
-        public EventsCollection(List<Event> events, int numFollowers, BrowseFilterObject filters, List<String> zones, ArrayList<ZoneLocalityMapObject> localities) {
+        public final List<String> dateFilters;
+
+        public EventsCollection(List<Event> events, int numFollowers, BrowseFilterObject filters, List<String> zones, ArrayList<ZoneLocalityMapObject> localities, List<String> dateFilters) {
             this.events = events;
             this.numFollowers = numFollowers;
             this.filters = filters;
             this.zones = zones;
             this.localities = localities;
+            this.dateFilters = dateFilters;
         }
     }
 
@@ -178,6 +181,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         final ArrayList<ZoneLocalityMapObject> localities = readLocalitiesFacets(eventsJson.optJSONObject("facets"), "localities");
 
+        final List<String> dateFilters = readFacetsArray(eventsJson.optJSONObject("facets"), "dates");
+
         if (listener != null) {
             Event.parseUpcomingEvents(eventsJson, filters, includeWithoutLocation, new Event.OnPartialDataLoadingComplete() {
                 @Override
@@ -185,7 +190,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                     filterOldEvents(context, events);
                     // Sort the event list to user.
                     Collections.sort(events, new EventComparator(eventsContext.location));
-                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities), false);
+                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities, dateFilters), false);
 
 
                 }
@@ -195,7 +200,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                     filterOldEvents(context, events);
                     // Sort the event list to user.
                     Collections.sort(events, new EventComparator(eventsContext.location));
-                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities), true);
+                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities, dateFilters), true);
                 }
             });
         } else {
@@ -204,7 +209,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             // Sort the event list to user.
             Collections.sort(events, new EventComparator(eventsContext.location));
 
-            return new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities);
+            return new EventsCollection(events, eventsJson.optInt("num_followers"), filters, zones, localities, dateFilters);
         }
         return null;
 

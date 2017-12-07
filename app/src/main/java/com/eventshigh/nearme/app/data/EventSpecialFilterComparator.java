@@ -10,18 +10,20 @@ import java.util.Comparator;
 public class EventSpecialFilterComparator implements Comparator<Event> {
 
     ArrayList<String> filterNames;
+    int scoreType;
 
-    public EventSpecialFilterComparator(ArrayList<String> filterNames) {
+    public EventSpecialFilterComparator(ArrayList<String> filterNames, int scoreType) {
         this.filterNames = filterNames;
+        this.scoreType = scoreType;
     }
 
     @Override
     public int compare(Event lhs, Event rhs) {
-        return Double.compare(getMaxUberScoreValue(rhs), getMaxUberScoreValue(lhs));
+        return Float.compare(getMaxUberScoreValue(rhs), getMaxUberScoreValue(lhs));
     }
 
-    public double getMaxUberScoreValue(Event event) {
-        double maxScore = 0.0;
+    public Float getMaxUberScoreValue(Event event) {
+        float maxScore = 0;
         if (event.nyeUberScoresMap != null) {
             for (String filterName : filterNames) {
                 if (event.nyeUberScoresMap.containsKey(filterName)) {
@@ -30,6 +32,32 @@ public class EventSpecialFilterComparator implements Comparator<Event> {
                     }
                 }
             }
+            if (maxScore == 0) {
+                if (scoreType == EventScoreComparator.SCORE_TYPE_OUTDOOR_UBER_SCORE) {
+                    if (event.nyeUberScoresMap.containsKey("Camping / Outdoors")) {
+                        maxScore = event.nyeUberScoresMap.get("Camping / Outdoors");
+                    } else if (event.outdoorUberScore != 0) {
+                        maxScore = event.outdoorUberScore;
+                    } else {
+                        maxScore = event.uberScore;
+                    }
+                } else {
+                    if (event.nyeUberScoresMap.containsKey("Default")) {
+                        maxScore = event.nyeUberScoresMap.get("Default");
+                    } else if (event.nyeUberScore != 0) {
+                        maxScore = event.nyeUberScore;
+                    } else {
+                        maxScore = event.uberScore;
+                    }
+                }
+
+            }
+        } else if (scoreType == EventScoreComparator.SCORE_TYPE_OUTDOOR_UBER_SCORE && event.outdoorUberScore != 0) {
+            maxScore = event.outdoorUberScore;
+        } else if (scoreType == EventScoreComparator.SCORE_TYPE_NYE_UBER_SCORE && event.nyeUberScore != 0) {
+            maxScore = event.nyeUberScore;
+        } else {
+            maxScore = event.uberScore;
         }
         return maxScore;
 
