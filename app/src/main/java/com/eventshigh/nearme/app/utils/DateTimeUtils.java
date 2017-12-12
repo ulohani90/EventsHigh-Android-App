@@ -521,6 +521,19 @@ public class DateTimeUtils {
         return formatter.format(date);
     }
 
+    public static String getDealDateTimeFromLongTime(String time) {
+        Date date = new Date();
+        SimpleDateFormat FULL_DATE_TIME_MILLIS_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat formatter = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
+        try {
+            date = FULL_DATE_TIME_MILLIS_FORMAT.parse(time);
+            return formatter.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static long parseZendeskTicketDate(String time) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date = new Date();

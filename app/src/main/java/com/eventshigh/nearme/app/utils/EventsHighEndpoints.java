@@ -57,6 +57,8 @@ public class EventsHighEndpoints {
     public static final String API_ENDPOINT_GET_SPONSORED_EVENTS = API_URI_BASE + "api/get_sponsored_events/%s";
 
 
+    public static final String API_ENDPOINT_GET_HOT_DEALS = API_URI_BASE + "api/get_hot_deals_for_city/%s";
+
     private static final String API_ENDPOINT_MOVIE_UBER_INFO_FORMAT = API_URI_BASE + "api/get_movie_uber_info/%s";
 
     private static final String API_EVENTS_SUGGEST_FORMAT =

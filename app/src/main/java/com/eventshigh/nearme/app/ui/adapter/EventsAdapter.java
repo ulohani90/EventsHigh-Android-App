@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.data.EventOccurenceComparator;
 import com.eventshigh.nearme.app.data.EventSession;
 import com.eventshigh.nearme.app.data.EventZendeskTicketObject;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.HotDealsObject;
 import com.eventshigh.nearme.app.data.MovieShowTimeObject;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.MyTicketObject;
@@ -271,6 +272,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     }
 
+    public void addDealsData(HotDealsObject dealsObject) {
+        dataToShow.add(1, new HelloBarDealData(activity, dealsObject, true));
+        notifyDataSetChanged();
+    }
+
     public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags, boolean showNewYearImage, int width) {
         dataToShow.clear();
         if (eventCollection != null) {
@@ -332,6 +338,23 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     public void addFollowCard(String title, int numEvents, int numFollowers, boolean isNearMeQuery) {
         //  dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this, isNearMeQuery));
     }
+
+    public void setHelloBarDeals(ArrayList<HotDealsObject> deals) {
+        dataToShow.clear();
+        for (HotDealsObject dealsObject : deals) {
+            dataToShow.add(new HelloBarDealData(activity, dealsObject, false));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setHotDealsData(ArrayList<HotDealsObject> deals) {
+        for (HotDealsObject dealsObject : deals) {
+            dataToShow.add(new HotDealsData(activity, dealsObject));
+        }
+
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public

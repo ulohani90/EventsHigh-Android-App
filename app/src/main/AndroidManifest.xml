@@ -363,6 +363,10 @@
             android:name=".activity.MyReviewsActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".activity.ShowDealsActivity"
+            android:screenOrientation="portrait" />
+
 
         <!-- Receivers within our application -->
         <!-- Receives the Install referrer from play store -->

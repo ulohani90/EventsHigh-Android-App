@@ -16,12 +16,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Priority;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.DealsObject;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
@@ -29,6 +31,7 @@ import com.eventshigh.nearme.app.data.SponsoredEventObj;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
+import com.eventshigh.nearme.app.network.GetHotDealsRequest;
 import com.eventshigh.nearme.app.network.GetSponsoredEventsRequest;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.DataType;
@@ -251,8 +254,10 @@ public class ExploreFragment extends BaseEventsFragment {
 
             int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
             eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(endDate)), width);
-            topProgressBar.setVisibility(View.GONE);
-            makeSponsoredEventsRequest();
+
+            makeHotDealsRequest();
+
+
             if (!isIntermediate) {
                /* EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                         false, mEventInvitationsCallback, mErrorListener);*/
@@ -261,7 +266,7 @@ public class ExploreFragment extends BaseEventsFragment {
     };
 
     public void makeSponsoredEventsRequest() {
-        topProgressBar.setVisibility(View.VISIBLE);
+
         final int width = (3 * (getResources().getDisplayMetrics().widthPixels -
                 3 * ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics())))) / 7;
 
@@ -277,9 +282,31 @@ public class ExploreFragment extends BaseEventsFragment {
         }, new ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-
+                topProgressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+
+    public void makeHotDealsRequest() {
+
+        GetHotDealsRequest.submit(activity, eventsContext.city.name(), Request.Priority.HIGH, null, true, new Response.Listener<DealsObject>() {
+            @Override
+            public void onResponse(DealsObject dealsObject, boolean b) {
+                if (dealsObject != null) {
+                    if (dealsObject.getHelloBarDeals() != null && dealsObject.getHelloBarDeals().size() > 0)
+                        eventsAdapter.addDealsData(dealsObject.getHelloBarDeals().get(0));
+                }
+                makeSponsoredEventsRequest();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                //topProgressBar.setVisibility(View.GONE);
+                makeSponsoredEventsRequest();
+            }
+        });
+
     }
 
     private Listener<EventInvitationsRequest.InvitaionData> mEventInvitationsCallback = new Listener<EventInvitationsRequest.InvitaionData>() {
@@ -306,7 +333,7 @@ public class ExploreFragment extends BaseEventsFragment {
                         Locality.getLocalities(eventsContext.city, false),
                         eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");*/
             }
-            makeSponsoredEventsRequest();
+            makeHotDealsRequest();
         }
     };
 
@@ -320,7 +347,10 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                    RecyclerView.State state) {
-            if (parent.getChildAdapterPosition(view) == 0 || parent.getChildAdapterPosition(view) == 1 || parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.BROWSE_HEADER_CARD.typeId) {
+
+
+            if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.EVENT_PAGER.typeId
+                    || parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.EXPLORE_CATEGORY_HEADER.typeId) {
                 outRect.top = 0;
                 outRect.bottom = 0;
                 outRect.left = 0;
@@ -330,14 +360,19 @@ public class ExploreFragment extends BaseEventsFragment {
                 outRect.bottom = space;
                 outRect.left = 0;
                 outRect.right = 0;
-            } else if (parent.getChildAdapterPosition(view) >= 2) {
+            } else if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.HELLOBAR_DEAL_CARD.typeId) {
+                outRect.top = space;
+                outRect.bottom = 0;
+                outRect.left = space;
+                outRect.right = space;
+            } else {
                 outRect.top = space;
                 if (parent.getChildAdapterPosition(view) % 2 == 0) {
-                    outRect.left = space;
-                    outRect.right = space / 2;
-                } else {
                     outRect.right = space;
                     outRect.left = space / 2;
+                } else {
+                    outRect.left = space;
+                    outRect.right = space / 2;
                 }
             }
 

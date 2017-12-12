@@ -96,18 +96,10 @@ public abstract class BaseContextActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_show_map) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Request missing location permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
-            } else {
-                reportActionToAnalytics("switchToMaps");
-                showMapActivity();
-                //switchTo(EventsMapsActivity.class);
-            }
-            return true;
+        if (id == R.id.action_show_deals) {
+            Intent intent = new Intent(this, ShowDealsActivity.class);
+            startActivity(intent);
+
         }
 
         return super.onOptionsItemSelected(item);

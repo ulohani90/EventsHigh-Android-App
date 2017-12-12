@@ -126,6 +126,8 @@ public class EventInfoObject implements Parcelable {
 
     public final String config;
 
+    public final ArrayList<String> offerMessages;
+
     public EventInfoObject(Event event) {
 
         this.id = event.id;
@@ -194,6 +196,7 @@ public class EventInfoObject implements Parcelable {
         this.destination = event.destination;
         this.timezone = event.timezone;
         this.config = event.config;
+        this.offerMessages = event.offerMessages;
     }
 
     protected EventInfoObject(Parcel in) {
@@ -252,6 +255,8 @@ public class EventInfoObject implements Parcelable {
         destination = in.readString();
         timezone = in.readString();
         config = in.readString();
+        offerMessages = new ArrayList<>();
+        in.readStringList(offerMessages);
     }
 
     @Override
@@ -307,6 +312,7 @@ public class EventInfoObject implements Parcelable {
         dest.writeString(destination);
         dest.writeString(timezone);
         dest.writeString(config);
+        dest.writeStringList(offerMessages);
     }
 
     @Override

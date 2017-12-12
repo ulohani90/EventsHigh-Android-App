@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_item_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/deal_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Offer Text"
+            android:textColor="#393939"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/deal_valid_till"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valid till 23 Oct 2017, 12:00pm"
+            android:textColor="@color/primary" />
+
+        <TextView
+            android:id="@+id/grab_now_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:text="Grab Now"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

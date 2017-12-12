@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -124,6 +125,8 @@ public class EventInfoFragment extends Fragment {
 
     FrameLayout configsFrame;
 
+    LinearLayout offerMessagesContainerLayout;
+
     public static final String OBJECT_TYPE = "movie";
 
     @Override
@@ -176,6 +179,7 @@ public class EventInfoFragment extends Fragment {
         configContainer = (RelativeLayout) view.findViewById(R.id.config_container);
         showAllConfig = (TextView) view.findViewById(R.id.show_more_config);
         configsFrame = (FrameLayout) view.findViewById(R.id.configs_frame);
+        offerMessagesContainerLayout = (LinearLayout) view.findViewById(R.id.offer_messages_container_layout);
         return view;
     }
 
@@ -251,6 +255,25 @@ public class EventInfoFragment extends Fragment {
         } else {
             eventDiscount.setVisibility(View.GONE);
         }
+
+
+        //Add Offer Messages if any
+        if (event.offerMessages != null && event.offerMessages.size() > 0) {
+            for (int i = 0; i < event.offerMessages.size(); i++) {
+                View couponView = getActivity().getLayoutInflater().inflate(R.layout.offer_message_text_view, offerMessagesContainerLayout, false);
+                TextView couponMessage = (TextView) couponView.findViewById(R.id.offer_message);
+                couponMessage.setText(Html.fromHtml(event.offerMessages.get(i)));
+                if (i == event.offerMessages.size() - 1) {
+                    couponView.findViewById(R.id.separator).setVisibility(View.GONE);
+                } else {
+                    couponView.findViewById(R.id.separator).setVisibility(View.GONE);
+                }
+
+                offerMessagesContainerLayout.addView(couponView);
+
+            }
+        }
+
 
         if (event.config != null && event.config.length() > 0) {
             configLayout.setVisibility(View.VISIBLE);
@@ -838,7 +861,8 @@ public class EventInfoFragment extends Fragment {
 
         int rowsMade = 1;
 
-        view.findViewById(R.id.header).getLayoutParams().height = 0;
+        //  view.findViewById(R.id.header).getLayoutParams().height = 0;
+        view.findViewById(R.id.close).setVisibility(View.INVISIBLE);
 
         if (checkIfKeyHasValue("special_highlights", configMap) || checkIfKeyHasValue("artists_performing", configMap)) {
             view.findViewById(R.id.highlights_layout).setVisibility(View.VISIBLE);

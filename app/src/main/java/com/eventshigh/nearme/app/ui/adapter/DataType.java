@@ -43,7 +43,9 @@ public enum DataType {
     BROWSE_CAROUSEL_CARD(32),
     EDITOR_PICKS_ITEM_CARD(33),
     BROWSE_HEADER_CARD(34),
-    BROWSE_SPONSORED_EVENTS(35);
+    BROWSE_SPONSORED_EVENTS(35),
+    HELLOBAR_DEAL_CARD(36),
+    HOT_DEALS_CARD(37);
 
     public final int typeId;
 
@@ -61,7 +63,9 @@ public enum DataType {
                 || typeId == EVENT_INFO_CARD.typeId || typeId == MY_REVIEW_CARD.typeId
                 || typeId == EVENT_FAQ_CARD.typeId || typeId == BROWSE_CAROUSEL_CARD.typeId || typeId == EVENT.typeId
                 || typeId == BROWSE_HEADER_CARD.typeId || typeId == BROWSE_SPONSORED_EVENTS.typeId
-                || typeId == EH_INVITE_NOTIFICATION.typeId;
+                || typeId == EH_INVITE_NOTIFICATION.typeId
+                || typeId == HELLOBAR_DEAL_CARD.typeId
+                || typeId == HOT_DEALS_CARD.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -171,6 +175,12 @@ public enum DataType {
         }
         if (typeId == BROWSE_SPONSORED_EVENTS.typeId) {
             return BrowseSponsoredEventsCard.newInstance(activity, parent);
+        }
+        if (typeId == HELLOBAR_DEAL_CARD.typeId) {
+            return HelloBarDealCard.newInstance(activity, parent);
+        }
+        if (typeId == HOT_DEALS_CARD.typeId) {
+            return HotDealsCard.newInstance(activity, parent);
         }
         throw new IllegalArgumentException("invalid typeid");
     }
