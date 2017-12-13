@@ -3,45 +3,70 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#e65634"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:background="@drawable/card_item_bg"
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="8dp"
-        android:drawableLeft="@drawable/ic_giftbox"
-        android:drawablePadding="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center_vertical"
-        android:text="DEAL OF THE DAY"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/deal_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center_horizontal"
-        android:textColor="@android:color/white"
-        android:textSize="14sp" />
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="12dp">
 
-    <TextView
-        android:id="@+id/view_all_deals"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:paddingBottom="8dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:paddingTop="8dp"
-        android:text="VIEW ALL DEALS"
-        android:textColor="@android:color/white"
-        android:textSize="14sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp"
+            android:drawableLeft="@drawable/ic_giftbox"
+            android:drawablePadding="8dp"
+            android:drawableRight="@drawable/ic_giftbox"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:text="DEAL OF THE DAY"
+            android:textColor="#e65634"
+            android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/deal_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:lineSpacingExtra="3dp"
+            android:textColor="#393939"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="*T&amp;C Apply"
+                android:textSize="10sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/view_all_deals"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:gravity="center"
+
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="8dp"
+                android:text="VIEW ALL DEALS"
+                android:textColor="#e65634"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

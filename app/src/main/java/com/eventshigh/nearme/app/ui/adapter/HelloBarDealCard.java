@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.ui.adapter;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.UnderlineSpan;
@@ -46,7 +47,9 @@ public class HelloBarDealCard extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final BaseContextActivity activity, final HotDealsObject data, boolean showHomePageNeedData) {
-        dealText.setText(data.getOfferText());
+        dealText.setText(Html.fromHtml(data.getOfferText()));
+        /*String htmlString = "On 13-12-17 use code <strong>13MERA7</strong> and get INR 150 OFF per person on 2+ NY tickets! First 50 only.";
+        dealText.setText(Html.fromHtml(htmlString));*/
         if (showHomePageNeedData) {
             viewAllOffers.setVisibility(View.VISIBLE);
             SpannableString string = new SpannableString("View All Deals");
