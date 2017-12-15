@@ -291,7 +291,7 @@ public class EventInfoFragment extends Fragment {
                 } else {
                     if (rowsAdded == 1 || rowsAdded == 2) {
                         configsFrame.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                (int) (rowsAdded * TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getResources().getDisplayMetrics()))));
+                                (int) ((rowsAdded + 1) * TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getResources().getDisplayMetrics()))));
                     }
                     showAllConfig.setVisibility(View.GONE);
                 }
@@ -954,7 +954,10 @@ public class EventInfoFragment extends Fragment {
 
             }
             if (checkIfParentChildKeyHasValue("is_parties_and_nightlife", "venue_view", configMap)) {
-                if (childCount == 2) {
+                if (childCount == 0) {
+                    childCount += 1;
+                    rowsMade += 1;
+                } else if (childCount == 2) {
                     partyLayoutCount += 1;
                     childCount = 1;
                     rowsMade += 1;
@@ -982,11 +985,14 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(partyLayoutCount, childCount, view, "Unlimited Food Available", finalValue, "party_info_layout_", "party_info_textview_");
             }
             if (checkIfKeyHasValue("is_unlimited_alcohol", configMap)) {
-                if (childCount == 2) {
+                if (childCount == 0) {
+                    childCount += 1;
+                    rowsMade += 1;
+                } else if (childCount == 2) {
                     partyLayoutCount += 1;
                     childCount = 1;
                     rowsMade += 1;
@@ -997,7 +1003,7 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(partyLayoutCount, childCount, view, "Unlimited Alcohol Available", finalValue, "party_info_layout_", "party_info_textview_");
             }
 
@@ -1014,12 +1020,15 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(partyLayoutCount, childCount, view, "Stag Entry Allowed", finalValue, "party_info_layout_", "party_info_textview_");
             }
 
             if (checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_parking_available", configMap)) {
-                if (childCount == 2) {
+                if (childCount == 0) {
+                    childCount += 1;
+                    rowsMade += 1;
+                } else if (childCount == 2) {
                     partyLayoutCount += 1;
                     childCount = 1;
                     rowsMade += 1;
@@ -1042,7 +1051,7 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(partyLayoutCount, childCount, view, "Group Discounts", finalValue, "party_info_layout_", "party_info_textview_");
             }
 
@@ -1085,13 +1094,16 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(outdoorLayoutCount, outdoorChildCount, view, "Transportation Available", finalValue, "outdoor_info_layout_", "outdoor_info_textview_");
 
             }
 
             if (checkIfParentChildKeyHasValue("is_outdoors", "is_alcohol_allowed", configMap)) {
-                if (outdoorChildCount == 2) {
+                if (outdoorChildCount == 0) {
+                    rowsMade += 1;
+                    outdoorChildCount += 1;
+                } else if (outdoorChildCount == 2) {
                     outdoorLayoutCount += 1;
                     outdoorChildCount = 1;
                     rowsMade += 1;
@@ -1102,7 +1114,7 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(outdoorLayoutCount, outdoorChildCount, view, "Alcohol Allowed", finalValue, "outdoor_info_layout_", "outdoor_info_textview_");
 
             }
@@ -1121,7 +1133,10 @@ public class EventInfoFragment extends Fragment {
 
             }
             if (checkIfParentChildKeyHasValue("is_outdoors", "outdoor_venue_type", configMap)) {
-                if (outdoorChildCount == 2) {
+                if (outdoorChildCount == 0) {
+                    rowsMade += 1;
+                    outdoorChildCount += 1;
+                } else if (outdoorChildCount == 2) {
                     outdoorLayoutCount += 1;
                     outdoorChildCount = 1;
                     rowsMade += 1;
@@ -1157,7 +1172,10 @@ public class EventInfoFragment extends Fragment {
             }
 
             if (checkIfParentChildKeyHasValue("is_outdoors", "tent_sharing_type", configMap)) {
-                if (outdoorChildCount == 2) {
+                if (outdoorChildCount == 0) {
+                    rowsMade += 1;
+                    outdoorChildCount += 1;
+                } else if (outdoorChildCount == 2) {
                     outdoorLayoutCount += 1;
                     outdoorChildCount = 1;
                     rowsMade += 1;
@@ -1191,7 +1209,10 @@ public class EventInfoFragment extends Fragment {
 
             }
             if (checkIfParentChildKeyHasValue("is_outdoors", "activity_type", configMap)) {
-                if (outdoorChildCount == 2) {
+                if (outdoorChildCount == 0) {
+                    rowsMade += 1;
+                    outdoorChildCount += 1;
+                } else if (outdoorChildCount == 2) {
                     outdoorLayoutCount += 1;
                     outdoorChildCount = 1;
                     rowsMade += 1;
@@ -1246,12 +1267,15 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(kidsLayoutCount, kidsChildCount, view, "Kids Friendly", finalValue, "kids_info_layout_", "kids_info_textview_");
             }
 
             if (checkIfParentChildKeyHasValue("is_kid_friendly", "is_free_for_kids_below_five", configMap)) {
-                if (kidsChildCount == 2) {
+                if (kidsChildCount == 0) {
+                    rowsMade += 1;
+                    kidsChildCount += 1;
+                } else if (kidsChildCount == 2) {
                     kidsLayoutCount += 1;
                     kidsChildCount = 1;
                     rowsMade += 1;
@@ -1263,7 +1287,7 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(kidsLayoutCount, kidsChildCount, view, "Free for kids below 5 years", finalValue, "kids_info_layout_", "kids_info_textview_");
             }
 
@@ -1280,12 +1304,15 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(kidsLayoutCount, kidsChildCount, view, "Child care zone available", finalValue, "kids_info_layout_", "kids_info_textview_");
             }
 
             if (checkIfParentChildKeyHasValue("is_kid_friendly", "max_age_kids_pricing", configMap)) {
-                if (kidsChildCount == 2) {
+                if (kidsChildCount == 0) {
+                    rowsMade += 1;
+                    kidsChildCount += 1;
+                } else if (kidsChildCount == 2) {
                     kidsLayoutCount += 1;
                     kidsChildCount = 1;
                     rowsMade += 1;
@@ -1355,11 +1382,14 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(kidsLayoutCount, kidsChildCount, view, "Stay Provided", finalValue, "stay_info_layout_", "stay_info_textview_");
             }
             if (checkIfParentChildKeyHasValue("is_stay_provided", "is_breakfast_included", configMap)) {
-                if (kidsChildCount == 2) {
+                if (kidsChildCount == 0) {
+                    rowsMade += 1;
+                    kidsChildCount += 1;
+                } else if (kidsChildCount == 2) {
                     kidsLayoutCount += 1;
                     kidsChildCount = 1;
                     rowsMade += 1;
@@ -1371,7 +1401,7 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(kidsLayoutCount, kidsChildCount, view, "Breakfast included", finalValue, "stay_info_layout_", "stay_info_textview_");
             }
             if (checkIfParentChildKeyHasValue("is_stay_provided", "is_extra_bed_available", configMap)) {
@@ -1387,11 +1417,14 @@ public class EventInfoFragment extends Fragment {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(kidsLayoutCount, kidsChildCount, view, "Extra Bed Available", finalValue, "stay_info_layout_", "stay_info_textview_");
             }
             if (checkIfParentChildKeyHasValue("is_stay_provided", "check_in_time", configMap)) {
-                if (kidsChildCount == 2) {
+                if (kidsChildCount == 0) {
+                    rowsMade += 1;
+                    kidsChildCount += 1;
+                } else if (kidsChildCount == 2) {
                     kidsLayoutCount += 1;
                     kidsChildCount = 1;
                     rowsMade += 1;

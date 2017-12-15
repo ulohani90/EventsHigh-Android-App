@@ -69,7 +69,9 @@ public class ExploreFragment extends BaseEventsFragment {
         return fragment;
     }
 
-    public static final String endDate = "2018-01-01 00:00:00.0";
+    public static final String nyeEndDate = "2018-01-01 00:00:00.0";
+
+    public static final String christmasEndDate = "2017-12-26 00:00:00.0";
 
     private EventsAdapter eventsAdapter;
     private View topProgressBar;
@@ -253,7 +255,7 @@ public class ExploreFragment extends BaseEventsFragment {
                             (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");*/
 
             int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
-            eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(endDate)), width);
+            eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(nyeEndDate)), (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
 
             makeHotDealsRequest();
 
@@ -328,7 +330,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
             if (eventsAdapter.getItemCount() == 0) {
                 int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
-                eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(endDate)), width);
+                eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(nyeEndDate)),(System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
                /* eventsAdapter.setExploreCategories(null,
                         Locality.getLocalities(eventsContext.city, false),
                         eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");*/

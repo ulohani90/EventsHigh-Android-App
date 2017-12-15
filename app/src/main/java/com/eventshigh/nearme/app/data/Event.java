@@ -983,7 +983,7 @@ public class Event implements Parcelable {
                                 }
                             }
                             if (!keyNotFound) {
-                                String value = jsonObject.optString("value");
+                                String value = jsonObject.optString("value").toLowerCase();
 
                                 if (value != null && value.length() > 0) {
                                     String[] valuesArray = value.split(",");
@@ -1014,7 +1014,7 @@ public class Event implements Parcelable {
                                         }
                                     } else {
                                         for (String valueSeen : valuesArray) {
-                                            if (Arrays.asList(filter.getValue().split(",")).contains(valueSeen)) {
+                                            if (Arrays.asList(filter.getValue().toLowerCase().split(",")).contains(valueSeen)) {
                                                 valueFound = true;
                                                 attributes.add(new EventFilterAttribute(filter.getName(), true));
                                                 attributeValues.put(filter.getName(), true);

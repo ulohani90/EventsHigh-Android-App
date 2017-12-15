@@ -14,6 +14,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -70,6 +71,7 @@ public class EventCard extends ViewHolder {
     private final TextView discountTag;
     private final FrameLayout offerMessageLayout;
     private final TextView offerMessageText;
+    private final View offerPointerArrow;
 
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
@@ -121,6 +123,7 @@ public class EventCard extends ViewHolder {
         discountTag = (TextView) cardView.findViewById(R.id.event_discount);
         offerMessageLayout = (FrameLayout) cardView.findViewById(R.id.offer_message_layout);
         offerMessageText = (TextView) cardView.findViewById(R.id.offer_message_text);
+        offerPointerArrow = cardView.findViewById(R.id.offer_pointer_arrow);
     }
 
 
@@ -330,8 +333,12 @@ public class EventCard extends ViewHolder {
             if (event.venue.equalsIgnoreCase("Outside " + event.city) && event.destination != null && event.destination.length() > 0) {
                 eventLocation.setText(event.destination);
             } else {
-                eventLocation.setText(event.venue);
+                eventLocation.setText(event.venue + (event.locality != null && event.locality.length() > 0 && !event.locality.toLowerCase().equalsIgnoreCase("unknown") ? ", " + event.locality : (event.zone != null && event.zone.length() > 0 && !event.zone.equalsIgnoreCase("unknown") ? ", " + event.zone : "")));
             }
+        } else if (event.locality != null && event.locality.length() > 0 && !event.locality.toLowerCase().equalsIgnoreCase("unknown")) {
+            eventLocation.setText(event.locality + (event.zone != null && event.zone.length() > 0 ? ", " + event.zone : ""));
+        } else if (event.zone != null && event.zone.length() > 0 && !event.zone.equalsIgnoreCase("unknown")) {
+            eventLocation.setText(event.zone);
         } else {
             eventLocation.setVisibility(View.GONE);
         }
@@ -399,8 +406,10 @@ public class EventCard extends ViewHolder {
         if (event.offerMessage != null && event.offerMessage.length() > 0) {
             offerMessageLayout.setVisibility(View.VISIBLE);
             offerMessageText.setText(event.offerMessage);
+            offerPointerArrow.setVisibility(View.VISIBLE);
         } else {
             offerMessageLayout.setVisibility(View.GONE);
+            offerPointerArrow.setVisibility(View.GONE);
         }
     }
 

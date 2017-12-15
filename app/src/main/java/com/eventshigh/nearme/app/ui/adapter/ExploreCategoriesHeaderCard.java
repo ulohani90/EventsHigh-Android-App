@@ -28,6 +28,10 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
 
     FrameLayout newYearLayout;
 
+    LinearLayout whatsHotlayout;
+
+    FrameLayout xmasLayout;
+
     public static ExploreCategoriesHeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.explore_categories_header_card, parent, false);
         return new ExploreCategoriesHeaderCard(view);
@@ -39,9 +43,11 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         nearBy = (ImageView) itemView.findViewById(R.id.nearby);
         newYearImage = (ImageView) itemView.findViewById(R.id.new_year_img);
         newYearLayout = (FrameLayout) itemView.findViewById(R.id.new_year_layout);
+        whatsHotlayout = (LinearLayout) itemView.findViewById(R.id.whats_hot_layout);
+        xmasLayout = (FrameLayout) itemView.findViewById(R.id.xmas_layout);
     }
 
-    public void bindData(final BaseContextActivity activity, boolean showNewYearCard, int width) {
+    public void bindData(final BaseContextActivity activity, boolean showNewYearCard, boolean showChristmasTab, int width) {
         whatsHot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +72,22 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
                 }
             });
         }
+
+        if (showChristmasTab) {
+            whatsHotlayout.setVisibility(View.GONE);
+            xmasLayout.setVisibility(View.VISIBLE);
+
+        } else {
+            whatsHotlayout.setVisibility(View.VISIBLE);
+            xmasLayout.setVisibility(View.GONE);
+        }
+
+        xmasLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activity.showSearchView("Christmas");
+            }
+        });
 
 
         nearBy.setOnClickListener(new View.OnClickListener() {

@@ -1100,7 +1100,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(partyLayoutCount, childCount, "Unlimited Food Available", finalValue, "party_info_layout_", "party_info_textview_");
             }
@@ -1115,7 +1115,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(partyLayoutCount, childCount, "Unlimited Alcohol Available", finalValue, "party_info_layout_", "party_info_textview_");
             }
@@ -1132,7 +1132,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(partyLayoutCount, childCount, "Stag Entry Allowed", finalValue, "party_info_layout_", "party_info_textview_");
             }
@@ -1160,7 +1160,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(partyLayoutCount, childCount, "Group Discounts", finalValue, "party_info_layout_", "party_info_textview_");
             }
@@ -1203,7 +1203,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Transportation Available", finalValue, "outdoor_info_layout_", "outdoor_info_textview_");
 
@@ -1220,7 +1220,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(outdoorLayoutCount, outdoorChildCount, "Alcohol Allowed", finalValue, "outdoor_info_layout_", "outdoor_info_textview_");
 
@@ -1361,7 +1361,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(kidsLayoutCount, kidsChildCount, "Kids Friendly", finalValue, "kids_info_layout_", "kids_info_textview_");
             }
@@ -1378,7 +1378,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(kidsLayoutCount, kidsChildCount, "Free for kids below 5 years", finalValue, "kids_info_layout_", "kids_info_textview_");
             }
@@ -1395,7 +1395,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(kidsLayoutCount, kidsChildCount, "Child care zone available", finalValue, "kids_info_layout_", "kids_info_textview_");
             }
@@ -1469,7 +1469,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(kidsLayoutCount, kidsChildCount, "Stay Provided", finalValue, "stay_info_layout_", "stay_info_textview_");
             }
@@ -1485,7 +1485,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
 
                 addPartyVenue(kidsLayoutCount, kidsChildCount, "Breakfast included", finalValue, "stay_info_layout_", "stay_info_textview_");
@@ -1502,7 +1502,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 String finalValue = (value.equalsIgnoreCase("Yes") ||
                         value.equalsIgnoreCase("true")) ? "Yes" :
                         ((value.equalsIgnoreCase("No") ||
-                                value.equalsIgnoreCase("false")) ? "No" : "");
+                                value.equalsIgnoreCase("false")) ? "No" : value);
                 isKeyAdded = true;
                 addPartyVenue(kidsLayoutCount, kidsChildCount, "Extra Bed Available", finalValue, "stay_info_layout_", "stay_info_textview_");
             }

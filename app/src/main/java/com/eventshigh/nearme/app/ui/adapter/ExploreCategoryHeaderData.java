@@ -13,11 +13,14 @@ public class ExploreCategoryHeaderData implements AdapterData {
 
     boolean showNewYearImage;
 
+    boolean showChristmasTab;
+
     int width;
 
-    public ExploreCategoryHeaderData(BaseContextActivity activity, boolean showNewYearImage, int width) {
+    public ExploreCategoryHeaderData(BaseContextActivity activity, boolean showNewYearImage, boolean showChristmasTab, int width) {
         this.activity = activity;
         this.showNewYearImage = showNewYearImage;
+        this.showChristmasTab = showChristmasTab;
         this.width = width;
     }
 
@@ -28,7 +31,7 @@ public class ExploreCategoryHeaderData implements AdapterData {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder card, int position) {
-        ((ExploreCategoriesHeaderCard) card).bindData(activity, showNewYearImage, width);
+        ((ExploreCategoriesHeaderCard) card).bindData(activity, showNewYearImage, showChristmasTab, width);
     }
 
     @Override

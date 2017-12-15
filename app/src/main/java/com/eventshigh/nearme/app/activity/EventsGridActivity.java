@@ -13,10 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.SwitchCompat;
@@ -68,8 +65,6 @@ import java.util.Date;
 import java.util.List;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
-
-import static com.eventshigh.nearme.app.activity.ExploreFragment.endDate;
 
 /**
  * Shows the events in Grid layout.

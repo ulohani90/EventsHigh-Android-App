@@ -18,7 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/offer_message_layout"
-            android:layout_marginTop="-14dp"
             android:background="#EFEFEF"
             android:orientation="horizontal">
 
@@ -163,14 +162,7 @@
                     android:layout_height="36dp"
                     android:background="@drawable/green_filled_rectangle_bg"></LinearLayout>
 
-                <RelativeLayout
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_marginLeft="32dp"
-                    android:background="@drawable/green_triangle_bg"
-                    android:rotation="180">
 
-                </RelativeLayout>
             </LinearLayout>
 
 
@@ -189,6 +181,16 @@
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
         </FrameLayout>
+        <RelativeLayout
+            android:id="@+id/offer_pointer_arrow"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="36dp"
+            android:background="@drawable/green_triangle_bg"
+            android:rotation="180">
+
+        </RelativeLayout>
     </RelativeLayout>
 
     <View
