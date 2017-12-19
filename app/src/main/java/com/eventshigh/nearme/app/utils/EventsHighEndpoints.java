@@ -52,7 +52,7 @@ public class EventsHighEndpoints {
             API_URI_BASE + "api/get_movie_infos/%s/%s";
 
     private static final String API_ENDPOINT_NEW_DATE_FORMAT =
-            API_URI_BASE + "api/date/%s/%s?mobile=1";
+            API_URI_BASE + "api/date/%s/%s?mobile=1&limit=100";
 
     public static final String API_ENDPOINT_GET_SPONSORED_EVENTS = API_URI_BASE + "api/get_sponsored_events/%s";
 

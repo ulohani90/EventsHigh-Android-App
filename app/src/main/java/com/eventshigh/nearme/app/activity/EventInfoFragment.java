@@ -258,57 +258,58 @@ public class EventInfoFragment extends Fragment {
 
 
         //Add Offer Messages if any
-        if (event.offerMessages != null && event.offerMessages.size() > 0) {
-            for (int i = 0; i < event.offerMessages.size(); i++) {
-                View couponView = getActivity().getLayoutInflater().inflate(R.layout.offer_message_text_view, offerMessagesContainerLayout, false);
-                TextView couponMessage = (TextView) couponView.findViewById(R.id.offer_message);
-                couponMessage.setText(Html.fromHtml(event.offerMessages.get(i)));
-                if (i == event.offerMessages.size() - 1) {
-                    couponView.findViewById(R.id.separator).setVisibility(View.GONE);
+        if (getActivity() != null) {
+            if (event.offerMessages != null && event.offerMessages.size() > 0) {
+                for (int i = 0; i < event.offerMessages.size(); i++) {
+                    View couponView = getActivity().getLayoutInflater().inflate(R.layout.offer_message_text_view, offerMessagesContainerLayout, false);
+                    TextView couponMessage = (TextView) couponView.findViewById(R.id.offer_message);
+                    couponMessage.setText(Html.fromHtml(event.offerMessages.get(i)));
+                    if (i == event.offerMessages.size() - 1) {
+                        couponView.findViewById(R.id.separator).setVisibility(View.GONE);
+                    } else {
+                        couponView.findViewById(R.id.separator).setVisibility(View.GONE);
+                    }
+
+                    offerMessagesContainerLayout.addView(couponView);
+
+                }
+            }
+
+
+            if (event.config != null && event.config.length() > 0) {
+                configLayout.setVisibility(View.VISIBLE);
+
+                ((NewEventDetailActivity) getActivity()).configLayout.setVisibility(View.VISIBLE);
+                LinkedTreeMap<String, Object> config = new Gson().fromJson(event.config, new TypeToken<LinkedTreeMap<String, Object>>() {
+                }.getType());
+                if (!((NewEventDetailActivity) getActivity()).addConfigsData(config)) {
+                    ((NewEventDetailActivity) getActivity()).configParentLayout.setVisibility(View.GONE);
+                    configLayout.setVisibility(View.GONE);
                 } else {
-                    couponView.findViewById(R.id.separator).setVisibility(View.GONE);
+                    int rowsAdded = setUpConfigContainer(config);
+                    if (rowsAdded > 2) {
+                        showAllConfig.setVisibility(View.VISIBLE);
+                    } else {
+                        if (rowsAdded == 1 || rowsAdded == 2) {
+                            configsFrame.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                    (int) ((rowsAdded + 1) * TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getResources().getDisplayMetrics()))));
+                        }
+                        showAllConfig.setVisibility(View.GONE);
+                    }
                 }
 
-                offerMessagesContainerLayout.addView(couponView);
-
-            }
-        }
-
-
-        if (event.config != null && event.config.length() > 0) {
-            configLayout.setVisibility(View.VISIBLE);
-
-            ((NewEventDetailActivity) getActivity()).configLayout.setVisibility(View.VISIBLE);
-            LinkedTreeMap<String, Object> config = new Gson().fromJson(event.config, new TypeToken<LinkedTreeMap<String, Object>>() {
-            }.getType());
-            if (!((NewEventDetailActivity) getActivity()).addConfigsData(config)) {
+                showAllConfig.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((NewEventDetailActivity) getActivity()).showHideConfigsLayout();
+                    }
+                });
+            } else {
                 ((NewEventDetailActivity) getActivity()).configParentLayout.setVisibility(View.GONE);
                 configLayout.setVisibility(View.GONE);
-            } else {
-                int rowsAdded = setUpConfigContainer(config);
-                if (rowsAdded > 2) {
-                    showAllConfig.setVisibility(View.VISIBLE);
-                } else {
-                    if (rowsAdded == 1 || rowsAdded == 2) {
-                        configsFrame.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                (int) ((rowsAdded + 1) * TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getResources().getDisplayMetrics()))));
-                    }
-                    showAllConfig.setVisibility(View.GONE);
-                }
             }
 
-            showAllConfig.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ((NewEventDetailActivity) getActivity()).showHideConfigsLayout();
-                }
-            });
-        } else {
-            ((NewEventDetailActivity) getActivity()).configParentLayout.setVisibility(View.GONE);
-            configLayout.setVisibility(View.GONE);
         }
-
-
         if (event.organizerName != null) {
             eventOrganizer.setText("By " + event.organizerName);
         }

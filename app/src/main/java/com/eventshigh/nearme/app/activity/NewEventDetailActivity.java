@@ -119,6 +119,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
     public static final int REQUEST_FOR_RESULT_CALL_EVENT = 0x011;
     public static final int REQUEST_FOR_RESULT_WRITE_REVIEW = 0x012;
 
+    boolean isDestroyed;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,10 +223,12 @@ public class NewEventDetailActivity extends BaseContextActivity {
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError volleyError) {
-                                Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
-                                        Toast.LENGTH_SHORT).show();
-                                VolleyHelper.log(NewEventDetailActivity.this, volleyError);
-                                finish();
+                                if (!isDestroyed) {
+                                    Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
+                                            Toast.LENGTH_SHORT).show();
+                                    VolleyHelper.log(NewEventDetailActivity.this, volleyError);
+                                    finish();
+                                }
                             }
                         });
             }
@@ -286,13 +290,15 @@ public class NewEventDetailActivity extends BaseContextActivity {
     private Response.Listener<Event> mEventListener = new Response.Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
-            if (event != null) {
-                NewEventDetailActivity.this.event = event;
-                makeMyReviewsServerRequest(false);
-            } else {
-                Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
-                        Toast.LENGTH_SHORT).show();
-                finish();
+            if (!isDestroyed) {
+                if (event != null) {
+                    NewEventDetailActivity.this.event = event;
+                    makeMyReviewsServerRequest(false);
+                } else {
+                    Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
             // populateView(event);
 
@@ -303,10 +309,12 @@ public class NewEventDetailActivity extends BaseContextActivity {
         MyReviewsRequest.submit(this, account.getUserInfo().email, Request.Priority.IMMEDIATE, this, shouldByPassCache, mReviewListener, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
-                        Toast.LENGTH_SHORT).show();
-                VolleyHelper.log(NewEventDetailActivity.this, volleyError);
-                finish();
+                if (!isDestroyed) {
+                    Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
+                            Toast.LENGTH_SHORT).show();
+                    VolleyHelper.log(NewEventDetailActivity.this, volleyError);
+                    finish();
+                }
             }
         });
     }
@@ -314,7 +322,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
     private Response.Listener<List<MovieUserReviewObject>> mReviewListener = new Response.Listener<List<MovieUserReviewObject>>() {
         @Override
         public void onResponse(List<MovieUserReviewObject> reviews, boolean isIntermediate) {
-            if (event != null) {
+            if (!isDestroyed && event != null) {
                 findReviewsByUserForMovie(reviews);
                 //if (fragment == null)
                 addAdapterData();
@@ -1605,5 +1613,12 @@ public class NewEventDetailActivity extends BaseContextActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        isDestroyed = true;
+        super.onDestroy();
+
     }
 }

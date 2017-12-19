@@ -99,7 +99,11 @@ public class BrowseSponsoredEventsCard extends RecyclerView.ViewHolder {
             parentLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    activity.showEventDetails(getEventId(event.destinationUrl), null, null);
+                    if (event.destinationUrl.contains("/detail/")) {
+                        activity.showEventDetails(getEventId(event.destinationUrl), null, null);
+                    } else {
+                        activity.showSearchView(getSearchQuery(event.destinationUrl));
+                    }
                 }
             });
             container.addView(view);
@@ -138,6 +142,20 @@ public class BrowseSponsoredEventsCard extends RecyclerView.ViewHolder {
         }
         if (firstOccurrence != -1)
             subString = subString.substring(0, firstOccurrence);
+        return subString;
+
+    }
+
+    public String getSearchQuery(String url) {
+
+        String subString = url.substring(url.lastIndexOf("/") + 1, url.length());
+        int firstOccurrence = subString.indexOf("?");
+        /*if (firstOccurrence == -1) {
+            firstOccurrence = subString.indexOf("/");
+        }*/
+        if (firstOccurrence != -1)
+            subString = subString.substring(0, firstOccurrence);
+        subString = subString.replace("+", " ");
         return subString;
 
     }

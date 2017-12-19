@@ -69,6 +69,7 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
                 @Override
                 public void onClick(View v) {
                     activity.showSearchView("New Year Parties");
+                    //  forceCrash(v);
                 }
             });
         }

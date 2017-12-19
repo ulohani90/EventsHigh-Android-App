@@ -19,6 +19,11 @@ public class EventSpecialFilterComparator implements Comparator<Event> {
 
     @Override
     public int compare(Event lhs, Event rhs) {
+        if ((lhs.id.equalsIgnoreCase("abaf7c81b606893c45d841b9d5db9256") && rhs.id.equalsIgnoreCase("2ee5a40e210863775fa5fd64ab57f3fd"))
+                ||
+                (rhs.id.equalsIgnoreCase("abaf7c81b606893c45d841b9d5db9256") && lhs.id.equalsIgnoreCase("2ee5a40e210863775fa5fd64ab57f3fd"))) {
+            System.out.println("Stop Here");
+        }
         return Float.compare(getMaxUberScoreValue(rhs), getMaxUberScoreValue(lhs));
     }
 
@@ -32,31 +37,9 @@ public class EventSpecialFilterComparator implements Comparator<Event> {
                     }
                 }
             }
-            if (maxScore == 0) {
-                if (scoreType == EventScoreComparator.SCORE_TYPE_OUTDOOR_UBER_SCORE) {
-                    if (event.nyeUberScoresMap.containsKey("Camping / Outdoors")) {
-                        maxScore = event.nyeUberScoresMap.get("Camping / Outdoors");
-                    } else if (event.outdoorUberScore != 0) {
-                        maxScore = event.outdoorUberScore;
-                    } else {
-                        maxScore = event.uberScore;
-                    }
-                } else {
-                    if (event.nyeUberScoresMap.containsKey("Default")) {
-                        maxScore = event.nyeUberScoresMap.get("Default");
-                    } else if (event.nyeUberScore != 0) {
-                        maxScore = event.nyeUberScore;
-                    } else {
-                        maxScore = event.uberScore;
-                    }
-                }
 
-            }
-        } else if (scoreType == EventScoreComparator.SCORE_TYPE_OUTDOOR_UBER_SCORE && event.outdoorUberScore != 0) {
-            maxScore = event.outdoorUberScore;
-        } else if (scoreType == EventScoreComparator.SCORE_TYPE_NYE_UBER_SCORE && event.nyeUberScore != 0) {
-            maxScore = event.nyeUberScore;
-        } else {
+        }
+        if (maxScore == 0) {
             maxScore = event.uberScore;
         }
         return maxScore;

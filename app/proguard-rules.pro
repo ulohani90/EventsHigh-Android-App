@@ -27,6 +27,10 @@
 # v7 support library
 -keep public class android.support.v7.widget.SearchView { *; }
 
+# Crashylytics Reuirement
+-keepattributes *Annotation*
+
+
 # Fix http lib issues.
 -keep class org.apache.http.** { *; }
 -dontwarn com.android.volley.**
@@ -59,3 +63,9 @@
 -dontwarn android.net.http.AndroidHttpClient
 -dontwarn com.google.android.gms.**
 -dontwarn com.android.volley.toolbox.**
+
+# Crashylytics
+-keepattributes SourceFile,LineNumberTable
+
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**
