@@ -38,7 +38,7 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_FEATURED_FORMAT =
             API_URI_BASE + "api/get_featured_events/%s?mobile=1";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
-            API_URI_BASE + "api/get_event_uber_info/%s?mobile=1&cmode=override";
+            API_URI_BASE + "api/get_event_uber_info/%s?mobile=1";
     private static final String API_ENDPOINT_MULTI_EVENT_UBER_FORMAT =
             API_URI_BASE + "api/get_event_uber_infos/%s?mobile=1";
 

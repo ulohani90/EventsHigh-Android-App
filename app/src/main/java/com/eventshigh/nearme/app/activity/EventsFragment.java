@@ -829,7 +829,7 @@ public class EventsFragment extends BaseEventsFragment {
                     if (showEditorPicks && EventsFragment.this.filteredEvents.size() > 13) {
                         addEditorPicks(EventsFragment.this.filteredEvents.subList(5, 13));
                     }
-                    addSocialInvitationRequests();
+               //     addSocialInvitationRequests();
                     if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
 
                         ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
@@ -847,7 +847,7 @@ public class EventsFragment extends BaseEventsFragment {
                 }
             }
 
-            addSocialInvitationRequests();
+          //  addSocialInvitationRequests();
         }
     };
 

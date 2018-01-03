@@ -501,7 +501,21 @@ public class EventsGridActivity extends BaseContextActivity {
                     @Override
                     public void onClick(View v) {
                         ArrayList<EventDateTime> eventDateTimes = new ArrayList<>();
-                        if (attribute.getValue().equalsIgnoreCase("this_weekend")) {
+                        if (attribute.getValue().equalsIgnoreCase("today")) {
+                            //checkIfCustomDateSelected();
+                            EventDateTime eventDateTime = new EventDateTime(DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime(), -1);
+                            eventDateTimes.add(eventDateTime);
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, eventDateTimes);
+                            reportActionToAnalytics("filters", eventsContext.query + "-Today");
+
+                            //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        } else if (attribute.getValue().equalsIgnoreCase("tomorrow")) {
+                           // checkIfCustomDateSelected();
+                            EventDateTime eventDateTime = new EventDateTime(DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY, -1);
+                            eventDateTimes.add(eventDateTime);
+                            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, null, eventDateTimes);
+                            reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
+                        }else if (attribute.getValue().equalsIgnoreCase("this_weekend")) {
                             //  checkIfCustomDateSelected();
                             long[] dateTimes = DateTimeUtils.getWeekEndDates();
                             EventDateTime eventDateTime = new EventDateTime(dateTimes[0], dateTimes[1]);

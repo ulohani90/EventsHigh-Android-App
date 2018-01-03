@@ -411,7 +411,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
             }
             // Get the Place object from the buffer.
             final Place place = places.get(0);
-
+            
             Intent intent = new Intent();
             intent.putExtra("place_lat_lng", place.getLatLng());
             intent.putExtra("place_name", place.getName());

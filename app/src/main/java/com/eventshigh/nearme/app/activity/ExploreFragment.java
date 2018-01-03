@@ -253,17 +253,12 @@ public class ExploreFragment extends BaseEventsFragment {
             /*eventsAdapter.setExploreCategories(eventCollection, selectedLocalities,
                     eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
                             (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");*/
-
-            int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
-            eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(nyeEndDate)), (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
-
-            makeHotDealsRequest();
-
-
-            if (!isIntermediate) {
-               /* EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
-                        false, mEventInvitationsCallback, mErrorListener);*/
+            if (isAdded() && getActivity() != null) {
+                int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
+                eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(nyeEndDate)), (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
+                makeHotDealsRequest();
             }
+
         }
     };
 
@@ -275,46 +270,55 @@ public class ExploreFragment extends BaseEventsFragment {
         GetSponsoredEventsRequest.submit(activity, eventsContext.city.name().toLowerCase(), Priority.HIGH, this, false, new Listener<List<SponsoredEventObj>>() {
             @Override
             public void onResponse(List<SponsoredEventObj> sponsoredEventObjs, boolean isIntermediate) {
-                if (!isIntermediate) {
-                    if (sponsoredEventObjs.size() > 0)
-                        eventsAdapter.addSponsoredEvents(sponsoredEventObjs, width);
-                    topProgressBar.setVisibility(View.GONE);
+                if (isAdded() && getActivity() != null) {
+                    if (!isIntermediate) {
+                        if (sponsoredEventObjs.size() > 0)
+                            eventsAdapter.addSponsoredEvents(sponsoredEventObjs, width);
+                        topProgressBar.setVisibility(View.GONE);
+                    }
                 }
             }
         }, new ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                topProgressBar.setVisibility(View.GONE);
+                if (isAdded() && getActivity() != null) {
+                    topProgressBar.setVisibility(View.GONE);
+                }
             }
         });
     }
 
 
     public void makeHotDealsRequest() {
-
-        GetHotDealsRequest.submit(activity, eventsContext.city.name(), Request.Priority.HIGH, null, true, new Response.Listener<DealsObject>() {
-            @Override
-            public void onResponse(DealsObject dealsObject, boolean b) {
-                if (dealsObject != null) {
-                    if (dealsObject.getHelloBarDeals() != null && dealsObject.getHelloBarDeals().size() > 0)
-                        eventsAdapter.addDealsData(dealsObject.getHelloBarDeals().get(0));
+        if (eventsContext != null && eventsContext.city != null) {
+            GetHotDealsRequest.submit(activity, eventsContext.city.name(), Request.Priority.HIGH, null, true, new Response.Listener<DealsObject>() {
+                @Override
+                public void onResponse(DealsObject dealsObject, boolean b) {
+                    if (isAdded() && getActivity() != null) {
+                        if (dealsObject != null) {
+                            if (dealsObject.getHelloBarDeals() != null && dealsObject.getHelloBarDeals().size() > 0)
+                                eventsAdapter.addDealsData(dealsObject.getHelloBarDeals().get(0));
+                        }
+                        makeSponsoredEventsRequest();
+                    }
                 }
-                makeSponsoredEventsRequest();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                //topProgressBar.setVisibility(View.GONE);
-                makeSponsoredEventsRequest();
-            }
-        });
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    //topProgressBar.setVisibility(View.GONE);
+                    if (isAdded() && getActivity() != null) {
+                        makeSponsoredEventsRequest();
+                    }
+                }
+            });
+        }
 
     }
 
     private Listener<EventInvitationsRequest.InvitaionData> mEventInvitationsCallback = new Listener<EventInvitationsRequest.InvitaionData>() {
         @Override
         public void onResponse(EventInvitationsRequest.InvitaionData eventInvitations, boolean isIntermediate) {
-            if (isAdded()) {
+            if (isAdded() && getActivity() != null) {
                 topProgressBar.setVisibility(View.GONE);
                 activity.reportActionToAnalytics("showSocialInfo", "eventInvitations",
                         eventInvitations.invitations.size());
@@ -326,16 +330,18 @@ public class ExploreFragment extends BaseEventsFragment {
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
-            topProgressBar.setVisibility(View.GONE);
+            if (isAdded() && getActivity() != null) {
+                topProgressBar.setVisibility(View.GONE);
 
-            if (eventsAdapter.getItemCount() == 0) {
-                int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
-                eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(nyeEndDate)),(System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
+                if (eventsAdapter.getItemCount() == 0) {
+                    int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
+                    eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(nyeEndDate)), (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
                /* eventsAdapter.setExploreCategories(null,
                         Locality.getLocalities(eventsContext.city, false),
                         eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");*/
+                }
+                makeHotDealsRequest();
             }
-            makeHotDealsRequest();
         }
     };
 
