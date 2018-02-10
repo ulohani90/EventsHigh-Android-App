@@ -937,7 +937,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     public void sortData() {
         if (filteredEvents != null) {
             if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
-                Collections.sort(filteredEvents, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_UBER_SCORE));
+                Collections.sort(filteredEvents, new EventScoreComparator("this+weekend"));
                 arrangeEventsForSponsered();
             } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
                 Collections.sort(filteredEvents, new EventPriceComparator());

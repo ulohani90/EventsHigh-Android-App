@@ -121,6 +121,10 @@ public class EventsFragment extends BaseEventsFragment {
 
     public List<Event> filteredEvents;
 
+    public List<Event> carouselEvents;
+
+    public List<Event> editorPicksEvent;
+
 
     LinearLayout eventListContainer;
 
@@ -155,6 +159,8 @@ public class EventsFragment extends BaseEventsFragment {
     boolean shouldAddPadding;
 
     boolean isListContentShown;
+
+
 
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
@@ -344,13 +350,13 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
         }
         if (!isFilterApplied()) {
-            if (showHeaderCard && filteredEvents.size() > 5) {
-                addBrowseCarousel(filteredEvents.subList(0, 5));
+            if (showHeaderCard && carouselEvents != null && carouselEvents.size() > 0) {
+                addBrowseCarousel(carouselEvents);
             } else {
                 stopCarousel();
             }
-            if (showEditorPicks && filteredEvents.size() > 13)
-                addEditorPicks(filteredEvents.subList(5, 13));
+            if (showEditorPicks && editorPicksEvent != null && editorPicksEvent.size() > 0)
+                addEditorPicks(editorPicksEvent);
         }
 
         if (scrollToPos != -1) {
@@ -539,13 +545,13 @@ public class EventsFragment extends BaseEventsFragment {
 
                                         eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
                                         eventsAdapter.setBrowseHeader(filteredEvents.size());
-                                        if (showHeaderCard && filteredEvents.size() > 5) {
-                                            addBrowseCarousel(filteredEvents.subList(0, 5));
+                                        if (showHeaderCard && carouselEvents != null && carouselEvents.size() > 0) {
+                                            addBrowseCarousel(carouselEvents);
                                         } else {
                                             stopCarousel();
                                         }
-                                        if (showEditorPicks && filteredEvents.size() > 13) {
-                                            addEditorPicks(filteredEvents.subList(5, 13));
+                                        if (showEditorPicks && editorPicksEvent != null && editorPicksEvent.size() > 0) {
+                                            addEditorPicks(editorPicksEvent);
                                         }
 
 
@@ -557,11 +563,7 @@ public class EventsFragment extends BaseEventsFragment {
                     });
 
         } else {
-            showHeaderCard = true;
-            if (eventsContext.query.toLowerCase().equalsIgnoreCase(EventCategory.NIGHTLIFE.categoryName.toLowerCase()) ||
-                    eventsContext.query.toLowerCase().equalsIgnoreCase("new year parties")) {
-                showEditorPicks = true;
-            }
+
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
@@ -767,6 +769,8 @@ public class EventsFragment extends BaseEventsFragment {
                 }
 
                 if (!isIntermediate || !eventsCollection.events.isEmpty()) {
+                    showHeaderCard = eventsCollection.showCarousel;
+                    showEditorPicks = eventsCollection.showCarousel;
                     ((EventsGridActivity) getActivity()).filters = eventsCollection.filters;
                     ((EventsGridActivity) getActivity()).browseZones = eventsCollection.zones;
                     ((EventsGridActivity) getActivity()).localities = eventsCollection.localities;
@@ -782,6 +786,8 @@ public class EventsFragment extends BaseEventsFragment {
                     }
                     EventsFragment.this.eventsCollection = eventsCollection;
                     List<Event> filteredEvents = eventsCollection.events;
+
+
                     filteredEvents = filterEventsWithCategory(null, filteredEvents);
                     if (isTodaySelected) {
                         EventDateTime dateTime = new EventDateTime(DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime(), -1);
@@ -799,16 +805,22 @@ public class EventsFragment extends BaseEventsFragment {
                     filteredEvents = filterEventsWithLocality(filteredEvents, null);
 
                     EventsFragment.this.filteredEvents = filteredEvents;
-
-                    if (isNewYearQuery() || isOutdoorsQuery()) {
-                        sortEventsAsPerSpecialFilters(EventsFragment.this.filteredEvents);
-                    } else {
-                        if (EventsHighEndpoints.isNearMeQuery(eventsContext.query) && (new Account(getActivity()).getLastLocality() != null || activity.getUserLocation() != null)) {
-                            sortState = EventsGridActivity.SORT_STATE_DISTANCE;
-                        }
-
-                        sortData();
+                    if (showHeaderCard && filteredEvents.size() > 5) {
+                        carouselEvents = new ArrayList<>(filteredEvents.subList(0, 5));
+                        // carouselEvents = filteredEvents.subList(0,5);
                     }
+                    if (showEditorPicks && filteredEvents.size() > 13) {
+                        editorPicksEvent = new ArrayList<>(filteredEvents.subList(5, 13));
+                        //editorPicksEvent = filteredEvents.subList(5,13);
+                    }
+
+
+                    if (EventsHighEndpoints.isNearMeQuery(eventsContext.query) && (new Account(getActivity()).getLastLocality() != null || activity.getUserLocation() != null)) {
+                        sortState = EventsGridActivity.SORT_STATE_DISTANCE;
+                    }
+
+                    sortData();
+
 
                     if (EventsFragment.this.filteredEvents != null && EventsFragment.this.filteredEvents.size() > 0)
                         ((EventsGridActivity) getActivity()).addSpecialFilterGrid(EventsFragment.this.filteredEvents.get(0).attributes);
@@ -820,16 +832,16 @@ public class EventsFragment extends BaseEventsFragment {
                                 eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
                     }
 
-                    if (showHeaderCard && EventsFragment.this.filteredEvents.size() > 5) {
-                        addBrowseCarousel(EventsFragment.this.filteredEvents.subList(0, 5));
+                    if (showHeaderCard && carouselEvents != null && carouselEvents.size() > 0) {
+                        addBrowseCarousel(carouselEvents);
                     } else {
                         stopCarousel();
                     }
 
-                    if (showEditorPicks && EventsFragment.this.filteredEvents.size() > 13) {
-                        addEditorPicks(EventsFragment.this.filteredEvents.subList(5, 13));
+                    if (showEditorPicks && editorPicksEvent != null && editorPicksEvent.size() > 0) {
+                        addEditorPicks(editorPicksEvent);
                     }
-               //     addSocialInvitationRequests();
+                    //     addSocialInvitationRequests();
                     if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
 
                         ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
@@ -847,7 +859,7 @@ public class EventsFragment extends BaseEventsFragment {
                 }
             }
 
-          //  addSocialInvitationRequests();
+            //  addSocialInvitationRequests();
         }
     };
 
@@ -1390,13 +1402,13 @@ public class EventsFragment extends BaseEventsFragment {
             }
             if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
                 if (!isFilterApplied()) {
-                    if (showHeaderCard && filteredEvents.size() > 5) {
-                        addBrowseCarousel(filteredEvents.subList(0, 5));
+                    if (showHeaderCard && carouselEvents != null && carouselEvents.size() > 0) {
+                        addBrowseCarousel(carouselEvents);
                     } else {
                         stopCarousel();
                     }
-                    if (showEditorPicks && filteredEvents.size() > 13) {
-                        addEditorPicks(filteredEvents.subList(5, 13));
+                    if (showEditorPicks && editorPicksEvent != null && editorPicksEvent.size() > 0) {
+                        addEditorPicks(editorPicksEvent);
                     }
                 }
             }
@@ -1432,8 +1444,9 @@ public class EventsFragment extends BaseEventsFragment {
     public void sortData() {
         if (filteredEvents != null) {
             if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
-                Collections.sort(filteredEvents, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_UBER_SCORE));
-                arrangeEventsForSponsered();
+                filteredEvents = sortEventsAsPerSpecialFilters(filteredEvents);
+                // Collections.sort(filteredEvents, new EventScoreComparator(eventsContext.query.toLowerCase()));
+             //   arrangeEventsForSponsered();
             } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
                 Collections.sort(filteredEvents, new EventPriceComparator());
             } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
@@ -1475,6 +1488,14 @@ public class EventsFragment extends BaseEventsFragment {
         return false;
     }
 
+    /*public boolean isPartiesAndNightlifeQuery() {
+        if (eventsContext.query.equalsIgnoreCase("Parties And Nightlife")
+                || eventsContext.query.equalsIgnoreCase("Parties")) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isOutdoorsQuery() {
         if (eventsContext.query.equalsIgnoreCase("Outdoors") || eventsContext.query.equalsIgnoreCase("Outdoor")
                 || eventsContext.query.toLowerCase().contains("outdoors")
@@ -1482,21 +1503,13 @@ public class EventsFragment extends BaseEventsFragment {
             return true;
         }
         return false;
-    }
+    }*/
 
     public List<Event> sortEventsAsPerSpecialFilters(List<Event> events) {
-        if (isNewYearQuery()) {
-            if (filterSpecialFilters != null && filterSpecialFilters.size() > 0) {
-                Collections.sort(events, new EventSpecialFilterComparator(filterSpecialFilters, EventScoreComparator.SCORE_TYPE_NYE_UBER_SCORE));
-            } else {
-                Collections.sort(events, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_NYE_UBER_SCORE));
-            }
-        } else if (isOutdoorsQuery()) {
-            if (filterSpecialFilters != null && filterSpecialFilters.size() > 0) {
-                Collections.sort(events, new EventSpecialFilterComparator(filterSpecialFilters, EventScoreComparator.SCORE_TYPE_OUTDOOR_UBER_SCORE));
-            } else {
-                Collections.sort(events, new EventScoreComparator(EventScoreComparator.SCORE_TYPE_OUTDOOR_UBER_SCORE));
-            }
+        if (filterSpecialFilters != null && filterSpecialFilters.size() > 0) {
+            Collections.sort(events, new EventSpecialFilterComparator(filterSpecialFilters));
+        } else {
+            Collections.sort(events, new EventScoreComparator(eventsContext.query.toLowerCase()));
         }
 
         return events;
@@ -1592,12 +1605,8 @@ public class EventsFragment extends BaseEventsFragment {
                     break;
             }
             if (!isMapShown) {
-                if (isNewYearQuery() || isOutdoorsQuery()) {
-                    System.out.println("New Year Sorting");
-                    sortEventsAsPerSpecialFilters(filteredEvents);
-                } else {
-                    sortData();
-                }
+                sortData();
+
             }
             //eventsContext.query
             //filteredEvents = sortEventsAsPerSpecialFilters(filteredEvents);
@@ -1623,13 +1632,13 @@ public class EventsFragment extends BaseEventsFragment {
                                 eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
                     }
                     if (!isFilterApplied()) {
-                        if (showHeaderCard && filteredEvents.size() > 5) {
-                            addBrowseCarousel(filteredEvents.subList(0, 5));
+                        if (showHeaderCard && carouselEvents != null && carouselEvents.size() > 0) {
+                            addBrowseCarousel(carouselEvents);
                         } else {
                             stopCarousel();
                         }
-                        if (showEditorPicks && filteredEvents.size() > 13)
-                            addEditorPicks(filteredEvents.subList(5, 13));
+                        if (showEditorPicks && editorPicksEvent != null && editorPicksEvent.size() > 0)
+                            addEditorPicks(editorPicksEvent);
                     }
 
                 }

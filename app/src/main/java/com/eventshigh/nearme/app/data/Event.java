@@ -1185,6 +1185,11 @@ public class Event implements Parcelable {
 
         List<Event> allEvents = new ArrayList<>();
 
+
+        if (eventsJSON.has("upcoming_events")) {
+            JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
+            allEvents.addAll(fromJSON(upcomingEvents, filters, includeWithoutLocation, listener));
+        }
         if (eventsJSON.has("evergreen_events")) {
             JSONArray evergreenEvents = eventsJSON.getJSONArray("evergreen_events");
             if (eventsJSON.has("upcoming_events")) {
@@ -1192,10 +1197,6 @@ public class Event implements Parcelable {
             } else {
                 allEvents.addAll(fromJSON(evergreenEvents, filters, includeWithoutLocation, listener));
             }
-        }
-        if (eventsJSON.has("upcoming_events")) {
-            JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-            allEvents.addAll(fromJSON(upcomingEvents, filters, includeWithoutLocation, listener));
         }
         return allEvents;
     }

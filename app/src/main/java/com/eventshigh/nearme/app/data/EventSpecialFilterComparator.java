@@ -10,20 +10,15 @@ import java.util.Comparator;
 public class EventSpecialFilterComparator implements Comparator<Event> {
 
     ArrayList<String> filterNames;
-    int scoreType;
 
-    public EventSpecialFilterComparator(ArrayList<String> filterNames, int scoreType) {
+    public EventSpecialFilterComparator(ArrayList<String> filterNames) {
         this.filterNames = filterNames;
-        this.scoreType = scoreType;
+
     }
 
     @Override
     public int compare(Event lhs, Event rhs) {
-        if ((lhs.id.equalsIgnoreCase("abaf7c81b606893c45d841b9d5db9256") && rhs.id.equalsIgnoreCase("2ee5a40e210863775fa5fd64ab57f3fd"))
-                ||
-                (rhs.id.equalsIgnoreCase("abaf7c81b606893c45d841b9d5db9256") && lhs.id.equalsIgnoreCase("2ee5a40e210863775fa5fd64ab57f3fd"))) {
-            System.out.println("Stop Here");
-        }
+
         return Float.compare(getMaxUberScoreValue(rhs), getMaxUberScoreValue(lhs));
     }
 
