@@ -19,8 +19,8 @@
 
         <ImageView
             android:id="@+id/filter_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="5dp"
             android:scaleType="centerInside" />
@@ -30,7 +30,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-
             android:text="DJ"
             android:textColor="@color/filter_tag_color_selector"
             android:textSize="14sp" />

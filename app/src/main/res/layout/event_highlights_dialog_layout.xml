@@ -249,7 +249,35 @@
                         android:textSize="14sp"
                         android:visibility="invisible" />
                 </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/party_info_layout_5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone">
 
+                    <TextView
+                        android:id="@+id/party_info_textview_51"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Unlimited Aloholo Included :Yes"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <View
+                        android:layout_width="12dp"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:id="@+id/party_info_textview_52"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+
+                        android:textSize="14sp"
+                        android:visibility="invisible" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout

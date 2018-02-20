@@ -926,7 +926,9 @@ public class EventInfoFragment extends Fragment {
                 || checkIfKeyHasValue("is_unlimited_alcohol", configMap)
                 || checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_stags_allowed", configMap)
                 || checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_parking_available", configMap)
-                || checkIfKeyHasValue("is_group_discounts", configMap)) {
+                || checkIfKeyHasValue("is_group_discounts", configMap)
+                || checkIfKeyHasValue("is_live_dhol", configMap)
+                || checkIfKeyHasValue("is_rain_dance", configMap)) {
             LinearLayout partyLayout = (LinearLayout) view.findViewById(R.id.party_info_layout);
             partyLayout.setVisibility(View.VISIBLE);
             if (view.findViewById(R.id.highlights_layout).isShown())
@@ -1054,6 +1056,36 @@ public class EventInfoFragment extends Fragment {
                         ((value.equalsIgnoreCase("No") ||
                                 value.equalsIgnoreCase("false")) ? "No" : value);
                 addPartyVenue(partyLayoutCount, childCount, view, "Group Discounts", finalValue, "party_info_layout_", "party_info_textview_");
+            }
+            if (checkIfKeyHasValue("is_live_dhol", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_live_dhol")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : value);
+
+                addPartyVenue(partyLayoutCount, childCount,view, "Live Dhol", finalValue, "party_info_layout_", "party_info_textview_");
+            }
+            if (checkIfKeyHasValue("is_rain_dance", configMap)) {
+                if (childCount == 2) {
+                    partyLayoutCount += 1;
+                    childCount = 1;
+                } else {
+                    childCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_rain_dance")).get("value");
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : value);
+
+                addPartyVenue(partyLayoutCount, childCount,view, "Rain Dance", finalValue, "party_info_layout_", "party_info_textview_");
             }
 
         } else {

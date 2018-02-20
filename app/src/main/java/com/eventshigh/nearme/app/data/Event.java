@@ -72,7 +72,9 @@ public class Event implements Parcelable {
     public final float outdoorUberScore;
     public final float nyeUberScore;
 
-    public final List<Long> eventTimings;    // each start time is stored as milliseconds since epoch.
+    public final List<Long> eventTimings;// each start time is stored as milliseconds since epoch.
+
+    public final long eventEndDateTime;
 
     @Nullable
     public final LatLng location;
@@ -173,7 +175,7 @@ public class Event implements Parcelable {
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
                  @Nullable String bookingUrl, @Nullable String bookingText,
                  int numViews, int numSaves, boolean ehRecommended,
-                 float uberScore, List<Long> eventTimings,
+                 float uberScore, List<Long> eventTimings,long eventEndDateTime,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
                  @Nullable String address, boolean isCleanVenue,
                  List<String> performers,
@@ -205,6 +207,7 @@ public class Event implements Parcelable {
         this.uberScore = uberScore;
 
         this.eventTimings = eventTimings;
+        this.eventEndDateTime =eventEndDateTime;
 
         this.location = location != null ? location : null;
         this.venue = Utils.checkIfUnknown(venue);
@@ -285,6 +288,7 @@ public class Event implements Parcelable {
 
         this.eventTimings = new ArrayList<>();
         in.readList(eventTimings, Long.class.getClassLoader());
+        this.eventEndDateTime = in.readLong();
         LatLng sLocation = (LatLng) in.readParcelable(LatLng.class.getClassLoader());
         this.location = sLocation != null ? sLocation : null;
         this.venue = Utils.checkIfUnknown(in.readString());
@@ -368,6 +372,7 @@ public class Event implements Parcelable {
         dest.writeInt(ehRecommended ? 1 : 0);
         dest.writeFloat(uberScore);
         dest.writeList(eventTimings);
+        dest.writeLong(eventEndDateTime);
         dest.writeParcelable(location == null ? new LatLng(0, 0) : location, flags);
         dest.writeString(emptyIfNull(venue));
         dest.writeString(emptyIfNull(locality));
@@ -678,6 +683,14 @@ public class Event implements Parcelable {
                 eventTimings.add(eventTiming.getTime());
             }
 
+            long eventEndDateTime = 0 ;
+            if(eventJson.has("end_date") && eventJson.has("end_time")) {
+                Date eventEndDate = DateTimeUtils.mergeDateTime(eventJson.optString("end_date"),
+                        eventJson.optString("end_time"), (timeZone != null) ? TimeZone.getTimeZone(timeZone) : TimeZone.getTimeZone(DEFAULT_TIME_ZONE));
+                if (eventEndDate != null) {
+                    eventEndDateTime = eventEndDate.getTime();
+                }
+            }
             JSONArray upcoming_occurrences = eventJson.optJSONArray("upcoming_occurrences");
             if (upcoming_occurrences != null) {
                 for (int i = 0; i < upcoming_occurrences.length(); i++) {
@@ -1083,7 +1096,7 @@ public class Event implements Parcelable {
                     uberScore,
 
                     eventTimings,
-
+                    eventEndDateTime,
                     new LatLng(lat, lon),
                     venue,
                     locality,

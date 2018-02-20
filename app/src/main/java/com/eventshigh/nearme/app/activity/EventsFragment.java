@@ -1515,6 +1515,7 @@ public class EventsFragment extends BaseEventsFragment {
         return events;
     }
 
+
     public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, DisplayZoneObject zone, String specialFilter, boolean showTicketedEvents, ArrayList<String> localities, ArrayList<EventDateTime> times) {
 
         if (isMapListShown) {

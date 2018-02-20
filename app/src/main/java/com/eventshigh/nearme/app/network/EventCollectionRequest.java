@@ -187,7 +187,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         final List<String> dateFilters = readFacetsArray(eventsJson.optJSONObject("facets"), "dates");
 
-        final boolean showCarousel = eventsJson.optBoolean("show_carousel");
+        final boolean showCarousel = eventsJson.optBoolean("editor_picks_enabled");
 
         if (listener != null) {
             Event.parseUpcomingEvents(eventsJson, filters, includeWithoutLocation, new Event.OnPartialDataLoadingComplete() {
@@ -281,6 +281,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         for (Iterator<Event> it = events.iterator(); it.hasNext(); ) {
             Event event = it.next();
             boolean isPastEvent;
+
             if (event.eventTimings == null || event.eventTimings.size() == 0) {
                 isPastEvent = false;
             } else {

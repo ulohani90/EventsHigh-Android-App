@@ -24,13 +24,13 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
 
 
-    ImageView whatsHot, nearBy, newYearImage;
+    ImageView whatsHot, nearBy, holiImage;
 
-    FrameLayout newYearLayout;
+    FrameLayout holiLayout;
 
     LinearLayout whatsHotlayout;
 
-    FrameLayout xmasLayout;
+
 
     public static ExploreCategoriesHeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.explore_categories_header_card, parent, false);
@@ -41,10 +41,10 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         super(itemView);
         whatsHot = (ImageView) itemView.findViewById(R.id.whats_hot);
         nearBy = (ImageView) itemView.findViewById(R.id.nearby);
-        newYearImage = (ImageView) itemView.findViewById(R.id.new_year_img);
-        newYearLayout = (FrameLayout) itemView.findViewById(R.id.new_year_layout);
+        holiImage = (ImageView) itemView.findViewById(R.id.holi_img);
+        holiLayout = (FrameLayout) itemView.findViewById(R.id.holi_layout);
         whatsHotlayout = (LinearLayout) itemView.findViewById(R.id.whats_hot_layout);
-        xmasLayout = (FrameLayout) itemView.findViewById(R.id.xmas_layout);
+
     }
 
     public void bindData(final BaseContextActivity activity, boolean showNewYearCard, boolean showChristmasTab, int width) {
@@ -56,40 +56,23 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         });
         Drawable drawable = activity.getDrawable(R.drawable.nye_poster);
         int height = (drawable.getIntrinsicHeight() * width) / drawable.getIntrinsicWidth();
-        newYearLayout.getLayoutParams().width = width;
-        newYearLayout.getLayoutParams().height = height;
+        holiLayout.getLayoutParams().width = width;
+        holiLayout.getLayoutParams().height = height;
 
         if (!showNewYearCard) {
-            newYearLayout.setVisibility(View.GONE);
-            newYearImage.setVisibility(View.GONE);
+            holiLayout.setVisibility(View.GONE);
+            holiImage.setVisibility(View.GONE);
         } else {
-            newYearLayout.setVisibility(View.VISIBLE);
-            newYearImage.setVisibility(View.VISIBLE);
-            newYearImage.setOnClickListener(new View.OnClickListener() {
+            holiLayout.setVisibility(View.VISIBLE);
+            holiImage.setVisibility(View.VISIBLE);
+            holiImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView("New Year Parties");
-                    //  forceCrash(v);
+                    activity.showSearchView("holi");
+
                 }
             });
         }
-
-        if (showChristmasTab) {
-            whatsHotlayout.setVisibility(View.GONE);
-            xmasLayout.setVisibility(View.VISIBLE);
-
-        } else {
-            whatsHotlayout.setVisibility(View.VISIBLE);
-            xmasLayout.setVisibility(View.GONE);
-        }
-
-        xmasLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                activity.showSearchView("Christmas");
-            }
-        });
-
 
         nearBy.setOnClickListener(new View.OnClickListener() {
             @Override

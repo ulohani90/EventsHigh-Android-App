@@ -37,7 +37,9 @@ import com.eventshigh.nearme.app.view.ContactListView;
 
 import org.w3c.dom.Text;
 
+import java.util.Date;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class EventCard extends ViewHolder {
     private final boolean shouldAdjustImageHeight;
@@ -46,8 +48,10 @@ public class EventCard extends ViewHolder {
     private final TextView titleView;
     private final ImageView favouriteView;
     //private final TextView eventTimeView;
-    private final TextView eventDay;
+
     private final TextView eventDate;
+    private final TextView eventEndDate;
+    private final TextView eventEndTimeText;
     private final TextView eventTimeText;
     private final LinearLayout eventTimeLayout;
     private final View eventTimeSeparator;
@@ -72,6 +76,8 @@ public class EventCard extends ViewHolder {
     private final FrameLayout offerMessageLayout;
     private final TextView offerMessageText;
     private final View offerPointerArrow;
+    private final View eventTimeToSeparator ;
+    private final View moreDates;
 
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
@@ -99,9 +105,11 @@ public class EventCard extends ViewHolder {
         titleView = (TextView) cardView.findViewById(R.id.event_title);
         favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
         // eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
-        eventDay = (TextView) cardView.findViewById(R.id.event_day);
+
         eventDate = (TextView) cardView.findViewById(R.id.event_date);
         eventTimeText = (TextView) cardView.findViewById(R.id.event_time);
+        eventEndDate = (TextView)cardView.findViewById(R.id.event_end_date);
+        eventEndTimeText = (TextView)cardView.findViewById(R.id.event_end_time);
         eventTimeLayout = (LinearLayout) cardView.findViewById(R.id.event_time_layout);
         eventTimeSeparator = cardView.findViewById(R.id.event_time_separator);
         priceView = (TextView) cardView.findViewById(R.id.event_price);
@@ -124,6 +132,8 @@ public class EventCard extends ViewHolder {
         offerMessageLayout = (FrameLayout) cardView.findViewById(R.id.offer_message_layout);
         offerMessageText = (TextView) cardView.findViewById(R.id.offer_message_text);
         offerPointerArrow = cardView.findViewById(R.id.offer_pointer_arrow);
+        eventTimeToSeparator = cardView.findViewById(R.id.event_time_to_separator);
+        moreDates = cardView.findViewById(R.id.more_dates);
     }
 
 
@@ -316,9 +326,23 @@ public class EventCard extends ViewHolder {
             eventTimeLayout.setVisibility(View.VISIBLE);
             eventTimeSeparator.setVisibility(View.VISIBLE);
             //eventTimeView.setVisibility(View.VISIBLE);
-            eventDay.setText(eventTime.day.toUpperCase());
+
             eventDate.setText(eventTime.date);
             eventTimeText.setText(eventTime.time);
+
+            EventTime eventEndTime = DateTimeUtils.dateToEventTime(new Date(event.eventEndDateTime),
+                    TimeZone.getTimeZone(event.timezone != null ? event.timezone : Event.DEFAULT_TIME_ZONE), event.eventEndDateTime);
+            if(eventEndTime != null){
+                eventEndTimeText.setVisibility(View.VISIBLE);
+                eventEndDate.setVisibility(View.VISIBLE);
+                eventTimeToSeparator.setVisibility(View.VISIBLE);
+                eventEndDate.setText(eventEndTime.date);
+                eventEndTimeText.setText(eventEndTime.time);
+            }else{
+                eventEndTimeText.setVisibility(View.GONE);
+                eventEndDate.setVisibility(View.GONE);
+                eventTimeToSeparator.setVisibility(View.GONE);
+            }
             /*if (lastEventTime == null) {
 
                 eventTimeView.setText(eventTime.toString());
@@ -327,6 +351,11 @@ public class EventCard extends ViewHolder {
                 dateString.setSpan(new StyleSpan(Typeface.BOLD), eventTime.toString().length(), eventTime.toString().length() + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 eventTimeView.setText(dateString);
             }*/
+            if(event.eventTimings.size() > 1){
+                moreDates.setVisibility(View.VISIBLE);
+            }else{
+                moreDates.setVisibility(View.GONE);
+            }
 
         }
         if (event.venue != null) {
