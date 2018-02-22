@@ -32,8 +32,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 383
-        versionName "3.8.3"
+        versionCode 384
+        versionName "3.8.4"
         resConfigs "en"
     }
     signingConfigs {
