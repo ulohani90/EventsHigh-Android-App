@@ -119,7 +119,8 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     @Override
     public void onResume() {
         super.onResume();
-        mGoogleApiClient.connect();
+        if (mGoogleApiClient != null)
+            mGoogleApiClient.connect();
     }
 
 

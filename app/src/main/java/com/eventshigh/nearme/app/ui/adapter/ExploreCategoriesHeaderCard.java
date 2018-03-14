@@ -24,9 +24,9 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
 
 
-    ImageView whatsHot, nearBy, holiImage;
+    ImageView whatsHot, nearBy, summerCampImage;
 
-    FrameLayout holiLayout;
+    FrameLayout summerCampLayout;
 
     LinearLayout whatsHotlayout;
 
@@ -41,34 +41,34 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         super(itemView);
         whatsHot = (ImageView) itemView.findViewById(R.id.whats_hot);
         nearBy = (ImageView) itemView.findViewById(R.id.nearby);
-        holiImage = (ImageView) itemView.findViewById(R.id.holi_img);
-        holiLayout = (FrameLayout) itemView.findViewById(R.id.holi_layout);
+        summerCampImage = (ImageView) itemView.findViewById(R.id.holi_img);
+        summerCampLayout = (FrameLayout) itemView.findViewById(R.id.holi_layout);
         whatsHotlayout = (LinearLayout) itemView.findViewById(R.id.whats_hot_layout);
 
     }
 
-    public void bindData(final BaseContextActivity activity, boolean showNewYearCard, boolean showChristmasTab, int width) {
+    public void bindData(final BaseContextActivity activity, boolean showSummerCampCard, boolean showChristmasTab, int width) {
         whatsHot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 activity.showSearchView(EventsHighEndpoints.QUERY_FEATURED);
             }
         });
-        Drawable drawable = activity.getDrawable(R.drawable.nye_poster);
+        Drawable drawable = activity.getDrawable(R.drawable.ic_summer_camp);
         int height = (drawable.getIntrinsicHeight() * width) / drawable.getIntrinsicWidth();
-        holiLayout.getLayoutParams().width = width;
-        holiLayout.getLayoutParams().height = height;
+        summerCampLayout.getLayoutParams().width = width;
+        summerCampLayout.getLayoutParams().height = height;
 
-        if (!showNewYearCard) {
-            holiLayout.setVisibility(View.GONE);
-            holiImage.setVisibility(View.GONE);
+        if (!showSummerCampCard) {
+            summerCampLayout.setVisibility(View.GONE);
+            summerCampImage.setVisibility(View.GONE);
         } else {
-            holiLayout.setVisibility(View.VISIBLE);
-            holiImage.setVisibility(View.VISIBLE);
-            holiImage.setOnClickListener(new View.OnClickListener() {
+            summerCampLayout.setVisibility(View.VISIBLE);
+            summerCampImage.setVisibility(View.VISIBLE);
+            summerCampImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView("holi");
+                    activity.showSearchView("summer camp");
 
                 }
             });

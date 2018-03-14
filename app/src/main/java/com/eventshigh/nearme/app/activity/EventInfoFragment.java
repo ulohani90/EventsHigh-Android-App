@@ -865,7 +865,8 @@ public class EventInfoFragment extends Fragment {
         //  view.findViewById(R.id.header).getLayoutParams().height = 0;
         view.findViewById(R.id.close).setVisibility(View.INVISIBLE);
 
-        if (checkIfKeyHasValue("special_highlights", configMap) || checkIfKeyHasValue("artists_performing", configMap)) {
+        if (checkIfKeyHasValue("special_highlights", configMap) || checkIfKeyHasValue("artists_performing", configMap)
+        || checkIfKeyHasValue("activities_type", configMap)) {
             view.findViewById(R.id.highlights_layout).setVisibility(View.VISIBLE);
             view.findViewById(R.id.highlights_border).setVisibility(View.VISIBLE);
             if (checkIfKeyHasValue("special_highlights", configMap)) {
@@ -884,6 +885,24 @@ public class EventInfoFragment extends Fragment {
                     TextView textView = (TextView) highlightView.findViewById(R.id.textview_text);
                     textView.setText("\u2022 " + value[i].trim());
                     rowsMade += 1;
+                    highlightsContainer.addView(highlightView);
+                }
+            }else if(checkIfKeyHasValue("activities_type", configMap)){
+
+                LinearLayout highlightsContainer = (LinearLayout) view.findViewById(R.id.highlights_container);
+                highlightsContainer.setVisibility(View.VISIBLE);
+                view.findViewById(R.id.highlights_title).setVisibility(View.VISIBLE);
+                String[] value;
+                if (((LinkedTreeMap<String, Object>) configMap.get("activities_type")).get("value") instanceof String) {
+                    value = ((String) ((LinkedTreeMap<String, Object>) configMap.get("activities_type")).get("value")).split(",");
+                } else {
+                    value = (String[]) ((ArrayList) ((LinkedTreeMap<String, Object>) configMap.get("activities_type")).get("value")).toArray();
+                }
+                for (int i = 0; i < value.length; i++) {
+                    View highlightView = getLayoutInflater().inflate(R.layout.textview_layout, highlightsContainer, false);
+                    TextView textView = (TextView) highlightView.findViewById(R.id.textview_text);
+                    rowsMade += 1;
+                    textView.setText("\u2022 " + value[i].trim());
                     highlightsContainer.addView(highlightView);
                 }
             } else {
@@ -1493,6 +1512,75 @@ public class EventInfoFragment extends Fragment {
             view.findViewById(R.id.stay_info_layout).setVisibility(View.GONE);
             view.findViewById(R.id.kids_border).setVisibility(View.GONE);
         }
+
+        if(checkIfKeyHasValue("is_transport_available",configMap) || checkIfKeyHasValue("min_age",configMap)
+                || checkIfKeyHasValue("max_age",configMap)){
+            view.findViewById(R.id.summer_camp_info_layout).setVisibility(View.VISIBLE);
+            if ((view.findViewById(R.id.stay_info_layout)).isShown())
+                view.findViewById(R.id.stay_border).setVisibility(View.VISIBLE);
+            else
+                view.findViewById(R.id.stay_border).setVisibility(View.GONE);
+
+            int summerCampLayoutCount = 1;
+            int summerCampChildCount = 0;
+            if (checkIfKeyHasValue("min_age", configMap)) {
+                if (summerCampChildCount == 0) {
+                    rowsMade += 1;
+                    summerCampChildCount += 1;
+                } else if (summerCampChildCount == 2) {
+                    summerCampLayoutCount += 1;
+                    summerCampChildCount = 1;
+                    rowsMade += 1;
+                } else {
+                    summerCampChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("min_age")).get("value") +" yrs";
+
+                addPartyVenue(summerCampLayoutCount, summerCampChildCount,view, "Min Age", value, "summer_camp_info_layout_", "summer_camp_info_textview_");
+            }
+
+            if (checkIfKeyHasValue("max_age", configMap)) {
+                if (summerCampChildCount == 2) {
+                    summerCampLayoutCount += 1;
+                    summerCampChildCount = 1;
+                    rowsMade += 1;
+                } else {
+                    summerCampChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("max_age")).get("value") +" yrs";
+
+
+                addPartyVenue(summerCampLayoutCount, summerCampChildCount,view, "Max Age", value, "summer_camp_info_layout_", "summer_camp_info_textview_");
+            }
+
+            if (checkIfKeyHasValue("is_transport_available",  configMap)) {
+                if (summerCampChildCount == 0) {
+                    rowsMade += 1;
+                    summerCampChildCount += 1;
+                } else if (summerCampChildCount == 2) {
+                    summerCampLayoutCount += 1;
+                    summerCampChildCount = 1;
+                    rowsMade += 1;
+                } else {
+                    summerCampChildCount += 1;
+                }
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("is_transport_available")).get("value");
+
+                String finalValue = (value.equalsIgnoreCase("Yes") ||
+                        value.equalsIgnoreCase("true")) ? "Yes" :
+                        ((value.equalsIgnoreCase("No") ||
+                                value.equalsIgnoreCase("false")) ? "No" : value);
+
+                addPartyVenue(summerCampLayoutCount, summerCampChildCount,view, "Transportation Available", finalValue, "summer_camp_info_layout_", "summer_camp_info_textview_");
+            }
+
+        }else{
+            view.findViewById(R.id.summer_camp_info_layout).setVisibility(View.GONE);
+            view.findViewById(R.id.stay_border).setVisibility(View.GONE);
+        }
+
+
+
         return rowsMade;
     }
 

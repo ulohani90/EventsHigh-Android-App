@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 public class EventCard extends ViewHolder {
-    private final boolean shouldAdjustImageHeight;
+    private final boolean shouldAdjustImageHeight ;
     private final ImageView bgView;
     private final ImageView recommendedView;
     private final TextView titleView;

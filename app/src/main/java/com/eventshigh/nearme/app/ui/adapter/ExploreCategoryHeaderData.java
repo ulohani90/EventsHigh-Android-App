@@ -11,15 +11,15 @@ public class ExploreCategoryHeaderData implements AdapterData {
 
     BaseContextActivity activity;
 
-    boolean showNewYearImage;
+    boolean showSummerCampImage;
 
     boolean showChristmasTab;
 
     int width;
 
-    public ExploreCategoryHeaderData(BaseContextActivity activity, boolean showNewYearImage, boolean showChristmasTab, int width) {
+    public ExploreCategoryHeaderData(BaseContextActivity activity, boolean showSummerCampImage, boolean showChristmasTab, int width) {
         this.activity = activity;
-        this.showNewYearImage = showNewYearImage;
+        this.showSummerCampImage = showSummerCampImage;
         this.showChristmasTab = showChristmasTab;
         this.width = width;
     }
@@ -31,7 +31,7 @@ public class ExploreCategoryHeaderData implements AdapterData {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder card, int position) {
-        ((ExploreCategoriesHeaderCard) card).bindData(activity, showNewYearImage, showChristmasTab, width);
+        ((ExploreCategoriesHeaderCard) card).bindData(activity, showSummerCampImage, showChristmasTab, width);
     }
 
     @Override

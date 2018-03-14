@@ -61,7 +61,7 @@
             android:layout_height="match_parent"
             android:foreground="?android:attr/selectableItemBackground"
             android:scaleType="centerCrop"
-            android:src="@drawable/holi_poster" />
+            android:src="@drawable/ic_summer_camp" />
 
         <View
             android:layout_width="match_parent"
@@ -71,15 +71,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
+            android:layout_gravity="center"
             android:background="@drawable/green_rectangle_bg"
             android:fontFamily="sans-serif-medium"
-            android:layout_marginBottom="16dp"
+
             android:padding="12dp"
-            android:text="HOLI PARTIES AROUND YOU"
+            android:text="SUMMER CAMPS FOR KIDS"
             android:letterSpacing="0.2"
             android:textColor="#E9E012"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
     </FrameLayout>
 
     <TextView

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
+import android.os.Build;
 import android.util.Log;
 
 import com.android.volley.Request.Method;
@@ -198,7 +199,11 @@ public class UpdateAccountInfoService extends IntentService {
 
     private static synchronized void run(Context context, boolean skipTimeCheck, Intent intent) {
         if (skipTimeCheck || last_sync_ts + INTERVAL_SYNC < System.currentTimeMillis()) {
-            context.startService(intent);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent);
+            }else{
+                context.startService(intent);
+            }
             last_sync_ts = System.currentTimeMillis();
         }
     }

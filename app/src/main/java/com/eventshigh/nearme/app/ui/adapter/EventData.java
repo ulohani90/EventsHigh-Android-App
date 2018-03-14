@@ -12,6 +12,7 @@ public class EventData implements AdapterData {
     private BaseContextActivity activity;
     private final SocialDataProvider socialDataProvider;
 
+
     public EventData(String header, Event event, boolean isFirstEvent,
                      BaseContextActivity activity, SocialDataProvider socialDataProvider) {
         this.header = header;
