@@ -1,6 +1,8 @@
 package com.eventshigh.nearme.app.broadcast;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +10,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Build;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.android.volley.Request.Method;
@@ -51,6 +54,29 @@ public class UpdateAccountInfoService extends IntentService {
 
     private static final long INTERVAL_SYNC = TimeUnit.HOURS.toMillis(1);
     private static long last_sync_ts = 0;
+    private static int FOREGROUND_ID=1338;
+
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(FOREGROUND_ID, buildForegroundNotification());
+        }
+    }
+
+    private Notification buildForegroundNotification() {
+        NotificationCompat.Builder b=new NotificationCompat.Builder(this);
+
+        b.setOngoing(true)
+                .setContentTitle("Updating")
+                .setContentText("")
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setTicker("Events High");
+
+        return(b.build());
+    }
 
     public static void run(Context context, boolean skipTimeCheck) {
         run(context, skipTimeCheck, new Intent(context, UpdateAccountInfoService.class));

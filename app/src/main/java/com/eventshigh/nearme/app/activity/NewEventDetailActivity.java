@@ -336,7 +336,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
     public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
         for (MovieUserReviewObject obj : reviews) {
             if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().email)
-                    && obj.getReviewedEntityId().equalsIgnoreCase(event.id + "")) {
+                    && obj.getReviewedEntityId() != null && obj.getReviewedEntityId().equalsIgnoreCase(event.id + "")) {
                 event.reviewObjects.add(0, obj);
                 isMyReviewWritten = true;
                 break;
@@ -1001,6 +1001,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 isKeyAdded = true;
                 LinearLayout highlightsContainer = (LinearLayout) configLayout.findViewById(R.id.highlights_container);
                 highlightsContainer.setVisibility(View.VISIBLE);
+                ((TextView)configLayout.findViewById(R.id.highlights_title)).setText("Highlights");
                 configLayout.findViewById(R.id.highlights_title).setVisibility(View.VISIBLE);
                 String[] value;
                 if (((LinkedTreeMap<String, Object>) configMap.get("special_highlights")).get("value") instanceof String) {
@@ -1014,10 +1015,11 @@ public class NewEventDetailActivity extends BaseContextActivity {
                     textView.setText("\u2022 " + value[i].trim());
                     highlightsContainer.addView(highlightView);
                 }
-            }else if(checkIfKeyHasValue("activities_type", configMap)){
+            } else if (checkIfKeyHasValue("activities_type", configMap)) {
                 isKeyAdded = true;
                 LinearLayout highlightsContainer = (LinearLayout) configLayout.findViewById(R.id.highlights_container);
                 highlightsContainer.setVisibility(View.VISIBLE);
+                ((TextView)configLayout.findViewById(R.id.highlights_title)).setText("Activities Include");
                 configLayout.findViewById(R.id.highlights_title).setVisibility(View.VISIBLE);
                 String[] value;
                 if (((LinkedTreeMap<String, Object>) configMap.get("activities_type")).get("value") instanceof String) {
@@ -1072,8 +1074,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 || checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_stags_allowed", configMap)
                 || checkIfParentChildKeyHasValue("is_parties_and_nightlife", "is_parking_available", configMap)
                 || checkIfKeyHasValue("is_group_discounts", configMap)
-                || checkIfKeyHasValue("is_live_dhol",configMap)
-                || checkIfKeyHasValue("is_rain_dance",configMap)) {
+                || checkIfKeyHasValue("is_live_dhol", configMap)
+                || checkIfKeyHasValue("is_rain_dance", configMap)) {
             LinearLayout partyLayout = (LinearLayout) configLayout.findViewById(R.id.party_info_layout);
             partyLayout.setVisibility(View.VISIBLE);
             if ((configLayout.findViewById(R.id.highlights_layout)).isShown()) {
@@ -1601,8 +1603,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
             configLayout.findViewById(R.id.stay_info_layout).setVisibility(View.GONE);
             configLayout.findViewById(R.id.kids_border).setVisibility(View.GONE);
         }
-        if(checkIfKeyHasValue("is_transport_available",configMap) || checkIfKeyHasValue("min_age",configMap)
-                || checkIfKeyHasValue("max_age",configMap)){
+        if (checkIfKeyHasValue("is_transport_available", configMap) || checkIfKeyHasValue("min_age", configMap)
+                || checkIfKeyHasValue("max_age", configMap)) {
             configLayout.findViewById(R.id.summer_camp_info_layout).setVisibility(View.VISIBLE);
             if ((configLayout.findViewById(R.id.stay_info_layout)).isShown())
                 configLayout.findViewById(R.id.stay_border).setVisibility(View.VISIBLE);
@@ -1618,7 +1620,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 } else {
                     summerCampChildCount += 1;
                 }
-                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("min_age")).get("value") +" yrs";
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("min_age")).get("value") + " yrs";
 
                 isKeyAdded = true;
                 addPartyVenue(summerCampLayoutCount, summerCampChildCount, "Min Age", value, "summer_camp_info_layout_", "summer_camp_info_textview_");
@@ -1631,13 +1633,13 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 } else {
                     summerCampChildCount += 1;
                 }
-                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("max_age")).get("value") +" yrs";
+                String value = (String) ((LinkedTreeMap<String, Object>) configMap.get("max_age")).get("value") + " yrs";
 
                 isKeyAdded = true;
                 addPartyVenue(summerCampLayoutCount, summerCampChildCount, "Max Age", value, "summer_camp_info_layout_", "summer_camp_info_textview_");
             }
 
-            if (checkIfKeyHasValue("is_transport_available",  configMap)) {
+            if (checkIfKeyHasValue("is_transport_available", configMap)) {
                 if (summerCampChildCount == 2) {
                     summerCampLayoutCount += 1;
                     summerCampChildCount = 1;
@@ -1654,7 +1656,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 addPartyVenue(summerCampLayoutCount, summerCampChildCount, "Transportation Available", finalValue, "summer_camp_info_layout_", "summer_camp_info_textview_");
             }
 
-        }else{
+        } else {
             configLayout.findViewById(R.id.summer_camp_info_layout).setVisibility(View.GONE);
             configLayout.findViewById(R.id.stay_border).setVisibility(View.GONE);
         }

@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
  */
 
 public class EventsHighEndpoints {
-    public static final String WEB_URI_BASE = "https://www.eventshigh.com/";
-    public static final String API_URI_BASE = "https://api.eventshigh.com/";
+    public static final String WEB_URI_BASE = "http://www.eventshigh.com/";
+    public static final String API_URI_BASE = "http://api.eventshigh.com/";
     public static final String GATEWAY_URI_BASE = "https://ticketing.eventshigh.com/";
 
     private static final String API_ENDPOINT_DATE_FORMAT =

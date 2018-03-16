@@ -100,7 +100,7 @@ public class BrowseCarouselCard extends ViewHolder {
             } else {
                 currentPage += 1;
             }
-            System.out.println("Change Page to::" + currentPage);
+          //  System.out.println("Change Page to::" + currentPage);
 
             cardBrowseCarousel.setCurrentItem(currentPage, true);
 

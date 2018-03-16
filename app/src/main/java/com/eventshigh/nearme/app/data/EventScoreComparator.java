@@ -26,10 +26,10 @@ public class EventScoreComparator implements Comparator<Event> {
 
     public Float getUberScore(Event event) {
         if (event.nyeUberScoresMap != null && event.nyeUberScoresMap.containsKey(filterName)) {
-            System.out.println("Filter name " + filterName + " Filter Score " + event.nyeUberScoresMap.get(filterName));
+           // System.out.println("Filter name " + filterName + " Filter Score " + event.nyeUberScoresMap.get(filterName));
             return event.nyeUberScoresMap.get(filterName);
         }
-        System.out.println("Filter name " + filterName + " Uber Score " + event.uberScore);
+        //System.out.println("Filter name " + filterName + " Uber Score " + event.uberScore);
         return event.uberScore;
 
     }

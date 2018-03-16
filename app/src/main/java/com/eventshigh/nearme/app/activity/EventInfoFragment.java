@@ -870,6 +870,7 @@ public class EventInfoFragment extends Fragment {
             view.findViewById(R.id.highlights_layout).setVisibility(View.VISIBLE);
             view.findViewById(R.id.highlights_border).setVisibility(View.VISIBLE);
             if (checkIfKeyHasValue("special_highlights", configMap)) {
+                ((TextView)view.findViewById(R.id.highlights_title)).setText("Highlights");
                 LinearLayout highlightsContainer = (LinearLayout) view.findViewById(R.id.highlights_container);
                 highlightsContainer.setVisibility(View.VISIBLE);
                 view.findViewById(R.id.highlights_title).setVisibility(View.VISIBLE);
@@ -888,7 +889,7 @@ public class EventInfoFragment extends Fragment {
                     highlightsContainer.addView(highlightView);
                 }
             }else if(checkIfKeyHasValue("activities_type", configMap)){
-
+                ((TextView)view.findViewById(R.id.highlights_title)).setText("Activities Include");
                 LinearLayout highlightsContainer = (LinearLayout) view.findViewById(R.id.highlights_container);
                 highlightsContainer.setVisibility(View.VISIBLE);
                 view.findViewById(R.id.highlights_title).setVisibility(View.VISIBLE);
