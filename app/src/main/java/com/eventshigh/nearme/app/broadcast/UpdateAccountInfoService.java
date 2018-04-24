@@ -2,14 +2,18 @@ package com.eventshigh.nearme.app.broadcast;
 
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -62,14 +66,15 @@ public class UpdateAccountInfoService extends IntentService {
     public void onCreate() {
         super.onCreate();
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(FOREGROUND_ID, buildForegroundNotification());
+            startForeground(FOREGROUND_ID, buildForegroundNotification(createNotificationChannel()));
         }
     }
 
-    private Notification buildForegroundNotification() {
+    private Notification buildForegroundNotification(String channelId) {
         NotificationCompat.Builder b=new NotificationCompat.Builder(this);
 
         b.setOngoing(true)
+                .setChannelId(channelId)
                 .setContentTitle("Updating")
                 .setContentText("")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
@@ -345,5 +350,18 @@ public class UpdateAccountInfoService extends IntentService {
                 .buildUpon()
                 .appendPath("mobileapp")
                 .appendPath(path);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private String createNotificationChannel(){
+        String channelId = "eh_app_update_account_service";
+        String channelName = "My Background Service";
+        NotificationChannel chan = new NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.createNotificationChannel(chan);
+        return channelId;
     }
 }

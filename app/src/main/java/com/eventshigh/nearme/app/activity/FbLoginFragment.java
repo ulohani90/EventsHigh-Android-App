@@ -388,8 +388,10 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mGoogleApiClient.stopAutoManage(getActivity());
-        mGoogleApiClient.disconnect();
+        if(mGoogleApiClient != null) {
+            mGoogleApiClient.stopAutoManage(getActivity());
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override

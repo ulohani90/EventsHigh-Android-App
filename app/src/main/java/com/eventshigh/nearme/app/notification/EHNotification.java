@@ -2,14 +2,18 @@ package com.eventshigh.nearme.app.notification;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.RingtoneManager;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.format.DateUtils;
@@ -126,11 +130,21 @@ public class EHNotification {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         GAHelper.getInstance(context).reportActionToAnalytics("background", "notificationShown",
                 title);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("notify_001",
+                    "Events High",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
         notificationManager.notify(notificationId, createNotification(bitmap));
         Preferences.getInstance(context).setIsNotificationActive(true);
         if (wakefulIntent != null)
             WakefulBroadcastReceiver.completeWakefulIntent(wakefulIntent);
     }
+
+
 
     @SuppressLint("InlinedApi")
     private Notification createNotification(@Nullable Bitmap bitmap){
@@ -145,7 +159,7 @@ public class EHNotification {
         Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notify_001")
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
                 .setContentText(message)
@@ -156,6 +170,8 @@ public class EHNotification {
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setLargeIcon(largeIcon)
                 .setContentIntent(launchIntent).setDeleteIntent(pendingIntent);
+
+
 
         if (!Preferences.getInstance(context).isNotificationActive()) {
             builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
@@ -172,6 +188,19 @@ public class EHNotification {
         }
 
         return builder.build();
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private String createNotificationChannel(){
+        String channelId = "eh_app_notification_service";
+        String channelName = "Eh app notification service";
+        NotificationChannel chan = new NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(Color.RED);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.createNotificationChannel(chan);
+        return channelId;
     }
 
 

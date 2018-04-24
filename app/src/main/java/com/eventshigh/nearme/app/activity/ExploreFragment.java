@@ -358,7 +358,6 @@ public class ExploreFragment extends BaseEventsFragment {
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                    RecyclerView.State state) {
 
-
             if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.EVENT_PAGER.typeId
                     || parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.EXPLORE_CATEGORY_HEADER.typeId) {
                 outRect.top = 0;
@@ -377,12 +376,12 @@ public class ExploreFragment extends BaseEventsFragment {
                 outRect.right = space;
             } else {
                 outRect.top = space;
-                if (parent.getChildAdapterPosition(view) % 2 == 0) {
+                if (parent.getChildAdapterPosition(view) % 2 != 0) {
                     outRect.right = space;
-                    outRect.left = space / 2;
+                    outRect.left = space/2;
                 } else {
                     outRect.left = space;
-                    outRect.right = space / 2;
+                    outRect.right = space/2;
                 }
             }
 

@@ -56,7 +56,7 @@ public class EHGcmListenerService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage message) {
         gaHelper = GAHelper.getInstance(EHGcmListenerService.this);
-
+        System.out.println("Notification Received");
         Bundle bundle = new Bundle();
         for (Map.Entry<String, String> entry : message.getData().entrySet()) {
             bundle.putString(entry.getKey(), entry.getValue());
