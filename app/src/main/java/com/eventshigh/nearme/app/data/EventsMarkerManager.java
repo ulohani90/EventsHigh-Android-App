@@ -90,7 +90,7 @@ public class EventsMarkerManager {
                 } else {
                     eventMarkMap.put(event.id, mark);
                     if (EventMark.isFavourite(mark)) {
-                        AlarmUtils.setEventAlarm(context, event);
+                        //AlarmUtils.setEventAlarm(context, event);
                         if (!isNoChangePreference)
                             Preferences.getInstance(context).setIsFavUpdated(true);
                         new UserActionHelper(context).recordAction(

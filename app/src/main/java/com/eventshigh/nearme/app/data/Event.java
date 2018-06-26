@@ -812,7 +812,7 @@ public class Event implements Parcelable {
             }
 
             Collections.sort(ehPrices);
-
+            boolean pricesFoundInMashup = false;
             if (mashup != null && ehPrices.size() == 0) {
                 JSONObject priceInfo = mashup.optJSONObject("price_info");
                 if (priceInfo != null) {
@@ -835,6 +835,7 @@ public class Event implements Parcelable {
                         }
                     }
                     ehPriceName = priceInfo.optString("name", "");
+                    pricesFoundInMashup = true;
 
                 }
             } else {
@@ -959,7 +960,7 @@ public class Event implements Parcelable {
                 }
                 //  eventSubType = eventJson.optJSONObject("attributes").optString("event_sub_type");
                 //Add Event Prices
-                if (ehPrices.size() == 0 && eventJson.optJSONObject("attributes").has("pricing_info")) {
+                if (ehPrices.size() == 0 && !pricesFoundInMashup && eventJson.optJSONObject("attributes").has("pricing_info")) {
                     JSONObject pricingInfoObj = eventJson.optJSONObject("attributes").optJSONObject("pricing_info");
                     if (pricingInfoObj.has("discount_value") && pricingInfoObj.optDouble("discount_value") > 0.01) {
                         minPrice = pricingInfoObj.optDouble("discount_value");

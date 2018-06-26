@@ -10,6 +10,7 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.CityBannerObject;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFilterAttribute;
 import com.eventshigh.nearme.app.data.EventOccurenceComparator;
@@ -129,10 +130,34 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     }
 
-    public void setCarouselEvents(List<Event> events) {
+    public void setCarouselEvents(List<Event> events, String eventContextQuery) {
         Collections.shuffle(events);
-        dataToShow.add(0, new BrowseCarouselCardData(activity, events));
+        List<Event> finalEvents = shuffleEventsAsPerScore(events, eventContextQuery);
+        dataToShow.add(0, new BrowseCarouselCardData(activity, finalEvents));
         notifyDataSetChanged();
+    }
+
+    public List<Event> shuffleEventsAsPerScore(List<Event> events, String eventContextQuery) {
+        List<Event> eventForPriority = new ArrayList<>();
+        List<Event> unsortedEvents = new ArrayList<>();
+        for (int i = 0; i < events.size(); i++) {
+            Event event = events.get(i);
+            if(event.nyeUberScoresMap.containsKey(eventContextQuery)){
+                if(event.nyeUberScoresMap.get(eventContextQuery) > (200* 100000)){
+                    eventForPriority.add(event);
+                    continue;
+                }
+            }else if(event.uberScore > (200* 100000)){
+                eventForPriority.add(event);
+                continue;
+            }
+            unsortedEvents.add(event);
+        }
+        List<Event> finalList = new ArrayList<>();
+        finalList.addAll(eventForPriority);
+        Collections.shuffle(unsortedEvents);
+        finalList.addAll(unsortedEvents);
+        return finalList;
     }
 
 
@@ -277,7 +302,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags, boolean showSummerCampImage, boolean showChristmasTab, int width) {
+    public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags, int width) {
         dataToShow.clear();
         if (eventCollection != null) {
             //if (!eventCollection.events.isEmpty()) {
@@ -285,7 +310,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
                     eventCollection.events));
             //}
         }
-        dataToShow.add(new ExploreCategoryHeaderData(activity, showSummerCampImage, showChristmasTab, width));
+        dataToShow.add(new ExploreCategoryHeaderData(activity,  width));
 
         for (String tag : tags) {
             dataToShow.add(new NewExploreCategoryData(tag, activity, this));
@@ -465,6 +490,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
         dataToShow.add(new BrowseHeaderCardData(activity, "Sponsored Events"));
         dataToShow.add(new BrowseSponsoredEventsData(activity, events, width));
+        notifyDataSetChanged();
+    }
+
+    public void setBannerObject(CityBannerObject bannerObject, int width, String city){
+        dataToShow.add(1, new ExploreBannerData(activity, bannerObject, width, city));
         notifyDataSetChanged();
     }
 

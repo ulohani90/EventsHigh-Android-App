@@ -23,11 +23,13 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.CityBannerObject;
 import com.eventshigh.nearme.app.data.DealsObject;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.SponsoredEventObj;
+import com.eventshigh.nearme.app.network.CityBannerRequest;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
@@ -69,7 +71,7 @@ public class ExploreFragment extends BaseEventsFragment {
         return fragment;
     }
 
-    public static final String summerCampEndDate = "2018-06-01 00:00:00.0";
+
 
     public static final String holiEndDate = "2018-03-05 00:00:00.0";
 
@@ -257,9 +259,11 @@ public class ExploreFragment extends BaseEventsFragment {
                             (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");*/
             if (isAdded() && getActivity() != null) {
                 int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
-                eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(summerCampEndDate)), (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
-                makeHotDealsRequest();
+                eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS,  width);
+
+                makeCityBannerRequest();
             }
+
 
         }
     };
@@ -290,6 +294,30 @@ public class ExploreFragment extends BaseEventsFragment {
         });
     }
 
+    public void makeCityBannerRequest(){
+        final int width = getResources().getDisplayMetrics().widthPixels -
+                2 * ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
+
+        if (eventsContext != null && eventsContext.city != null) {
+            CityBannerRequest.submit(activity, eventsContext.city.name(), Request.Priority.HIGH, null, true, new Response.Listener<List<CityBannerObject>>() {
+
+                @Override
+                public void onResponse(List<CityBannerObject> cityBannerObjects, boolean b) {
+                    if(cityBannerObjects.size() > 0){
+                        eventsAdapter.setBannerObject(cityBannerObjects.get(0),width, eventsContext.city.name().toLowerCase());
+                    }
+                    makeHotDealsRequest();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    if (isAdded() && getActivity() != null) {
+                        makeHotDealsRequest();
+                    }
+                }
+            });
+        }
+    }
 
     public void makeHotDealsRequest() {
         if (eventsContext != null && eventsContext.city != null) {
@@ -337,12 +365,12 @@ public class ExploreFragment extends BaseEventsFragment {
 
                 if (eventsAdapter.getItemCount() == 0) {
                     int width = (activity.getResources().getDisplayMetrics().widthPixels - (2 * (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, activity.getResources().getDisplayMetrics())));
-                    eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(summerCampEndDate)), (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(christmasEndDate)), width);
+                    eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS, width);
                /* eventsAdapter.setExploreCategories(null,
                         Locality.getLocalities(eventsContext.city, false),
                         eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");*/
                 }
-                makeHotDealsRequest();
+                makeCityBannerRequest();
             }
         }
     };
@@ -370,6 +398,11 @@ public class ExploreFragment extends BaseEventsFragment {
                 outRect.left = 0;
                 outRect.right = 0;
             } else if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.HELLOBAR_DEAL_CARD.typeId) {
+                outRect.top = space;
+                outRect.bottom = 0;
+                outRect.left = space;
+                outRect.right = space;
+            }else if(parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(view)) == DataType.EXPLORE_BANNER_CARD.typeId){
                 outRect.top = space;
                 outRect.bottom = 0;
                 outRect.left = space;

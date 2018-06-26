@@ -294,7 +294,7 @@ public abstract class BaseContextActivity extends BaseActivity {
     }
 
     public void showEventDetails(String eventId, @Nullable String label, @Nullable Bundle bundle) {
-        reportActionToAnalytics("showSponsoredEventDetails", label);
+        reportActionToAnalytics("showEventDetails", label);
         Crashlytics.setString("Event_id", eventId);
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
         detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE.name(), eventId));

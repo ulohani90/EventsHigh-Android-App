@@ -32,9 +32,10 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 389
-        versionName "3.8.9"
+        versionCode 392
+        versionName "3.9.2"
         resConfigs "en"
+        multiDexEnabled true
     }
     signingConfigs {
         debug {
@@ -66,7 +67,8 @@ dependencies {
 
     compile 'com.google.android.gms:play-services-plus:15.0.0'
     compile 'com.google.android.gms:play-services-auth:15.0.0'
-    compile 'com.google.firebase:firebase-messaging:15.0.0'
+    compile 'com.google.firebase:firebase-messaging:15.0.2'
+
 
     compile 'com.android.support:appcompat-v7:27.1.1'
     compile 'com.android.support:support-v4:27.1.1'

@@ -24,9 +24,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
 
 
-    ImageView whatsHot, nearBy, summerCampImage;
-
-    FrameLayout summerCampLayout;
+    ImageView whatsHot, nearBy;
 
     LinearLayout whatsHotlayout;
 
@@ -41,38 +39,16 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         super(itemView);
         whatsHot = (ImageView) itemView.findViewById(R.id.whats_hot);
         nearBy = (ImageView) itemView.findViewById(R.id.nearby);
-        summerCampImage = (ImageView) itemView.findViewById(R.id.holi_img);
-        summerCampLayout = (FrameLayout) itemView.findViewById(R.id.holi_layout);
         whatsHotlayout = (LinearLayout) itemView.findViewById(R.id.whats_hot_layout);
-
     }
 
-    public void bindData(final BaseContextActivity activity, boolean showSummerCampCard, boolean showChristmasTab, int width) {
+    public void bindData(final BaseContextActivity activity,  int width) {
         whatsHot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 activity.showSearchView(EventsHighEndpoints.QUERY_FEATURED);
             }
         });
-        Drawable drawable = activity.getDrawable(R.drawable.ic_summer_camp);
-        int height = (drawable.getIntrinsicHeight() * width) / drawable.getIntrinsicWidth();
-        summerCampLayout.getLayoutParams().width = width;
-        summerCampLayout.getLayoutParams().height = height;
-
-        if (!showSummerCampCard) {
-            summerCampLayout.setVisibility(View.GONE);
-            summerCampImage.setVisibility(View.GONE);
-        } else {
-            summerCampLayout.setVisibility(View.VISIBLE);
-            summerCampImage.setVisibility(View.VISIBLE);
-            summerCampImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.showSearchView("summer camp");
-
-                }
-            });
-        }
 
         nearBy.setOnClickListener(new View.OnClickListener() {
             @Override

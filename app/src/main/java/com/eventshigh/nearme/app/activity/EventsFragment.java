@@ -1429,7 +1429,7 @@ public class EventsFragment extends BaseEventsFragment {
             activity.timer.cancel();
             activity.timer = null;
         }
-        eventsAdapter.setCarouselEvents(events);
+        eventsAdapter.setCarouselEvents(events, eventsContext.query.toLowerCase());
 
     }
 

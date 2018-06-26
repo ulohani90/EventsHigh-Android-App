@@ -45,7 +45,8 @@ public enum DataType {
     BROWSE_HEADER_CARD(34),
     BROWSE_SPONSORED_EVENTS(35),
     HELLOBAR_DEAL_CARD(36),
-    HOT_DEALS_CARD(37);
+    HOT_DEALS_CARD(37),
+    EXPLORE_BANNER_CARD(38);
 
     public final int typeId;
 
@@ -65,7 +66,8 @@ public enum DataType {
                 || typeId == BROWSE_HEADER_CARD.typeId || typeId == BROWSE_SPONSORED_EVENTS.typeId
                 || typeId == EH_INVITE_NOTIFICATION.typeId
                 || typeId == HELLOBAR_DEAL_CARD.typeId
-                || typeId == HOT_DEALS_CARD.typeId;
+                || typeId == HOT_DEALS_CARD.typeId
+                || typeId == EXPLORE_BANNER_CARD.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -181,6 +183,9 @@ public enum DataType {
         }
         if (typeId == HOT_DEALS_CARD.typeId) {
             return HotDealsCard.newInstance(activity, parent);
+        }
+        if(typeId == EXPLORE_BANNER_CARD.typeId){
+            return ExploreBannerCard.newInstance(activity,parent);
         }
         throw new IllegalArgumentException("invalid typeid");
     }
